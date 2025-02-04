@@ -38,9 +38,9 @@ jobs:
       - name: run document generator script
         run: |
           bash devops/bin/gen_doc.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: hmc-doc-artifact
+          name: powervc-doc-artifact
           path: ./docs/build
 
   deploy-doc:
@@ -48,7 +48,7 @@ jobs:
     needs: gen-doc
     environment:
       name: github-pages
-      url: https://${{env.GITHUB_REPOSITORY_OWNER}}.github.io/ansible-power-hmc
+      url: https://${{env.GITHUB_REPOSITORY_OWNER}}.github.io/ansible-powervc
     permissions:
       id-token: write
       pages: write
@@ -56,7 +56,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: hmc-doc-artifact
+          name: powervc-doc-artifact
           path: .
       - uses: actions/configure-pages@v4
         with:
