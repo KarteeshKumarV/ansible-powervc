@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: manage_vm
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: For Managing the VM.
 description:
   - This playbook helps in performing the Manage operations on the VM provided.

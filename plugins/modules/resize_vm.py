@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: resize_vm
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Resizes the VM based on the compute templates parameter.
 description:
   - This playbook helps in performing the Resize operations on the VM based on the compute templates parameter.
@@ -43,6 +45,7 @@ EXAMPLES = '''
             auth: "{{ auth }}"
             vm_name: "VM_NAME"
             template_type: "TEMPLATE_TYPE"
+            validate_certs: no
          register: result
        - debug:
             var: result

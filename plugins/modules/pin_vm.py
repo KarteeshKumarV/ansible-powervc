@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: pin_vm
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: To perform Pin VM operations.
 description:
   - This playbook helps in performing the Pin operations on the VM provided.
@@ -41,6 +43,7 @@ EXAMPLES = '''
             auth: "{{ auth }}"
             name: "NAME"
             pin_type: "PIN_TYPE"
+            validate_certs: no
          register: result
        - debug:
             var: result

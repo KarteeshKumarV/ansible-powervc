@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: volume_attach
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Attach the Volume to the VM.
 description:
   - This playbook helps in performing the Volume attach operations on the VM provided.

@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: snapshot_vm
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Takes the Snapshot of VM's All/Boot/Specific volumes.
 description:
   - This playbook helps in performing the Snapshot operations on the VM based on the inputs: volume type and volume name.

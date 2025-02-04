@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: server
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Create/Delete the Virtual Machines from PowerVC.
 description:
   - This playbook helps in performing the Create and Delete VM operations.
@@ -102,6 +104,7 @@ EXAMPLES = '''
           flavor: "FLAVOR_NAME"
           volume_name: ["VOLUME_1","VOLUME_2"]
           state: present
+          validate_certs: no
         register: result
       - name: Disply server info
         debug: var=result

@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: scg_operations
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Create, Delete, Update the SCG Details.
 description:
   - This playbook helps in performing the Create, Delete and Update operations for the Storage Connectivity Groups.
@@ -47,6 +49,7 @@ EXAMPLES = '''
             auth: "{{ auth }}"
             state: "absent"
             name: "NAME"
+            validate_certs: no
          register: result
        - debug:
             var: result
