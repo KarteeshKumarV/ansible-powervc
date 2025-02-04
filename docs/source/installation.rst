@@ -55,14 +55,20 @@ Auth information can be passed either in a config file or directly in the playbo
    Add the auth related information or credentials in the /etc/openstack/clouds.yaml. Example shown below:
 
    cat /etc/openstack/clouds.yml
+   
    clouds:
      mycloud:
        auth:
          auth_url: https://<IP_ADDRESS_OF_POWERVC>>:5000/v3/
+		 
          username: USERNAME
+		 
          password: PASSWORD
+		 
          project_name: PROJECT_NAME
+		 
          project_domain_name: PROJECT_DOMAIN_NAME
+		 
          user_domain_name: USER_DOMAIN_NAME
 
 Note: Auth information is driven by openstacksdk, which means that values can come from a yaml config file in /etc/ansible/openstack.yaml, /etc/openstack/clouds.yaml or ~/.config/openstack/clouds.yaml, then from standard environment variables, then finally by explicit parameters in plays. More information can be found at https://docs.openstack.org/openstacksdk/
