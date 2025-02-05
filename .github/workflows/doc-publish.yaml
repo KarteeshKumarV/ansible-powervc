@@ -63,10 +63,10 @@ jobs:
           # User need to set this secret on github actions
           token: ${{ secrets.TOKEN_PAM }}
           enablement: true
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v1
         with:
           path: .
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v3
         with:
           token: ${{ secrets.TOKEN_PAM }}
