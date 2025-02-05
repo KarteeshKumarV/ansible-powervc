@@ -54,7 +54,7 @@ jobs:
       pages: write
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: powervc-doc-artifact
           path: .
@@ -63,10 +63,10 @@ jobs:
           # User need to set this secret on github actions
           token: ${{ secrets.TOKEN_PAM }}
           enablement: true
-      - uses: actions/upload-pages-artifact@v1
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: .
       - id: deployment
-        uses: actions/deploy-pages@v3
+        uses: actions/deploy-pages@v4
         with:
           token: ${{ secrets.TOKEN_PAM }}

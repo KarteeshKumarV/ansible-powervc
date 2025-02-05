@@ -15,7 +15,6 @@ trap 'err_report "$BASH_COMMAND" $? $LINENO' ERR
 
 DIR="$(pwd)"
 MODULE_DIR="$DIR/plugins/modules"
-INV_PLUGIN_DIR="$DIR/plugins/inventory"
 ROLE_DIR="$DIR/roles"
 ROLE_LIST=`ls -1 $ROLE_DIR`
 DOC_SRC_DIR="$DIR/docs/source"
@@ -27,7 +26,6 @@ DOC_BLD_DIR="$DIR/docs/build"
 
 
 ansible-doc-extractor "$DOC_SRC_DIR"/modules "$MODULE_DIR"/*.py
-ansible-doc-extractor "$DOC_SRC_DIR"/plugins "$INV_PLUGIN_DIR"/*.py
 
 
 # create the html files

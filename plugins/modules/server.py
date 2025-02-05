@@ -319,7 +319,7 @@ class ServerOpsModule(OpenStackModule):
                     template_id = image_vol_template[0]['template_id']
                 flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id)
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
-		availability_zone = ":" + availability_zone
+                availability_zone = ":" + availability_zone
                 vm_data = {"server": {
                 "name": vm_name,
                 "imageRef": imageRef,
@@ -348,5 +348,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
