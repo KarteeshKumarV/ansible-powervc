@@ -15,8 +15,6 @@ trap 'err_report "$BASH_COMMAND" $? $LINENO' ERR
 
 DIR="$(pwd)"
 MODULE_DIR="$DIR/plugins/modules"
-ROLE_DIR="$DIR/roles"
-ROLE_LIST=`ls -1 $ROLE_DIR`
 DOC_SRC_DIR="$DIR/docs/source"
 DOC_BLD_DIR="$DIR/docs/build"
 
