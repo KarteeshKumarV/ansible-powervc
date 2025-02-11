@@ -32,7 +32,7 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
 def get_collocation_rules_id(mod, connectn, authtoken, tenant_id, collocation_rule_name):
     service_name = "compute"
     endpoint_compute = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
-    rule_url = f"{endpoint_compute}/os-server-groups"    
+    rule_url = f"{endpoint_compute}/os-server-groups"
     headers_scg = get_headers(authtoken)
     responce = requests.get(rule_url, headers=headers_scg, verify=False)
     collocation_id = None
@@ -62,9 +62,9 @@ def server_flavor(mod, connectn, authtoken, tenant_id, flavor_id, image_id, voli
     specsvmurl = f"{flavor_url}/os-extra_specs"
     responce = requests.get(specsvmurl, headers=headers_scg,  verify=False)
     flavor_specs = responce.json()
-    image_temp_id = "powervm:image_volume_type_" + volid
-    flavor_specs['extra_specs'][image_temp_id] = template_id
-    print("Finals ",flavor_specs, flavor_details)
+    if volid:
+        image_temp_id = "powervm:image_volume_type_" + volid
+        flavor_specs['extra_specs'][image_temp_id] = template_id
     flavor_data={
             **flavor_details,  # Merge flavor_details
             **flavor_specs # Include flavor_data as "extra_specs"
