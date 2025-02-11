@@ -31,7 +31,7 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
 def snapshot_vm(module, snapshotvm_url, authtoken, post_data):
     """
     Performs Snapshot VM operation on the volume_list passed.
-    """      
+    """
     input_data_options = [
         "snapshot_name",
         "description",
@@ -54,7 +54,7 @@ def snapshot_vm(module, snapshotvm_url, authtoken, post_data):
 def get_volumeids_bytype(mod, connectn, endpoint, authtoken, tenant_id, vm_id, volume_type):
     """
     Gets the Volume Ids (Boot/Data/Specific) in the form of list
-    """    
+    """
     headers_scg = get_headers(authtoken)
     volume_url = f"{endpoint}/servers/{vm_id}"
     responce = requests.get(volume_url, headers=headers_scg, verify=False)
@@ -64,7 +64,7 @@ def get_volumeids_bytype(mod, connectn, endpoint, authtoken, tenant_id, vm_id, v
     data_vol = []
     for i in volume_ids:
         service_name = "volume"
-        endpoint = get_endpoint_url_by_service_name(connectn, service_name, tenant_id)
+        endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
         vol_url = f"{endpoint}/volumes/{i}"
         responce = requests.get(vol_url, headers=headers_scg, verify=False)
         vol_details = responce.json()
@@ -86,15 +86,16 @@ def get_volumeids_byname(mod, connectn, endpoint, authtoken, tenant_id, volume_n
 def snapshot_ops(mod, connectn, authtoken, tenant_id, vm_id, snapshot_name, snapshot_description, volume):
     service_name = "compute"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
-    if volume["name"] and volume["type"] == "Specific":
-        volume_list = get_volumeids_byname(mod, connectn, endpoint, authtoken, tenant_id,  volume["name"])
+    if volume["type"] == "Specific":
+        if volume["name"]:
+            volume_list = get_volumeids_byname(mod, connectn, endpoint, authtoken, tenant_id,  volume["name"])
     elif volume["type"] in ["All","Boot"]:
         volume_list = get_volumeids_bytype(mod, connectn, endpoint, authtoken, tenant_id, vm_id, volume["type"])
     else:
          mod.fail_json(
                  msg=f"Pass Volume details as type: All or Boot or Specific, Pass Volume name only if type is specific",
             changed=False,
-        )        
+        )
     post_data = {"vm-snapshot":{"name":snapshot_name,"description":snapshot_description,"volumes":volume_list}}
     snapshotvm_url = f"{endpoint}/servers/{vm_id}/action"
     result = snapshot_vm(mod, snapshotvm_url, authtoken, post_data)
