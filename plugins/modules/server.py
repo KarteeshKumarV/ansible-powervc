@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: server
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Create/Delete the Virtual Machines from PowerVC.
 description:
   - This playbook helps in performing the Create and Delete VM operations.
@@ -57,7 +59,7 @@ options:
          Referenced by volume_id and template_id.
      type: list
      elements: raw
-     default: []     
+     default: []
   volume_name:
      description:
        - A list of volumes that are to be attached to the VM
@@ -102,6 +104,7 @@ EXAMPLES = '''
           flavor: "FLAVOR_NAME"
           volume_name: ["VOLUME_1","VOLUME_2"]
           state: present
+          validate_certs: no
         register: result
       - name: Disply server info
         debug: var=result
@@ -204,7 +207,7 @@ class ServerOpsModule(OpenStackModule):
                 network_id = self.conn.network.find_network(
                     net['network_name'], ignore_missing=False).id
                 net = copy.deepcopy(net)
-                del net['net-name']
+                del net['network_name']
                 net['uuid'] = network_id
                 nics.append(net)
             elif net.get('fixed_ip'):
@@ -289,8 +292,11 @@ class ServerOpsModule(OpenStackModule):
             flavor_id = self.conn.compute.find_flavor(flavor, ignore_missing=False).id
             imageRef = self.conn.compute.find_image(image, ignore_missing=False).id
             nics=self._parse_nics()
-            base64_encoded = base64.b64encode(user_data.encode('utf-8'))
-            userdata = base64_encoded.decode('utf-8')
+            if user_data:
+                base64_encoded = base64.b64encode(user_data.encode('utf-8'))
+                userdata = base64_encoded.decode('utf-8')
+            else:
+                userdata = None
             if not volume_id:
                 vol_id = []
                 for name in volume_name:
@@ -311,12 +317,16 @@ class ServerOpsModule(OpenStackModule):
                     index += 1
                 vol_dict = {"block_device_mapping_v2": vol_list}
             if state == "present":
+                volid = None  # Initialize with None
+                template_id = None  # Initialize with None
                 if image_vol_template:
-                    volid = image_vol_template[0]['volume_id']
-                    template_id = image_vol_template[0]['template_id']
+                    volid = image_vol_template[0].get('volume_id',None)
+                    template_id = image_vol_template[0].get('template_id',None)
                 flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id)
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
-		availability_zone = ":" + availability_zone
+                if availability_zone:
+                    availability_zone = ":" + availability_zone
+                #print("The Availability zone is", availability_zones)
                 vm_data = {"server": {
                 "name": vm_name,
                 "imageRef": imageRef,
@@ -345,5 +355,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

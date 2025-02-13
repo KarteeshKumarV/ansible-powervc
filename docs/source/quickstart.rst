@@ -11,7 +11,7 @@ can access the collection and the ansible-doc covered in the following topics:
 .. _installation:
    installation.html
 
-ibm.power_hmc
+ibm.powervc
 --------------
 
 After the collection is installed, you can access the collection content for a

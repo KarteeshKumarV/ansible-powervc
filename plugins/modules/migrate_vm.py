@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: migrate_vm
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: For Migrating the VM.
 description:
   - This playbook helps in performing the Migrate operations on the VM provided.
@@ -41,7 +43,7 @@ EXAMPLES = '''
          ibm.powervc.migate_vm:
             auth: "{{ auth }}"
             name: "NAME"
-	    host: "HOST"
+            host: "HOST"
             validate_certs: no
          register: result
        - debug:

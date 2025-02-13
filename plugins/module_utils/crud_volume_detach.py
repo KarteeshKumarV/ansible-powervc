@@ -47,6 +47,6 @@ def volume_ops(mod, connectn, authtoken, tenant_id, vm_id, volume_list):
     service_name = "compute"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
     volume_url = f"{endpoint}/servers/{vm_id}/os-volume_attachments"
-    result = volume_vm(mod, volume_url, authtoken, volume_list, volume_name)
+    result = volume_vm(mod, volume_url, authtoken, volume_list)
     return result
 

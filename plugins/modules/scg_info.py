@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: scg_info
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: To Fetch the SCG Details.
 description:
   - This playbook helps in performing the Get operations for the Storage Connectivity Groups.
@@ -40,6 +42,7 @@ EXAMPLES = '''
        - name: Get All the SCG Details
          ibm.powervc.scg_info:
             auth: "{{ auth }}"
+            validate_certs: no
          register: result
        - debug:
             var: result
@@ -51,6 +54,7 @@ EXAMPLES = '''
        - name: Get All the SCG Details
          ibm.powervc.scg_info:
             cloud: "CLOUD_NAME"
+            validate_certs: no
          register: result
        - debug:
             var: result
@@ -71,6 +75,7 @@ EXAMPLES = '''
          powervc.cloud.scg_info:
             auth: "{{ auth }}"
             scg_name: "SCG_NAME"
+            validate_certs: no
          register: result
        - debug:
             var: result

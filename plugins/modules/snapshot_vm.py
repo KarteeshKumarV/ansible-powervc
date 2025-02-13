@@ -2,13 +2,15 @@
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
-                    'status': ['testing'],
+                    'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
 
 DOCUMENTATION = '''
 ---
 module: snapshot_vm
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Takes the Snapshot of VM's All/Boot/Specific volumes.
 description:
   - This playbook helps in performing the Snapshot operations on the VM based on the inputs: volume type and volume name.
@@ -23,7 +25,7 @@ options:
       - Name of the Volume type: All/Specific/Boot
       - Provide the Volume name if volume type is Specific
     required: true
-    type: dict    
+    type: dict
   snapshot_name:
     description:
       - Name of the Snapshot
@@ -118,24 +120,29 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_snapshot import s
 
 class SnapshotVMModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(required=True),
+        name=dict(),
+        id=dict(),
         volume=dict(required=True,type='dict'),
         snapshot_name=dict(required=False),
         snapshot_description=dict(required=False),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ['name', 'id'],
+        ]
     )
 
     def run(self):
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
         vm_name = self.params['name']
+        vm_id = self.params['id']
         snapshot_name = self.params['snapshot_name']
         snapshot_description = self.params['snapshot_description']
         volume = self.params['volume']
-        print("Volume Details",volume['type'],volume['name'])
-        vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
+        if vm_name:
+            vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         try:
                 res = snapshot_ops(self, self.conn, authtoken, tenant_id, vm_id, snapshot_name, snapshot_description, volume)
                 self.exit_json(changed=True, result=res)
