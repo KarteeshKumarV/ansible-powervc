@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 module: pin_vm
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: To perform Pin VM operations.
+short_description: Performs the Pin VM operations.
 description:
   - This playbook helps in performing the Pin operations on the VM provided.
 options:

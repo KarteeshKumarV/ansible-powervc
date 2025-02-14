@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 module: scg_info
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: To Fetch the SCG Details.
+short_description: Fetches the Storage Connectivity Group Details.
 description:
   - This playbook helps in performing the Get operations for the Storage Connectivity Groups.
 options:
