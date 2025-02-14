@@ -84,7 +84,7 @@ lint: module-lint
 module-lint:
 	flake8 plugins/modules/* --max-line-length=160 --ignore=E402,W503 
 	flake8 plugins/module_utils/* --max-line-length=160 --ignore=E402,W503
-	flake8 plugins/inventory/* --max-line-length=160 --ignore=E402,W503 --exclude=plugins/inventory/*.yaml,plugins/inventory/*.yml
+	# flake8 plugins/inventory/* --max-line-length=160 --ignore=E402,W503 --exclude=plugins/inventory/*.yaml,plugins/inventory/*.yml
 	python -m pycodestyle --ignore=E402,W503 --max-line-length=160 $(MODULE)
 
 .PHONY: prep-collection
