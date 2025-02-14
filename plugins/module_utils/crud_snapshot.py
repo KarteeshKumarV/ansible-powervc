@@ -95,14 +95,16 @@ def snapshot_ops(mod, connectn, authtoken, tenant_id, vm_id, snapshot_name, snap
     if volume["type"] == "Specific":
         if volume["name"]:
             volume_list = get_volumeids_byname(mod, connectn, endpoint, authtoken, tenant_id, volume["name"])
-    elif volume["type"] in ["All", "Boot"]:
+    elif volume["type"] in ["All","Boot"]:
         volume_list = get_volumeids_bytype(mod, connectn, endpoint, authtoken, tenant_id, vm_id, volume["type"])
     else:
         mod.fail_json(
             msg="Pass Volume details as type: All or Boot or Specific, Pass Volume name only if type is specific",
             changed=False,
         )
+
     post_data = {"vm-snapshot": {"name": snapshot_name, "description": snapshot_description, "volumes": volume_list}}
+
     snapshotvm_url = f"{endpoint}/servers/{vm_id}/action"
     result = snapshot_vm(mod, snapshotvm_url, authtoken, post_data)
     return result

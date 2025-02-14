@@ -294,6 +294,7 @@ class ServerOpsModule(OpenStackModule):
             flavor_id = self.conn.compute.find_flavor(flavor, ignore_missing=False).id
             imageRef = self.conn.compute.find_image(image, ignore_missing=False).id
             nics = self._parse_nics()
+
             if user_data:
                 base64_encoded = base64.b64encode(user_data.encode('utf-8'))
                 userdata = base64_encoded.decode('utf-8')
@@ -328,6 +329,7 @@ class ServerOpsModule(OpenStackModule):
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
                 if availability_zone:
                     availability_zone = ":" + availability_zone
+
                 vm_data = {"server": {
                            "name": vm_name,
                            "imageRef": imageRef,
