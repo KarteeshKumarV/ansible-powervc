@@ -47,7 +47,7 @@ Configure PowerVC Credentials to interact with Ansible
 
 IBM PowerVC Ansible modules have to be used remotely.
 
-These Modules will be installed on the remote machine from which will be connecting to the IBM PowerVC.
+These Modules have to be installed on the remote machine from which it will be connecting to the IBM PowerVC.
 
 
 Auth information can be passed either in a config file or directly in the playbook.
