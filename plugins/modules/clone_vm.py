@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.9','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -104,8 +104,9 @@ EXAMPLES = '''
 '''
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
-from ansible_collections.ibm.powervc.plugins.module_utils.crud_clone_vm import clone_vm_ops 
+from ansible_collections.ibm.powervc.plugins.module_utils.crud_clone_vm import clone_vm_ops
 import copy
+
 
 class CloneVMModule(OpenStackModule):
     argument_spec = dict(
@@ -113,7 +114,6 @@ class CloneVMModule(OpenStackModule):
         clonevm_name=dict(required=True),
         network=dict(),
         nics=dict(default=[], type='list', elements='raw'),
-        
     )
     module_kwargs = dict(
         supports_check_mode=True
@@ -135,8 +135,6 @@ class CloneVMModule(OpenStackModule):
             if not isinstance(net, dict):
                 self.fail_json(
                     msg="Each entry in the 'nics' parameter must be a dict.")
-            #if net.get('fixed_ip'):
-            #    nics.append(net)
             if net.get('net-id'):
                 nics.append(net)
             elif net.get('net-name'):
@@ -167,14 +165,15 @@ class CloneVMModule(OpenStackModule):
         tenant_id = self.conn.session.get_project_id()
         vm_name = self.params['vm_name']
         clonevm_name = self.params['clonevm_name']
-        nics=self._parse_nics()
+        nics = self._parse_nics()
         vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         try:
-            data = {"clone-vm":{"server":{"name":clonevm_name,"networks":nics,"availability_zone":"Default Group"}}}
+            data = {"clone-vm": {"server": {"name": clonevm_name, "networks": nics, "availability_zone": "Default Group"}}}
             res = clone_vm_ops(self, self.conn, authtoken, tenant_id, vm_id, data)
             self.exit_json(changed=False, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
+
 
 def main():
     module = CloneVMModule()
@@ -183,4 +182,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

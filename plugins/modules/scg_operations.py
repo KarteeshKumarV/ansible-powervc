@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -17,7 +17,7 @@ description:
 options:
   state:
     description:
-      - SCG Operation to be perfomed 
+      - SCG Operation to be perfomed
     choices: [absent, present]
     required: yes
     type: str
@@ -99,6 +99,7 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_scg import scg_ops
 
+
 class SCGOpsModule(OpenStackModule):
     argument_spec = dict(
         name=dict(required=False),
@@ -119,11 +120,11 @@ class SCGOpsModule(OpenStackModule):
         port_tag=dict(),
         include_untagged=dict(type='bool'),
         vios_redundancy=dict(type='bool'),
-        cluster_provider_name=dict(),        
+        cluster_provider_name=dict(),
     )
     module_kwargs = dict(
         supports_check_mode=True
-    )    
+    )
 
     def run(self):
         authtoken = self.conn.auth_token
@@ -145,29 +146,29 @@ class SCGOpsModule(OpenStackModule):
         fabric_set_req = self.params['fabric_set_req']
         fabric_set_npiv = self.params['fabric_set_npiv']
         port_tag = self.params['port_tag']
-        ports_per_fabric_npiv = self.params['ports_per_fabric_npiv']        
+        ports_per_fabric_npiv = self.params['ports_per_fabric_npiv']
         tenant_id = self.conn.session.get_project_id()
         try:
             data = {"storage_connectivity_group": {
-            "auto_add_vios": auto_add_vios,
-            "include_untagged": include_untagged,
-            "fc_storage_access": fc_storage_access,
-            "boot_connectivity": boot_connectivity,
-            "data_connectivity": data_connectivity,
-            "vios_ids": vios_ids,
-            "enabled": enabled,
-            "display_name": display_name,
-            "cluster_provider_name": cluster_provider_name,
-            "vios_redundancy": vios_redundancy,
-            "exact_redundancy": exact_redundancy,
-            "ports_per_fabric_npiv": ports_per_fabric_npiv,
-            "fabric_set_req": fabric_set_req,
-            "fabric_set_npiv": fabric_set_npiv,
-            "port_tag": port_tag }}
+                    "auto_add_vios": auto_add_vios,
+                    "include_untagged": include_untagged,
+                    "fc_storage_access": fc_storage_access,
+                    "boot_connectivity": boot_connectivity,
+                    "data_connectivity": data_connectivity,
+                    "vios_ids": vios_ids,
+                    "enabled": enabled,
+                    "display_name": display_name,
+                    "cluster_provider_name": cluster_provider_name,
+                    "vios_redundancy": vios_redundancy,
+                    "exact_redundancy": exact_redundancy,
+                    "ports_per_fabric_npiv": ports_per_fabric_npiv,
+                    "fabric_set_req": fabric_set_req,
+                    "fabric_set_npiv": fabric_set_npiv,
+                    "port_tag": port_tag}}
             res = scg_ops(self, self.conn, authtoken, state, action, tenant_id, name, scg_id, data)
             self.exit_json(changed=False, result=res)
         except Exception as e:
-            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)        
+            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
 
 
 def main():
@@ -177,4 +178,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

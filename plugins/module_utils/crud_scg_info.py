@@ -1,21 +1,22 @@
 #!/usr/bin/python
 
+
 """
-This module helps in perfoming all the 
-GET operation on Storage Connectivity Groups
+This module helps in perfoming all the GET operation on Storage Connectivity Groups
 """
 
+
 import requests
-import json
+# import json
+
 
 def get_headers(authtoken):
     return {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
 
+
 def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
-  
     """
     Get the endpoint url for that particular Service
-    
     """
     all_endpoints = connectn.identity.endpoints()
     services = connectn.identity.services()
@@ -30,10 +31,10 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
         if endpoint:
             return endpoint.url.replace("%(tenant_id)s", tenant_id)
         else:
-            mod.fail_json(msg=f"No endpoint found for service '{service_name}'",changed=False)
+            mod.fail_json(msg=f"No endpoint found for service '{service_name}'", changed=False)
     else:
-         mod.fail_json(msg=f"No service found with the name '{service_name}'",changed=False)
-        
+        mod.fail_json(msg=f"No service found with the name '{service_name}'", changed=False)
+
 
 def get_storage_connectivity_group_id(mod, scg_url, authtoken, desired_display_name):
     """
@@ -51,7 +52,7 @@ def get_storage_connectivity_group_id(mod, scg_url, authtoken, desired_display_n
                 break
         # If the entry is found, extract the "id"
         if found_entry:
-            desired_id = found_entry["id"]
+            # desired_id = found_entry["id"]
             return found_entry["id"]
         else:
             mod.fail_json(
@@ -89,4 +90,4 @@ def scg_ops(mod, connectn, authtoken, tenant_id, scg_name):
     else:
         endpoint = endpoint + "/storage-connectivity-groups/detail?include_ports=true"
         result = get_storage_connectivity_group_details(authtoken, endpoint)
-    return result        
+    return result

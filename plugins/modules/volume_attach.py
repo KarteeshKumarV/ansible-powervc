@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -27,7 +27,7 @@ options:
   volume_id:
     description:
       - IDs of the volumes want to be attached
-    type: list  
+    type: list
 
 '''
 
@@ -70,8 +70,10 @@ EXAMPLES = '''
             var: result
 '''
 
+
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_volume_attach import volume_ops
+
 
 class VolumeAttachVMModule(OpenStackModule):
     argument_spec = dict(
@@ -96,11 +98,11 @@ class VolumeAttachVMModule(OpenStackModule):
                 vol_ids.append(self.conn.block_storage.find_volume(name, ignore_missing=False).id)
             vol_data = {"volumeAttachment": [{"volumeId": vol_id} for vol_id in vol_ids]}
         elif volume_id:
-            vol_data = {"volumeAttachment": [{"volumeId": vol_id} for vol_id in volume_id]}        
+            vol_data = {"volumeAttachment": [{"volumeId": vol_id} for vol_id in volume_id]}
         try:
-                data = {"bulkVolumeAttach":vol_data}
-                res = volume_ops(self, self.conn, authtoken, tenant_id, vm_id, data)
-                self.exit_json(changed=True, result=res)
+            data = {"bulkVolumeAttach": vol_data}
+            res = volume_ops(self, self.conn, authtoken, tenant_id, vm_id, data)
+            self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
@@ -112,4 +114,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

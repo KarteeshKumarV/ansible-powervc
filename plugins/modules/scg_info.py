@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -71,7 +71,7 @@ EXAMPLES = '''
       project_domain_name: PROJECT_DOMAIN_NAME
       user_domain_name: USER_DOMAIN_NAME
     tasks:
-       - name: Get the specific SCG Details 
+       - name: Get the specific SCG Details
          powervc.cloud.scg_info:
             auth: "{{ auth }}"
             scg_name: "SCG_NAME"
@@ -85,6 +85,7 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_scg_info import scg_ops
 
+
 class SCGInfoModule(OpenStackModule):
     argument_spec = dict(
         scg_name=dict(required=False),
@@ -92,18 +93,18 @@ class SCGInfoModule(OpenStackModule):
     )
     module_kwargs = dict(
         supports_check_mode=True
-    )    
+    )
 
     def run(self):
         authtoken = self.conn.auth_token
         name = self.params['scg_name']
-        scg_id = self.params['scg_id']
+        # scg_id = self.params['scg_id']
         tenant_id = self.conn.session.get_project_id()
         try:
             res = scg_ops(self, self.conn, authtoken, tenant_id, name)
             self.exit_json(changed=False, result=res)
         except Exception as e:
-            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)        
+            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
 
 
 def main():
@@ -113,4 +114,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

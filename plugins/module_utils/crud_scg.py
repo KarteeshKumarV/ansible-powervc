@@ -1,21 +1,20 @@
 #!/usr/bin/python
 
 """
-This module helps in perfoming the 
-Create, Update and Delete operations on Storage Connectivity Groups
+This module helps in perfoming the Create, Update and Delete operations on Storage Connectivity Groups
 """
 
 import requests
 import json
 
+
 def get_headers(authtoken):
     return {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
 
+
 def get_endpoint_url_by_service_name(connectn, service_name, tenant_id):
-  
     """
     Get the endpoint url for that particular Service
-    
     """
     all_endpoints = connectn.identity.endpoints()
     services = connectn.identity.services()
@@ -51,7 +50,7 @@ def get_storage_connectivity_group_id(mod, scg_url, authtoken, desired_display_n
                 break
         # If the entry is found, extract the "id"
         if found_entry:
-            desired_id = found_entry["id"]
+            # desired_id = found_entry["id"]
             return found_entry["id"]
         else:
             mod.fail_json(
@@ -88,6 +87,7 @@ def delete_storage_connectivity_groups(mod, scg_url, authtoken, scg_name):
         mod.fail_json(
             msg=f"An unexpected error occurred: {responce.json()}", changed=False
         )
+
 
 def put_storage_connectivity_groups(mod, scg_url, authtoken, put_data, scg_name):
     """
@@ -137,6 +137,7 @@ def post_storage_connectivity_groups(module, scg_url, authtoken, post_data):
             changed=False,
         )
 
+
 def scg_ops(mod, connectn, authtoken, state, action, tenant_id, scg_name, scg_id, data):
     """
     Performs the SCG CRUD Operations based on the action input
@@ -183,8 +184,5 @@ def scg_ops(mod, connectn, authtoken, state, action, tenant_id, scg_name, scg_id
             mod, scg_post_url, authtoken, json_data
         )
     else:
-        mod.fail_json(
-            msg="For deleting the SCG: Pass state as 'absent' with name as the required Storage Connectivity group. Similarly pass stes as 'present' for creating/updating the SCG.",
-            changed=False,
-        )
-    return result        
+        mod.fail_json(msg="For deleting the SCG: Pass state as 'absent' with name as the required Storage Connectivity group", changed=False)
+    return result
