@@ -25,9 +25,9 @@ The **IBM PowerVC collection** includes `modules`_ and `sample playbooks`_
 that help to automate tasks on PowerVC systems.
 
 .. _modules:
-    https://github.com/IBM/ansible-power-vc/tree/dev-collection/plugins/modules/
+    https://github.com/IBM/ansible-powervc/tree/main/plugins/modules/
 .. _sample playbooks:
-    https://github.com/IBM/ansible-power-vc/tree/dev-collection/playbooks
+    https://github.com/IBM/ansible-powervc/tree/main/playbooks
 
 Copyright
 =========
@@ -85,5 +85,4 @@ This Ansible collection is maintained by the IBM PowerVC development team.
    :hidden:
 
    release_notes
-
 
