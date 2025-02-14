@@ -7,8 +7,10 @@ This module performs the PowerVC Server Create/delete operations
 import requests
 import json
 
+
 def get_headers(authtoken):
     return {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
+
 
 def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
     all_endpoints = connectn.identity.endpoints()
@@ -24,9 +26,9 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
         if endpoint:
             return endpoint.url.replace("%(tenant_id)s", tenant_id)
         else:
-            mod.fail_json(msg=f"No endpoint found for service '{service_name}'",changed=False)
+            mod.fail_json(msg=f"No endpoint found for service '{service_name}'", changed=False)
     else:
-         mod.fail_json(msg=f"No service found with the name '{service_name}'",changed=False)
+        mod.fail_json(msg=f"No service found with the name '{service_name}'", changed=False)
 
 
 def get_collocation_rules_id(mod, connectn, authtoken, tenant_id, collocation_rule_name):
@@ -49,29 +51,30 @@ def server_flavor(mod, connectn, authtoken, tenant_id, flavor_id, image_id, voli
     image_url = f"{endpoint_compute}/images/{image_id}"
     headers_scg = get_headers(authtoken)
     responce = requests.get(image_url, headers=headers_scg, verify=False)
-    volume_id = responce.json()['image']['metadata']['block_device_mapping'][0]['volume_id'] #to get image volume_id
+    volume_id = responce.json()['image']['metadata']['block_device_mapping'][0]['volume_id']  # to get image volume_id
     service_name = "volume"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
     vol_url = f"{endpoint}/volumes/{volume_id}"
-    responce = requests.get(vol_url, headers=headers_scg,  verify=False)
+    responce = requests.get(vol_url, headers=headers_scg, verify=False)
     size = responce.json()['volume']['size']
     flavor_url = f"{endpoint_compute}/flavors/{flavor_id}"
-    responce = requests.get(flavor_url, headers=headers_scg,  verify=False)
-    flavor_info = responce.json()
-    flavor_details={"ram": responce.json()["flavor"]["ram"],"vcpus": responce.json()["flavor"]["vcpus"],"disk": size}
+    responce = requests.get(flavor_url, headers=headers_scg, verify=False)
+    # flavor_info = responce.json()
+    flavor_details = {"ram": responce.json()["flavor"]["ram"], "vcpus": responce.json()["flavor"]["vcpus"], "disk": size}
     specsvmurl = f"{flavor_url}/os-extra_specs"
-    responce = requests.get(specsvmurl, headers=headers_scg,  verify=False)
+    responce = requests.get(specsvmurl, headers=headers_scg, verify=False)
     flavor_specs = responce.json()
     if volid:
         image_temp_id = "powervm:image_volume_type_" + volid
         flavor_specs['extra_specs'][image_temp_id] = template_id
-    flavor_data={
-            **flavor_details,  # Merge flavor_details
-            **flavor_specs # Include flavor_data as "extra_specs"
+    flavor_data = {
+        **flavor_details,
+        **flavor_specs  # Merge flavor_details and Include flavor_data as "extra_specs"
     }
     return flavor_data
 
-def create_vm(headers_vm,vm_url,data,vm_name):
+
+def create_vm(headers_vm, vm_url, data, vm_name):
     """
     Performs VM Create operation
     """
@@ -81,7 +84,8 @@ def create_vm(headers_vm,vm_url,data,vm_name):
     else:
         return (f"VM '{vm_name}' create operation failed", responce.json())
 
-def delete_vm(headers_vm,vm_url,vm_name):
+
+def delete_vm(headers_vm, vm_url, vm_name):
     """
     Performs VM Delete operation
     """
@@ -98,7 +102,7 @@ def server_ops(mod, connectn, authtoken, tenant_id, vm_name, state, data, vm_id=
         if not vm_id:
             vm_id = mod.conn.compute.find_server(vm_name, ignore_missing=False).id
         vm_url = f"{endpoint}/servers/{vm_id}"
-        result = delete_vm(headers_vm,vm_url,vm_name)
+        result = delete_vm(headers_vm, vm_url, vm_name)
     elif state == 'present':
         json_string = json.dumps(data)
         input_data = json.loads(json_string.replace("'", '"'))
@@ -109,5 +113,5 @@ def server_ops(mod, connectn, authtoken, tenant_id, vm_name, state, data, vm_id=
         }
         json_data = {"server": filtered_data}
         vm_url = f"{endpoint}/servers"
-        result = create_vm(headers_vm,vm_url,json_data,vm_name)
+        result = create_vm(headers_vm, vm_url, json_data, vm_name)
     return result

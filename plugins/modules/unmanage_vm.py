@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -65,6 +65,7 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_unmanage import unmanage_ops
 
+
 class UnmanageVMModule(OpenStackModule):
     argument_spec = dict(
         name=dict(required=True),
@@ -79,8 +80,8 @@ class UnmanageVMModule(OpenStackModule):
         vm_name = self.params['name']
         vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         try:
-                res = unmanage_ops(self, self.conn, authtoken, tenant_id, vm_id, vm_name)
-                self.exit_json(changed=True, result=res)
+            res = unmanage_ops(self, self.conn, authtoken, tenant_id, vm_id, vm_name)
+            self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
@@ -92,4 +93,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

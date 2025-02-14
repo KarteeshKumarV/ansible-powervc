@@ -5,10 +5,12 @@ This module performs the Snapshot operations on VMs
 """
 
 import requests
-import json
+# import json
+
 
 def get_headers(authtoken):
     return {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
+
 
 def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
     all_endpoints = connectn.identity.endpoints()
@@ -24,9 +26,10 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
         if endpoint:
             return endpoint.url.replace("%(tenant_id)s", tenant_id)
         else:
-            mod.fail_json(msg=f"No endpoint found for service '{service_name}'",changed=False)
+            mod.fail_json(msg=f"No endpoint found for service '{service_name}'", changed=False)
     else:
-         mod.fail_json(msg=f"No service found with the name '{service_name}'",changed=False)
+        mod.fail_json(msg=f"No service found with the name '{service_name}'", changed=False)
+
 
 def snapshot_vm(module, snapshotvm_url, authtoken, post_data):
     """
@@ -50,6 +53,7 @@ def snapshot_vm(module, snapshotvm_url, authtoken, post_data):
             msg=f"Paramters required for VM Snapshot are {input_data_options}. {responce.json()}",
             changed=False,
         )
+
 
 def get_volumeids_bytype(mod, connectn, endpoint, authtoken, tenant_id, vm_id, volume_type):
     """
@@ -77,27 +81,28 @@ def get_volumeids_bytype(mod, connectn, endpoint, authtoken, tenant_id, vm_id, v
             data_vol.append(volume_id)
     return data_vol if volume_type == "Data" else (boot_vol if volume_type == "Boot" else volume_ids)
 
+
 def get_volumeids_byname(mod, connectn, endpoint, authtoken, tenant_id, volume_name):
     vol_id = []
     for name in volume_name:
         vol_id.append(connectn.block_storage.find_volume(name, ignore_missing=False).id)
     return vol_id
 
+
 def snapshot_ops(mod, connectn, authtoken, tenant_id, vm_id, snapshot_name, snapshot_description, volume):
     service_name = "compute"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
     if volume["type"] == "Specific":
         if volume["name"]:
-            volume_list = get_volumeids_byname(mod, connectn, endpoint, authtoken, tenant_id,  volume["name"])
-    elif volume["type"] in ["All","Boot"]:
+            volume_list = get_volumeids_byname(mod, connectn, endpoint, authtoken, tenant_id, volume["name"])
+    elif volume["type"] in ["All", "Boot"]:
         volume_list = get_volumeids_bytype(mod, connectn, endpoint, authtoken, tenant_id, vm_id, volume["type"])
     else:
-         mod.fail_json(
-                 msg=f"Pass Volume details as type: All or Boot or Specific, Pass Volume name only if type is specific",
+        mod.fail_json(
+            msg="Pass Volume details as type: All or Boot or Specific, Pass Volume name only if type is specific",
             changed=False,
         )
-    post_data = {"vm-snapshot":{"name":snapshot_name,"description":snapshot_description,"volumes":volume_list}}
+    post_data = {"vm-snapshot": {"name": snapshot_name, "description": snapshot_description, "volumes": volume_list}}
     snapshotvm_url = f"{endpoint}/servers/{vm_id}/action"
     result = snapshot_vm(mod, snapshotvm_url, authtoken, post_data)
     return result
-

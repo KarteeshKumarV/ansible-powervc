@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -70,6 +70,7 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_volume_detach import volume_ops
 
+
 class VolumeDetachVMModule(OpenStackModule):
     argument_spec = dict(
         name=dict(required=True),
@@ -92,8 +93,8 @@ class VolumeDetachVMModule(OpenStackModule):
             for name in vol_name:
                 vol_id.append(self.conn.block_storage.find_volume(name, ignore_missing=False).id)
         try:
-                res = volume_ops(self, self.conn, authtoken, tenant_id, vm_id, vol_id )
-                self.exit_json(changed=True, result=res)
+            res = volume_ops(self, self.conn, authtoken, tenant_id, vm_id, vol_id)
+            self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
@@ -105,5 +106,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

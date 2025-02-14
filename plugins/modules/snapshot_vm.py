@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -118,11 +118,12 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_snapshot import snapshot_ops
 
+
 class SnapshotVMModule(OpenStackModule):
     argument_spec = dict(
         name=dict(),
         id=dict(),
-        volume=dict(required=True,type='dict'),
+        volume=dict(required=True, type='dict'),
         snapshot_name=dict(required=False),
         snapshot_description=dict(required=False),
     )
@@ -144,8 +145,8 @@ class SnapshotVMModule(OpenStackModule):
         if vm_name:
             vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         try:
-                res = snapshot_ops(self, self.conn, authtoken, tenant_id, vm_id, snapshot_name, snapshot_description, volume)
-                self.exit_json(changed=True, result=res)
+            res = snapshot_ops(self, self.conn, authtoken, tenant_id, vm_id, snapshot_name, snapshot_description, volume)
+            self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
@@ -157,4 +158,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

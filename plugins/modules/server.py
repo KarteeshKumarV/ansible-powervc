@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -155,11 +155,14 @@ EXAMPLES = '''
         debug: var=result
 
 '''
+
+
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
-from ansible_collections.ibm.powervc.plugins.module_utils.crud_server import server_ops,server_flavor,get_collocation_rules_id
+from ansible_collections.ibm.powervc.plugins.module_utils.crud_server import server_ops, server_flavor, get_collocation_rules_id
 import copy
-#import json
+# import json
 import base64
+
 
 class ServerOpsModule(OpenStackModule):
     argument_spec = dict(
@@ -267,7 +270,6 @@ class ServerOpsModule(OpenStackModule):
                 image_volume_override[-1]['tag'] = net['tag']
         return image_volume_override
 
-
     def run(self):
         try:
             authtoken = self.conn.auth_token
@@ -278,20 +280,20 @@ class ServerOpsModule(OpenStackModule):
             max_count = self.params['max_count']
             availability_zone = self.params['host']
             flavor = self.params['flavor']
-            security_groups = self.params['security_groups']
+            # security_groups = self.params['security_groups']
             collocation_rule = self.params['collocation_rule_name']
-            network = self.params['network']
+            # network = self.params['network']
             nics = self.params['nics']
             image_vol_template = self.params['image_volume_override']
             key_name = self.params['key_name']
-            meta = self.params['metadata']
+            # meta = self.params['metadata']
             volume_name = self.params['volume_name']
-            volume_id =  self.params['volume_id']
+            volume_id = self.params['volume_id']
             user_data = self.params['user_data']
             tenant_id = self.conn.session.get_project_id()
             flavor_id = self.conn.compute.find_flavor(flavor, ignore_missing=False).id
             imageRef = self.conn.compute.find_image(image, ignore_missing=False).id
-            nics=self._parse_nics()
+            nics = self._parse_nics()
             if user_data:
                 base64_encoded = base64.b64encode(user_data.encode('utf-8'))
                 userdata = base64_encoded.decode('utf-8')
@@ -307,7 +309,7 @@ class ServerOpsModule(OpenStackModule):
                     entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
                     vol_list.append(entry)
                     index += 1
-                vol_dict = {"block_device_mapping_v2": vol_list}
+                # vol_dict = {"block_device_mapping_v2": vol_list}
             elif volume_id:
                 vol_list = []
                 index = 1
@@ -315,37 +317,36 @@ class ServerOpsModule(OpenStackModule):
                     entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
                     vol_list.append(entry)
                     index += 1
-                vol_dict = {"block_device_mapping_v2": vol_list}
+                # vol_dict = {"block_device_mapping_v2": vol_list}
             if state == "present":
                 volid = None  # Initialize with None
                 template_id = None  # Initialize with None
                 if image_vol_template:
-                    volid = image_vol_template[0].get('volume_id',None)
-                    template_id = image_vol_template[0].get('template_id',None)
+                    volid = image_vol_template[0].get('volume_id', None)
+                    template_id = image_vol_template[0].get('template_id', None)
                 flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id)
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
                 if availability_zone:
                     availability_zone = ":" + availability_zone
-                #print("The Availability zone is", availability_zones)
                 vm_data = {"server": {
-                "name": vm_name,
-                "imageRef": imageRef,
-                "key_name": key_name,
-                "availability_zone": availability_zone,
-                "block_device_mapping_v2": vol_list,
-                "max_count": max_count,
-                "config_drive": True,
-                "user_data": userdata,
-                "networks": nics,
-                "flavor": flavor},
-                "os:scheduler_hints": collocation_rule_id}
+                           "name": vm_name,
+                           "imageRef": imageRef,
+                           "key_name": key_name,
+                           "availability_zone": availability_zone,
+                           "block_device_mapping_v2": vol_list,
+                           "max_count": max_count,
+                           "config_drive": True,
+                           "user_data": userdata,
+                           "networks": nics,
+                           "flavor": flavor},
+                           "os:scheduler_hints": collocation_rule_id}
                 res = server_ops(self, self.conn, authtoken, tenant_id, vm_name, state, vm_data, vm_id=None)
             elif state == "absent":
                 vm_data = None
                 res = server_ops(self, self.conn, authtoken, tenant_id, vm_name, state, vm_data, vm_id=vmid)
             self.exit_json(changed=False, result=res)
         except Exception as e:
-                self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
+            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
 
 
 def main():

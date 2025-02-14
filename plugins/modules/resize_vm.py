@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -52,8 +52,10 @@ EXAMPLES = '''
 
 '''
 
+
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_resize import resize_ops
+
 
 class ResizeVMModule(OpenStackModule):
     argument_spec = dict(
@@ -72,8 +74,8 @@ class ResizeVMModule(OpenStackModule):
         vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         template_id = self.conn.compute.find_flavor(template_type, ignore_missing=False).id
         try:
-                res = resize_ops(self, self.conn, authtoken, tenant_id, vm_id, template_id, vm_name)
-                self.exit_json(changed=True, result=res)
+            res = resize_ops(self, self.conn, authtoken, tenant_id, vm_id, template_id, vm_name)
+            self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
@@ -85,4 +87,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

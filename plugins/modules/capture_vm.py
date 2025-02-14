@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -66,6 +66,7 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_capture_vm import capture_ops
 
+
 class CaptureVMModule(OpenStackModule):
     argument_spec = dict(
         name=dict(),
@@ -88,8 +89,8 @@ class CaptureVMModule(OpenStackModule):
         if vm_name:
             vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         try:
-                res = capture_ops(self, self.conn, authtoken, tenant_id, vm_id, image_name)
-                self.exit_json(changed=True, result=res)
+            res = capture_ops(self, self.conn, authtoken, tenant_id, vm_id, image_name)
+            self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 

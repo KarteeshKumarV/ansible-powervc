@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.6','ansible >= openstack.cloud'],
+                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -53,6 +53,7 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_pin import pin_ops
 
+
 class PinOpsModule(OpenStackModule):
     argument_spec = dict(
         name=dict(required=True),
@@ -60,7 +61,7 @@ class PinOpsModule(OpenStackModule):
     )
     module_kwargs = dict(
         supports_check_mode=True
-    )    
+    )
 
     def run(self):
         authtoken = self.conn.auth_token
@@ -72,7 +73,7 @@ class PinOpsModule(OpenStackModule):
             res = pin_ops(self, self.conn, authtoken, tenant_id, vm_id, vm_name, pin_type)
             self.exit_json(changed=False, result=res)
         except Exception as e:
-            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)        
+            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
 
 
 def main():
@@ -82,4 +83,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
