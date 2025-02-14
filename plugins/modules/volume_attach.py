@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 module: volume_attach
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Attach the Volume to the VM.
+short_description: Attach the Volume to the Virtual Machine.
 description:
   - This playbook helps in performing the Volume attach operations on the VM provided.
 options:

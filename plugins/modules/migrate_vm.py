@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 module: migrate_vm
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: For Migrating the VM.
+short_description: Migrating the Virtual Machine from one host to the other
 description:
   - This playbook helps in performing the Migrate operations on the VM provided.
 options:

@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 module: volume_detach
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Detaches the Volume to the VM.
+short_description: Detaches the Volume to the Virtual Machine.
 description:
   - This playbook helps in performing the Volume detach operations on the VM provided.
 options:

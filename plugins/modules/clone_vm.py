@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 module: clone_vm
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Takes Clone of the VM.
+short_description: Takes Clone of the Virtual Machine.
 description:
   - This playbook helps in performing the Clone operations on the VM provided.
 options:

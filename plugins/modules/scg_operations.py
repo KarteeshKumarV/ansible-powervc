@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 module: scg_operations
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Create, Delete, Update the SCG Details.
+short_description: Performs the Create, Delete, Update on the Storage Connectivity Group.
 description:
   - This playbook helps in performing the Create, Delete and Update operations for the Storage Connectivity Groups.
 options:

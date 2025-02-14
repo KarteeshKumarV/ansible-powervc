@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 module: manage_vm
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: For Managing the VM.
+short_description: Performs the Manage operations on the Virtual Machine.
 description:
   - This playbook helps in performing the Manage operations on the VM provided.
 options:
