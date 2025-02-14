@@ -45,6 +45,11 @@ Below are the commands to install OpenStack and PowerVC ansible collections.
 Configure PowerVC Credentials to interact with Ansible
 =======================================================
 
+IBM PowerVC Ansible modules have to be used remotely.
+
+These Modules will be installed on the remote machine from which will be connecting to the IBM PowerVC.
+
+
 Auth information can be passed either in a config file or directly in the playbook.
 
 1. Passing the auth info in a config file.
@@ -68,7 +73,9 @@ Auth information can be passed either in a config file or directly in the playbo
 		 
          user_domain_name: USER_DOMAIN_NAME
 
-Note: Auth information is driven by openstacksdk, which means that values can come from a yaml config file in /etc/ansible/openstack.yaml, /etc/openstack/clouds.yaml or ~/.config/openstack/clouds.yaml, then from standard environment variables, then finally by explicit parameters in plays. More information can be found at https://docs.openstack.org/openstacksdk/
+Note: 
+
+Auth information is driven by openstacksdk, which means that values can come from a yaml config file in /etc/ansible/openstack.yaml, /etc/openstack/clouds.yaml or ~/.config/openstack/clouds.yaml, then from standard environment variables, then finally by explicit parameters in plays. More information can be found at https://docs.openstack.org/openstacksdk/
 
 2. Directly passing the credentials in the playbook.
 
