@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -11,7 +10,7 @@ DOCUMENTATION = '''
 module: pin_vm
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: To perform Pin VM operations.
+short_description: Performs the Pin VM operations.
 description:
   - This playbook helps in performing the Pin operations on the VM provided.
 options:

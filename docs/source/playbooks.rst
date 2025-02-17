@@ -14,10 +14,9 @@ Playbook Documentation
 An `Ansible playbook`_ consists of organized instructions that define work for
 a managed node (host) to be managed with Ansible.
 
-A `playbooks directory`_ that contains a sample playbook is included in the
-**IBM PowerVC collection**. The sample playbook can be run with the
-``ansible-playbook`` command with some modification to the **inventory**
-and **group_vars**.
+A playbooks directory that contains a sample playbook is included in the
+**IBM PoweVC collection**. The sample playbook can be run with the
+``ansible-playbook`` command with some modification to the **inventory**.
 
 You can find the playbook content that is included with the collection in the
 same location where the collection is installed. For more information, refer to
@@ -27,7 +26,7 @@ refer to the installation path as ``~/.ansible/collections/ansible_collections/i
 .. _Ansible playbook:
    https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#playbooks-intro
 .. _playbooks directory:
-   https://github.com/IBM/ansible-powervc/tree/dev-collection/playbooks
+   https://github.com/IBM/ansible-powervc/tree/main/playbooks
 .. _installation documentation:
    installation.html
 
@@ -70,18 +69,18 @@ should be included when running the sample playbook.
 
 .. code-block:: yaml
 
-   vcserver:
+   powervcserver:
      hosts:
-       vio:
-         ansible_host: vc_target_address
-         ansible_user: vc_target_username
-         ansible_python_interpreter: path_to_python_interpreter_binary_on_vios_target
+       powervc:
+         ansible_host: target_address
+         ansible_user: target_username
+         ansible_python_interpreter: path_to_python_interpreter_binary_on_target
 
 
 The value for the property **ansible_host** is the hostname of the managed node;
 for example, ``ansible_host: regency.aus.stglabs.ibm.com``
 
-The value for the property **vc_target_username** is the user name to use when
+The value for the property **target_username** is the user name to use when
 connecting to the host; for example, ``ansible_user: padmin``.
 
 The value for the property **ansible_python_interpreter** is the target host
@@ -148,4 +147,3 @@ levels INFO, WARN, ERROR, DEBUG.
 
 .. _ask-pass documentation:
    https://linux.die.net/man/1/sshpass
-

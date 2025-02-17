@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -11,7 +10,7 @@ DOCUMENTATION = '''
 module: clone_vm
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Takes Clone of the VM.
+short_description: Takes Clone of the Virtual Machine.
 description:
   - This playbook helps in performing the Clone operations on the VM provided.
 options:

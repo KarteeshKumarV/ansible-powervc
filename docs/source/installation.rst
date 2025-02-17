@@ -17,10 +17,7 @@ a. sudo dnf install -y ansible
 
 b. ansible --version
 
-You should now have Ansible installed and ready to use on your RHEL system.
-
 Step 2: Installing from pip
-If you prefer to install the ansible using pip, follow these steps:
 
 Install Python and pip:
 
@@ -33,13 +30,13 @@ c. ansible --version
 Refer https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html and https://docs.ansible.com/ansible/latest/installation_guide/index.html 
 for more details
 
-OpenStack Ansible modules and PowerVC custom ansible modules use openstacksdk python libraries to perform operations in PowerVC. You must install OpenStack SDK before proceeding with the playbook execution. 
+OpenStack Ansible modules and PowerVC custom ansible modules use openstacksdk python libraries to perform operations in PowerVC. OpenStack SDK must be installed before proceeding with the playbook execution. 
 
-You can install the OpenStack SDK by using the pip install openstacksdk command.
+OpenStack SDK can be installed by using the pip install openstacksdk command.
 
-Ansible does not contain the required collections and modules be default. You can run these commands to install OpenStack and PowerVC ansible collections.
+Below are the commands to install OpenStack and PowerVC ansible collections.
 
-=> pip3 install openstacksdk
+=>	pip3 install openstacksdk
 
 =>	ansible-galaxy collection install openstack.cloud
 
@@ -47,6 +44,11 @@ Ansible does not contain the required collections and modules be default. You ca
 
 Configure PowerVC Credentials to interact with Ansible
 =======================================================
+
+IBM PowerVC Ansible modules have to be used remotely.
+
+These Modules have to be installed on the remote machine from which it will be connecting to the IBM PowerVC.
+
 
 Auth information can be passed either in a config file or directly in the playbook.
 
@@ -71,11 +73,13 @@ Auth information can be passed either in a config file or directly in the playbo
 		 
          user_domain_name: USER_DOMAIN_NAME
 
-Note: Auth information is driven by openstacksdk, which means that values can come from a yaml config file in /etc/ansible/openstack.yaml, /etc/openstack/clouds.yaml or ~/.config/openstack/clouds.yaml, then from standard environment variables, then finally by explicit parameters in plays. More information can be found at https://docs.openstack.org/openstacksdk/
+Note: 
+
+Auth information is driven by openstacksdk, which means that values can come from a yaml config file in /etc/ansible/openstack.yaml, /etc/openstack/clouds.yaml or ~/.config/openstack/clouds.yaml, then from standard environment variables, then finally by explicit parameters in plays. More information can be found at https://docs.openstack.org/openstacksdk/
 
 2. Directly passing the credentials in the playbook.
 
-You can refer the examples related to the aboves in each module playbook examples section.
+Please refer the examples related to the aboves in each module playbook examples section.
 
 
 ===========================================================================
@@ -107,13 +111,13 @@ the ``==`` range identifier is set to that pre-release version.
 A pre-release version is denoted by appending a hyphen and a series of
 dot separated identifiers immediately following the patch version. The
 **IBM PowerVC collection** releases collections with the pre-release
-naming convention such as **1.0.0-beta1** that would require a range identifier.
+naming convention such as **1.0.0-** that would require a range identifier.
 
 Here is an example of installing a pre-release collection:
 
 .. code-block:: sh
 
-   $ ansible-galaxy collection install ibm.powervc:==1.0.0-beta1
+   $ ansible-galaxy collection install ibm.powervc:==1.0.0
 
 
 If you have installed a prior version, you must overwrite an existing
@@ -182,7 +186,7 @@ collection built from source. Version builds are available in the ``builds``
 directory of the IBM ansible-powervc Git repository. The archives can be
 installed locally without having to Galaxy.
 
-To install a build from the ansible-power-hmc Git repository:
+To install a build from the ansible-powervc Git repository:
 
    1. Obtain a local copy from the Git repository:
 

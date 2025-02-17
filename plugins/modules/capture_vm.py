@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'requirements': ['python >= 3.9', 'ansible >= openstack.cloud'],
                     'status': ['preview'],
                     'supported_by': 'PowerVC'}
 
@@ -11,7 +10,7 @@ DOCUMENTATION = '''
 module: capture_vm
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: For Capturing the Image out of the VM.
+short_description: Capturing the Image out of the Virtual Machine.
 description:
   - This playbook helps in performing the Image Create/Capture operations on the VM provided.
 options:
