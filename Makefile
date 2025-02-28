@@ -99,4 +99,4 @@ unit-test: prep-collection
 
 .PHONY: ansible-lint
 ansible-lint: 
-	cd playbooks && ansible-lint --exclude=users_input.yaml,powervc.yml,source.powervc.yml .
+	cd playbooks && ansible-lint --exclude=users_input.yaml,powervc.yml,source.powervc.yml
