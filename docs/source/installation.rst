@@ -1,34 +1,12 @@
+.. ...........................................................................
+.. © Copyright IBM Corporation 2020                                          .
+.. ...........................................................................
+
 Installation
 ============
 
-Steps to install Ansible:
-==========================
-Prerequisite:
-
-1.	OS: Rhel 8.10
-
-2.	Architecture: ppc64le
-
-
-
-Step 1:
-
-a. sudo dnf install -y ansible
-
-b. ansible --version
-
-Step 2: Installing from pip
-
-Install Python and pip:
-
-a. sudo dnf install python3 python3-pip
-
-b. pip3 install ansible
-
-c. ansible --version
-
-Refer https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html and https://docs.ansible.com/ansible/latest/installation_guide/index.html 
-for more details
+Pre-requisite
+-------------
 
 OpenStack Ansible modules and PowerVC custom ansible modules use openstacksdk python libraries to perform operations in PowerVC. OpenStack SDK must be installed before proceeding with the playbook execution. 
 
@@ -40,49 +18,9 @@ Below are the commands to install OpenStack and PowerVC ansible collections.
 
 =>	ansible-galaxy collection install openstack.cloud
 
-=>	ansible-galaxy collection install ibm.powervc
-
-Configure PowerVC Credentials to interact with Ansible
-=======================================================
-
-IBM PowerVC Ansible modules have to be used remotely.
-
-These Modules have to be installed on the remote machine from which it will be connecting to the IBM PowerVC.
+=>	Followed by ibm.powervc collection  (ansible-galaxy collection install ibm.powervc). Detailed steps for the collection installation mentioned below.
 
 
-Auth information can be passed either in a config file or directly in the playbook.
-
-1. Passing the auth info in a config file.
-
-   Add the auth related information or credentials in the /etc/openstack/clouds.yaml. Example shown below:
-
-   cat /etc/openstack/clouds.yml
-   
-   clouds:
-     mycloud:
-       auth:
-         auth_url: https://<IP_ADDRESS_OF_POWERVC>>:5000/v3/
-		 
-         username: USERNAME
-		 
-         password: PASSWORD
-		 
-         project_name: PROJECT_NAME
-		 
-         project_domain_name: PROJECT_DOMAIN_NAME
-		 
-         user_domain_name: USER_DOMAIN_NAME
-
-Note: 
-
-Auth information is driven by openstacksdk, which means that values can come from a yaml config file in /etc/ansible/openstack.yaml, /etc/openstack/clouds.yaml or ~/.config/openstack/clouds.yaml, then from standard environment variables, then finally by explicit parameters in plays. More information can be found at https://docs.openstack.org/openstacksdk/
-
-2. Directly passing the credentials in the playbook.
-
-Please refer the examples related to the aboves in each module playbook examples section.
-
-
-===========================================================================
 You can install the **IBM PowerVC collection** using one of these options:
 Ansible Galaxy or a local build.
 
@@ -216,3 +154,46 @@ To install a build from the ansible-powervc Git repository:
 
       .. _installing collections with Ansible Galaxy:
          https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#installing-collections-with-ansible-galaxy
+
+Refer https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html and https://docs.ansible.com/ansible/latest/installation_guide/index.html 
+for Ansible installation details
+
+
+Configure PowerVC Credentials to interact with Ansible
+=======================================================
+
+IBM PowerVC Ansible modules have to be used remotely.
+
+These Modules have to be installed on the remote machine from which it will be connecting to the IBM PowerVC.
+
+
+Auth information can be passed either in a config file or directly in the playbook.
+
+1. Passing the auth info in a config file.
+
+   Add the auth related information or credentials in the /etc/openstack/clouds.yaml. Example shown below:
+
+   cat /etc/openstack/clouds.yml
+   
+   clouds:
+     mycloud:
+       auth:
+         auth_url: https://<IP_ADDRESS_OF_POWERVC>>:5000/v3/
+		 
+         username: USERNAME
+		 
+         password: PASSWORD
+		 
+         project_name: PROJECT_NAME
+		 
+         project_domain_name: PROJECT_DOMAIN_NAME
+		 
+         user_domain_name: USER_DOMAIN_NAME
+
+Note: 
+
+Auth information is driven by openstacksdk, which means that values can come from a yaml config file in /etc/ansible/openstack.yaml, /etc/openstack/clouds.yaml or ~/.config/openstack/clouds.yaml, then from standard environment variables, then finally by explicit parameters in plays. More information can be found at https://docs.openstack.org/openstacksdk/
+
+2. Directly passing the credentials in the playbook.
+
+Please refer the examples related to the aboves in each module playbook examples section.

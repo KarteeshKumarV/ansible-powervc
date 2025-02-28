@@ -33,7 +33,7 @@ qualified name ``powervc``. For example:
       user_domain_name: Default
     tasks:
        - name: Perform VM Capture Operations
-         powervc.cloud.capture_vm:
+         ibm.powervc.capture_vm:
             auth: "{{ auth }}"
             name: "ansible_vm"
             image_name: "test_Image"
