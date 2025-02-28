@@ -71,7 +71,7 @@ EXAMPLES = '''
       user_domain_name: USER_DOMAIN_NAME
     tasks:
        - name: Get the specific SCG Details
-         powervc.cloud.scg_info:
+         ibm.powervc.scg_info:
             auth: "{{ auth }}"
             scg_name: "SCG_NAME"
             validate_certs: no
