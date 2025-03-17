@@ -92,7 +92,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ```
 
 Authors:
-- Karteesh Kumar V (vkarteesh@gmail.com)
+- Karteesh Kumar Vipparapelli (karteesh.kumar.vipparapelli@partner.ibm.com)
 
 
 [coc]: https://help.github.com/en/github/building-a-strong-community/adding-a-code-of-conduct-to-your-project
