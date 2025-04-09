@@ -28,7 +28,7 @@ options:
   id:
     description:
       - ID of the VM
-    type: str    
+    type: str
   clonevm_name:
     description:
       - Name of the Cloned VM
