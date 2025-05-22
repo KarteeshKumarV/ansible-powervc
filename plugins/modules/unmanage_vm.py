@@ -19,11 +19,14 @@ options:
       - Name of the VM
     required: true
     type: str
+  id:
+    description:
+      - ID of the VM
+    type: str
 
 '''
 
 EXAMPLES = '''
----
   - name: VM Unmanage Playbook
     hosts: localhost
     gather_facts: no
@@ -67,19 +70,25 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_unmanage import u
 
 class UnmanageVMModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(required=True),
+        name=dict(),
+        id=dict(),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ['name', 'id'],
+        ]
     )
 
     def run(self):
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
         vm_name = self.params['name']
-        vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
+        vm_id = self.params['id']
+        if vm_name:
+            vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         try:
-            res = unmanage_ops(self, self.conn, authtoken, tenant_id, vm_id, vm_name)
+            res = unmanage_ops(self, self.conn, authtoken, tenant_id, vm_id)
             self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)

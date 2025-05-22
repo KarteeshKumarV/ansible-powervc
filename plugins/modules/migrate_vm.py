@@ -18,14 +18,18 @@ options:
     description:
       - Name of the VM
     type: str
+  id:
+    description:
+      - ID of the VM
+    type: str
   host:
     description:
       - Name of the Host
     type: str
+
 '''
 
 EXAMPLES = '''
----
   - name: VM Migrate Playbook
     hosts: localhost
     gather_facts: no
@@ -42,7 +46,7 @@ EXAMPLES = '''
          ibm.powervc.migate_vm:
             auth: "{{ auth }}"
             name: "NAME"
-            host: "HOST"
+            host: "HOST_ID"
             validate_certs: no
          register: result
        - debug:
@@ -56,7 +60,7 @@ EXAMPLES = '''
          ibm.powervc.migate_vm:
             cloud: "CLOUD_NAME"
             name: "NAME"
-            host: "HOST"
+            host: "HOST_ID"
             validate_certs: no
          register: result
        - debug:
@@ -70,19 +74,25 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_migrate import mi
 
 class MigrateVMModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(required=True),
-        host=dict(required=False),
+        name=dict(),
+        id=dict(),
+        host=dict(required=True),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ['name', 'id'],
+        ]
     )
 
     def run(self):
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
         vm_name = self.params['name']
+        vm_id = self.params['id']
         host = self.params['host']
-        vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
+        if vm_name:
+            vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         try:
             data = {"os-migrateLive": {"host": host, "block_migration": "false", "disk_over_commit": "true"}}
             res = migrate_ops(self, self.conn, authtoken, tenant_id, vm_id, host, data)

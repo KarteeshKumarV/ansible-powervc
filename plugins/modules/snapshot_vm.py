@@ -17,7 +17,10 @@ options:
   name:
     description:
       - Name of the VM
-    required: true
+    type: str
+  id:
+    description:
+      - ID of the VM
     type: str
   volume:
     description:
@@ -33,6 +36,7 @@ options:
     description:
       - Description of the Snapshot
     type: str
+
 '''
 
 EXAMPLES = '''

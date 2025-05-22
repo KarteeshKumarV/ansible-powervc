@@ -1,4 +1,4 @@
-  - name: VM Unmanage Playbook
+  - name: VM Manage Playbook
     hosts: localhost
     gather_facts: no
     vars:
@@ -10,23 +10,25 @@
       project_domain_name: PROJECT_DOMAIN_NAME
       user_domain_name: USER_DOMAIN_NAME
     tasks:
-       - name: Perform VM Unmanage Operations
-         ibm.powervc.unmanage_vm:
-            auth: "{{ auth }}"
+       - name: Perform VM Manage Operations
+         ibm.powervc.manage_vm:
+            auth: "{{ AUTH }}"
             name: "NAME"
+            host: "HOST_ID"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: VM Unmanage Playbook
+  - name: VM Manage Playbook
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Perform VM Unmanage Operations
-         ibm.powervc.unmanage_vm:
+       - name: Perform VM Manage Operations
+         ibm.powervc.manage_vm:
             cloud: "CLOUD_NAME"
             name: "NAME"
+            host: "HOST_ID"
             validate_certs: no
          register: result
        - debug:

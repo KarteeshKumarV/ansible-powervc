@@ -12,12 +12,16 @@ author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Attach the Volume to the Virtual Machine.
 description:
-  - This playbook helps in performing the Volume attach operations on the VM provided.
+  - This playbook helps in performing the Volume attach operations on the VM provided. Bulk Volume Attach API call is used for this operation.
 options:
   name:
     description:
       - Name of the VM
     required: true
+    type: str
+  id:
+    description:
+      - ID of the VM
     type: str
   volume_name:
     description:
@@ -31,7 +35,6 @@ options:
 '''
 
 EXAMPLES = '''
----
   - name: VM Volume Attach Playbook
     hosts: localhost
     gather_facts: no
@@ -67,6 +70,20 @@ EXAMPLES = '''
          register: result
        - debug:
             var: result
+
+  - name: VM Volume Attach Playbook using the Volume IDs
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Perform VM Volume Attach Operations
+         ibm.powervc.volume_attach:
+            cloud: "CLOUD_NAME"
+            name: "NAME"
+            volume_id: ["VOL_ID1","VOL_ID2","VOL_ID3"]
+            validate_certs: no
+         register: result
+       - debug:
+            var: result
 '''
 
 
@@ -76,21 +93,27 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_volume_attach imp
 
 class VolumeAttachVMModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(required=True),
+        name=dict(),
+        id=dict(),
         volume_name=dict(type='list'),
         volume_id=dict(type='list'),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ['name', 'id'], ['volume_name', 'volume_id']
+        ]
     )
 
     def run(self):
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
         vm_name = self.params['name']
+        vm_id = self.params['id']
         vol_name = self.params['volume_name']
         volume_id = self.params['volume_id']
-        vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
+        if vm_name:
+            vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
         if vol_name:
             vol_ids = []
             for name in vol_name:

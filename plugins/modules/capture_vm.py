@@ -18,11 +18,19 @@ options:
     description:
       - Name of the VM
     type: str
+  id:
+    description:
+      - ID of the VM
+    type: str
+  image_name:
+    description:
+      - Name of the Captured Image
+    required: true
+    type: str
 
 '''
 
 EXAMPLES = '''
----
   - name: VM Capture Playbook
     hosts: localhost
     gather_facts: no
@@ -53,6 +61,20 @@ EXAMPLES = '''
          ibm.powervc.capture_vm:
             cloud: "CLOUDNAME"
             name: "NAME"
+            image_name: "IMAGE_NAME"
+            validate_certs: no
+         register: result
+       - debug:
+            var: result
+
+  - name: VM Capture Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Perform VM Capture Operations
+         ibm.powervc.capture_vm:
+            cloud: "CLOUDNAME"
+            id: "VM_ID"
             image_name: "IMAGE_NAME"
             validate_certs: no
          register: result
