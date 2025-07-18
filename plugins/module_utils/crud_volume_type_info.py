@@ -49,4 +49,4 @@ def volume_ops(mod, connectn, authtoken, tenant_id, vol_type_id):
     else:
         volume_type_url = f"{endpoint}/types"
         result = get_volume_type_details(authtoken, volume_type_url)
-    return result
+
