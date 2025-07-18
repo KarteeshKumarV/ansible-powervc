@@ -61,7 +61,7 @@ EXAMPLES = '''
        - debug:
             var: result
 
-  - name: Volume Details Playbook using the Volume Name
+  - name: Volume Details Playbook using the Volume IDs
     hosts: localhost
     gather_facts: no
     tasks:
