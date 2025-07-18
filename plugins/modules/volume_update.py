@@ -7,11 +7,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-<<<<<<< HEAD
 module: volume_update
-=======
-module: volume_attach
->>>>>>> 49ef494 (Add Volume Info, VolumeType Info and Volume Update features)
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Performs the Volume Update Operations
@@ -34,11 +30,7 @@ options:
   enable_sharing_vm:
     description:
       - Enable sharing between the VMs of the Volume
-<<<<<<< HEAD
     type: bool
-=======
-    type: str    
->>>>>>> 49ef494 (Add Volume Info, VolumeType Info and Volume Update features)
 
 '''
 
@@ -59,10 +51,7 @@ EXAMPLES = '''
          ibm.powervc.volume_update:
             auth: "{{ auth }}"
             name: "VOLUME_NAME"
-<<<<<<< HEAD
             size: "SIZE"
-=======
->>>>>>> 49ef494 (Add Volume Info, VolumeType Info and Volume Update features)
             validate_certs: no
          register: result
        - debug:
@@ -76,10 +65,7 @@ EXAMPLES = '''
          ibm.powervc.volume_update:
             cloud: "CLOUD_NAME"
             id: "VOLUME_ID"
-<<<<<<< HEAD
             enable_sharing_vm: "ENABLE_SHARING_VM"
-=======
->>>>>>> 49ef494 (Add Volume Info, VolumeType Info and Volume Update features)
             validate_certs: no
          register: result
        - debug:
@@ -93,10 +79,7 @@ EXAMPLES = '''
          ibm.powervc.volume_update:
             cloud: "CLOUD_NAME"
             name: "VOLUME_NAME"
-<<<<<<< HEAD
             size: "SIZE"
-=======
->>>>>>> 49ef494 (Add Volume Info, VolumeType Info and Volume Update features)
             validate_certs: no
          register: result
        - debug:
@@ -113,11 +96,7 @@ class VolumeUpdateModule(OpenStackModule):
         name=dict(),
         id=dict(),
         size=dict(type='int'),
-<<<<<<< HEAD
         enable_sharing_vm=dict(type='bool'),
-=======
-        enable_sharing_vm=dict(),
->>>>>>> 49ef494 (Add Volume Info, VolumeType Info and Volume Update features)
     )
     module_kwargs = dict(
         supports_check_mode=True,
