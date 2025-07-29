@@ -113,7 +113,6 @@ class VolumeTypeUpdateModule(OpenStackModule):
         extra_specs = self.params['extra_specs']
         if vol_type_name:
             vol_type_id = self.conn.block_storage.find_type(vol_type_name, ignore_missing=False).id
-
         try:
             res = volume_ops(self, self.conn, authtoken, tenant_id, vol_type_id, extra_specs)
             self.exit_json(changed=True, result=res)
