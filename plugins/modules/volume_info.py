@@ -7,7 +7,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: volume_attach
+module: volume_info
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Fetches the Volume Details
@@ -66,7 +66,7 @@ EXAMPLES = '''
     gather_facts: no
     tasks:
        - name: Perform Volume Details Operation
-         ibm.powervc.volume_attach:
+         ibm.powervc.volume_info:
             cloud: "CLOUD_NAME"
             name: "VOLUME_NAME"
             validate_certs: no
