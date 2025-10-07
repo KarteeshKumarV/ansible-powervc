@@ -29,7 +29,9 @@ options:
   host:
     description:
       - ID of the host
-    type: str
+
+    type: str    
+>>>>>>>
   collocation_rule_name:
     description:
       - Name of the collocation_rule_name
@@ -177,6 +179,7 @@ EXAMPLES = '''
           cloud: "CLOUD_NAME"
           name: "VM_NAME"
           image: "VM_IMAGE"
+          host: "HOST_ID"
           timeout: 200
           max_count: "COUNT"
           collocation_rule_name: "COLLOCATION_RULE_NAME"
@@ -434,4 +437,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
