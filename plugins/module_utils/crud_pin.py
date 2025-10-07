@@ -5,7 +5,6 @@ This module performs the Pin operations (soft, hard, no_pin) on VMs.
 """
 
 import requests
-# import json
 
 
 def get_headers(authtoken):
