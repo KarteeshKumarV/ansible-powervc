@@ -17,11 +17,18 @@ options:
   name:
     description:
       - Name of the VM
+<<<<<<< HEAD
     type: str
   id:
     description:
       - ID of the VM
+=======
+>>>>>>> 187f89e (VM ID/Name as input parameter Changes)
     type: str
+  id:
+    description:
+      - ID of the VM
+    type: str    
   clonevm_name:
     description:
       - Name of the Cloned VM

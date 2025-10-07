@@ -21,7 +21,7 @@ options:
   id:
     description:
       - ID of the VM
-    type: str
+    type: str    
   host:
     description:
       - ID of the Host
