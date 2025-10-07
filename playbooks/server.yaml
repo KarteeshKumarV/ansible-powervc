@@ -84,7 +84,6 @@
       - name: Disply server info
         debug: var=result
 
-
   - name: PowerVC Delete VM Playbook
     hosts: localhost
     gather_facts: no
