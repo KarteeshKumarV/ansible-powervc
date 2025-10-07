@@ -5,7 +5,6 @@ This module performs the Unmanage operations on VMs
 """
 
 import requests
-# import json
 
 
 def get_headers(authtoken):
