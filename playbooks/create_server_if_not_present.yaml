@@ -1,0 +1,50 @@
+---
+- name: Create a Server with a specific Name if it doesn't exist
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    vm_name: "TestVM"   # <-- Change this only
+
+  tasks:
+    - name: Get server information
+      openstack.cloud.server_info:
+        cloud: "powervc"
+        validate_certs: no
+      register: output
+
+    - name: Find the specified VM
+      set_fact:
+        my_vm: "{{ output.servers | selectattr('name', 'equalto', vm_name) | list | first | default({}, true) }}"
+
+    - name: Display VM name if it exists
+      debug:
+        msg: "VM already exists: {{ my_vm.name | default('VM not found') }}"
+
+    - name: Create VM if it doesn't exist
+      ibm.powervc.server:
+        cloud: "CLOUD_NAME"
+        name: "{{ vm_name }}"
+        image: "VM_IMAGE"
+        host: "HOST_ID"
+        timeout: 200
+        max_count: "COUNT"
+        collocation_rule_name: "COLLOCATION_RULE_NAME"
+        scg_id: "STORAGE_CONNECTIVITY_GROUP_ID"
+        nics:
+          - network_name: "NETWORK_NAME"
+            fixed_ip: "FIXED_IP" 
+        image_volume_override:
+          - volume_id: "VOLUME_ID"
+            template_id: "TEMPLATE_ID"
+        flavor: "FLAVOR_NAME"
+        volume_name: ["VOLUME_1","VOLUME_2"]
+        state: present
+        validate_certs: false
+      register: output
+      when: my_vm.name is not defined
+
+    - name: Show Server creation result
+      debug:
+        var: output.result
+      when: my_vm.name is not defined
