@@ -1,0 +1,36 @@
+---
+  - name: Volume Unmanage Playbook
+    hosts: localhost
+    gather_facts: no
+    vars:
+     auth:
+      auth_url: https://<POWERVC>:5000/v3
+      project_name: PROJECT-NAME
+      username: USERID
+      password: PASSWORD
+      project_domain_name: PROJECT_DOMAIN_NAME
+      user_domain_name: USER_DOMAIN_NAME
+    tasks:
+       - name: Perform Volume Unmanage Operations
+         ibm.powervc.unmanage_volume:
+            auth: "{{ auth }}"
+            name: "VOLUME_NAME"
+            host_metadata_name: "HOST_METADATA_NAME"
+            validate_certs: no
+         register: result
+       - debug:
+            var: result
+
+  - name: Volume Unmanage Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Perform Volume Unmanage Operations
+         ibm.powervc.unmanage_volume:
+            cloud: "CLOUD_NAME"
+            id: "VOLUME_ID"
+            host_metadata_name: "HOST_METADATA_NAME"
+            validate_certs: no
+         register: result
+       - debug:
+            var: result

@@ -7,27 +7,23 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: volume_info
+module: all_volumes
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Fetches the Volume Details
+short_description: Fetches the Details of all the volumes
 description:
-  - This playbook helps in performing the Volume Information Fetch operations on the Volume provided.
+  - This playbook helps in performing the Get operation on the All the Volumes.
 options:
-  name:
+  host_metadata_name:
     description:
-      - Name of the Volume
+      - Host Name from the Storage specific metadata
     required: true
-    type: str
-  id:
-    description:
-      - ID of the Volume
     type: str
 
 '''
 
 EXAMPLES = '''
-  - name: Volume Details Playbook
+  - name: All Volume Details Playbook
     hosts: localhost
     gather_facts: no
     vars:
@@ -40,35 +36,22 @@ EXAMPLES = '''
       user_domain_name: USER_DOMAIN_NAME
     tasks:
        - name: Perform Volume Details Operation
-         ibm.powervc.volume_info:
+         ibm.powervc.all_volumes:
             auth: "{{ auth }}"
-            name: "VOLUME_NAME"
+            host_metadata_name: "HOST_METADATA_NAME"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: Volume Details Playbook using Volume ID
+  - name: All Volume Details Playbook
     hosts: localhost
     gather_facts: no
     tasks:
        - name: Perform Volume Details Operation
-         ibm.powervc.volume_info:
+         ibm.powervc.all_volumes:
             cloud: "CLOUD_NAME"
-            id: "VOLUME_ID"
-            validate_certs: no
-         register: result
-       - debug:
-            var: result
-
-  - name: Volume Details Playbook using the Volume Name
-    hosts: localhost
-    gather_facts: no
-    tasks:
-       - name: Perform Volume Details Operation
-         ibm.powervc.volume_info:
-            cloud: "CLOUD_NAME"
-            name: "VOLUME_NAME"
+            host_metadata_name: "HOST_METADATA_NAME"
             validate_certs: no
          register: result
        - debug:
@@ -77,37 +60,30 @@ EXAMPLES = '''
 
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
-from ansible_collections.ibm.powervc.plugins.module_utils.crud_volume_info import volume_ops
+from ansible_collections.ibm.powervc.plugins.module_utils.crud_all_volumes import volume_ops
 
 
-class VolumeInfoModule(OpenStackModule):
+class AllVolumeInfoModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(),
-        id=dict(),
+        host_metadata_name=dict(required=True),
     )
     module_kwargs = dict(
-        supports_check_mode=True,
-        mutually_exclusive=[
-            ['name', 'id'],
-        ]
+        supports_check_mode=True
     )
 
     def run(self):
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
-        vol_name = self.params['name']
-        vol_id = self.params['id']
-        if vol_name:
-            vol_id = self.conn.block_storage.find_volume(vol_name, ignore_missing=False).id
+        host = self.params['host_metadata_name']
         try:
-            res = volume_ops(self, self.conn, authtoken, tenant_id, vol_id)
+            res = volume_ops(self, self.conn, authtoken, tenant_id, host)
             self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
 
 def main():
-    module = VolumeInfoModule()
+    module = AllVolumeInfoModule()
     module()
 
 

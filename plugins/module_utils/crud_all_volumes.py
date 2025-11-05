@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-This module performs the Get Volume Details operation.
+This module performs the Get All Volume Details operation.
 """
 
 import requests
@@ -30,9 +30,9 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
         mod.fail_json(msg=f"No service found with the name '{service_name}'", changed=False)
 
 
-def get_volume_details(authtoken, volume_url):
+def get_all_volume_details(authtoken, volume_url):
     """
-    Performs Get Volume Details operation on the Volume ID passed
+    Performs Get All Volume Details operation on the host passed
     """
     headers_scg = get_headers(authtoken)
     responce = requests.get(volume_url, headers=headers_scg, verify=False)
@@ -40,12 +40,9 @@ def get_volume_details(authtoken, volume_url):
         return responce.json()
 
 
-def volume_ops(mod, connectn, authtoken, tenant_id, vol_id):
+def volume_ops(mod, connectn, authtoken, tenant_id, host):
     service_name = "volume"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
-    volume_url = f"{endpoint}/volumes/{vol_id}"
-    result = get_volume_details(authtoken, volume_url)
-    volume_metadata_url = f"{volume_url}/restricted-metadata"
-    result_vol_metadata = get_volume_details(authtoken, volume_metadata_url)
-    result.update(result_vol_metadata)
+    volume_url = f"{endpoint}/os-hosts/{host}/all-volumes"
+    result = get_all_volume_details(authtoken, volume_url)
     return result
