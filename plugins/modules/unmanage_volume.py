@@ -7,7 +7,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: unmanage_vol
+module: unmanage_volume
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Performs Unmanage operations on the Volumes.
@@ -25,7 +25,7 @@ options:
     type: str
   host_metadata_name:
     description:
-      - Name of the Host from Storage specific metadata
+      - Host Name from the Storage specific metadata
     type: str
 
 '''
@@ -44,9 +44,9 @@ EXAMPLES = '''
       user_domain_name: USER_DOMAIN_NAME
     tasks:
        - name: Perform Volume Unmanage Operations
-         ibm.powervc.unmanage_vol:
+         ibm.powervc.unmanage_volume:
             auth: "{{ auth }}"
-            name: "NAME"
+            name: "VOLUME_NAME"
             host_metadata_name: "HOST_METADATA_NAME"
             validate_certs: no
          register: result
@@ -58,9 +58,9 @@ EXAMPLES = '''
     gather_facts: no
     tasks:
        - name: Perform Volume Unmanage Operations
-         ibm.powervc.unmanage_vol:
+         ibm.powervc.unmanage_volume:
             cloud: "CLOUD_NAME"
-            id: "ID"
+            id: "VOLUME_ID"
             host_metadata_name: "HOST_METADATA_NAME"
             validate_certs: no
          register: result
