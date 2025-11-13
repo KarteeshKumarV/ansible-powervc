@@ -15,4 +15,4 @@ Version 1.1.0
 -------------
 Notes
   * Enabled the option to support SRIOV in server module.
-  * Storage modules volume_type_info, volume_type_update, copy_volume_type, all_volumes, manage_volume, unmanage_volume, snapshot_info are added as part of this version 1.1.0.
+  * volume_type_info, volume_type_update, copy_volume_type, all_volumes, manage_volume, unmanage_volume, snapshot_info storage modules are added as part of this version 1.1.0.
