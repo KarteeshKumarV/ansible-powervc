@@ -21,4 +21,18 @@ Availability
 .. _GitHub v1.0.0:
    https://github.com/IBM/ansible-powervc/releases/download/v1.0.0/ibm-powervc-1.0.0.tar.gz
 
+Version 1.1.0
+-------------
+Notes
+  * Enabled the option to support SRIOV in server module.
+  * volume_type_info, volume_type_update, copy_volume_type, all_volumes, manage_volume, unmanage_volume, snapshot_info storage modules are added as part of this version 1.1.0.
+  
+Availability
+  * `Galaxy v1.1.0`_
+  * `GitHub v1.1.0`_
 
+.. _Galaxy v1.1.0:
+   https://galaxy.ansible.com/download/ibm-powervc-1.1.0.tar.gz
+
+.. _GitHub v1.1.0:
+   https://github.com/IBM/ansible-powervc/releases/download/v1.1.0/ibm-powervc-1.1.0.tar.gz
