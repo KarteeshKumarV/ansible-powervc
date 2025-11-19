@@ -16,8 +16,8 @@ readme: README.md
 # A list of the collection's content authors. Can be just the name or in the format 'Full Name <email> (url)
 # @nicks:irc/im.site#channel'
 authors:
-- Karteesh Kumar Vipparapelli (karteesh.kumar.vipparapelli@partner.ibm.com)
-- Prabhuraj K (k.prabhuraj@in.ibm.com)
+- Prabhuraj K (@k.prabhuraj)
+- Karteesh Kumar Vipparapelli (@Karteesh.Kumar.Vipparapelli)
 
 ### OPTIONAL but strongly recommended
 
