@@ -1,0 +1,34 @@
+---
+- name: All Volume Details Playbook
+  hosts: localhost
+  gather_facts: no
+  vars:
+   auth:
+    auth_url: https://<POWERVC>:5000/v3
+    project_name: PROJECT-NAME
+    username: USERID
+    password: PASSWORD
+    project_domain_name: PROJECT_DOMAIN_NAME
+    user_domain_name: USER_DOMAIN_NAME
+  tasks:
+     - name: Perform All Volume Details Operation
+       ibm.powervc.all_volumes:
+          auth: "{{ auth }}"
+          host_metadata_name: "STORAGE_HOST_METADATA_NAME"
+          validate_certs: no
+       register: result
+     - debug:
+          var: result
+
+- name: All Volume Details Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+     - name: Perform All Volume Details Operation
+       ibm.powervc.volume_info:
+          cloud: "CLOUD_NAME"
+          host_metadata_name: "STORAGE_HOST_METADATA_NAME"
+          validate_certs: no
+       register: result
+     - debug:
+          var: result

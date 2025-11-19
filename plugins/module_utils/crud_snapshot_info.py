@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-This module performs the Get Volume Details operation.
+This module performs the Get Snapshot Details operation.
 """
 
 import requests
@@ -30,22 +30,23 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
         mod.fail_json(msg=f"No service found with the name '{service_name}'", changed=False)
 
 
-def get_volume_details(authtoken, volume_url):
+def get_snapshot_details(authtoken, snapshot_url):
     """
-    Performs Get Volume Details operation on the Volume ID passed
+    Performs Get Snapshot Details operation on the Snapshot ID passed
     """
     headers_scg = get_headers(authtoken)
-    responce = requests.get(volume_url, headers=headers_scg, verify=False)
+    responce = requests.get(snapshot_url, headers=headers_scg, verify=False)
     if responce.ok:
         return responce.json()
 
 
-def volume_ops(mod, connectn, authtoken, tenant_id, vol_id):
+def snapshot_ops(mod, connectn, authtoken, tenant_id, snapshot_id):
     service_name = "volume"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
-    volume_url = f"{endpoint}/volumes/{vol_id}"
-    result = get_volume_details(authtoken, volume_url)
-    volume_metadata_url = f"{volume_url}/restricted-metadata"
-    result_vol_metadata = get_volume_details(authtoken, volume_metadata_url)
-    result.update(result_vol_metadata)
+    if snapshot_id:
+        snapshot_url = f"{endpoint}/snapshots/{snapshot_id}"
+        result = get_snapshot_details(authtoken, snapshot_url)
+    else:
+        snapshot_url = f"{endpoint}/snapshots"
+        result = get_snapshot_details(authtoken, snapshot_url)
     return result

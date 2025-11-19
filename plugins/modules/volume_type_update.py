@@ -7,27 +7,31 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: volume_type_info
+module: volume_type_update
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Fetches the Volume Type/Storage Templates Details
+short_description: Performs the Volume Type Update Operations
 description:
-  - This playbook helps in performing the Volume Type/Storage Templates Fetch operations on the Storage Name provided.
+  - This playbook helps in performing the Volume Update operations on the Volume provided.
 options:
   name:
     description:
-      - Name of the Volume Type or Storage Template
+      - Name of the Volume Type
     required: true
     type: str
   id:
     description:
-      - ID of the Volume Type or Storage Template
+      - ID of the Volume Type
     type: str
+  extra_specs:
+    description:
+      - extra specifications of the volume type
+    type: dict
 
 '''
 
 EXAMPLES = '''
-  - name: List Storage Templates/Volume Type Details Playbook
+  - name: Volume Type Details Playbook
     hosts: localhost
     gather_facts: no
     vars:
@@ -39,36 +43,44 @@ EXAMPLES = '''
       project_domain_name: PROJECT_DOMAIN_NAME
       user_domain_name: USER_DOMAIN_NAME
     tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
+       - name: Perform Volume Details Operation
+         ibm.powervc.volume_type_update:
             auth: "{{ auth }}"
-            name: "VOLUME_TYPE_NAME"
+            name: "VOLUME_NAME"
+            extra_specs:
+                    drivers:flashcopy_rate: "50"
+                    drivers:grainsize: "256"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: List Storage Templates/Volume Type Details Playbook using IDs
+  - name: Volume Type Details Playbook using Volume Name
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
+       - name: Perform Volume Details Operation
+         ibm.powervc.volume_type_update:
             cloud: "CLOUD_NAME"
-            id: "VOLUME_TYPE_ID"
+            id: "VOLUME_ID"
+            extra_specs:
+                    drivers:flashcopy_rate: "50"
+                    drivers:grainsize: "256"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: List Storage Templates/Volume Type Details Playbook using the Volume Name
+  - name: Volume Type Details Playbook using the Volume IDs
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
+       - name: Perform Volume Details Operation
+         ibm.powervc.volume_update:
             cloud: "CLOUD_NAME"
-            name: "VOLUME_TYPE_NAME"
+            name: "VOLUME_NAME"
+            extra_specs:
+                    "drivers:provision_type":"thin"
             validate_certs: no
          register: result
        - debug:
@@ -77,13 +89,14 @@ EXAMPLES = '''
 
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
-from ansible_collections.ibm.powervc.plugins.module_utils.crud_volume_type_info import volume_ops
+from ansible_collections.ibm.powervc.plugins.module_utils.crud_volume_type_update import volume_ops
 
 
-class VolumeTypeInfoModule(OpenStackModule):
+class VolumeTypeUpdateModule(OpenStackModule):
     argument_spec = dict(
         name=dict(),
         id=dict(),
+        extra_specs=dict(type='dict'),
     )
     module_kwargs = dict(
         supports_check_mode=True,
@@ -97,17 +110,18 @@ class VolumeTypeInfoModule(OpenStackModule):
         tenant_id = self.conn.session.get_project_id()
         vol_type_name = self.params['name']
         vol_type_id = self.params['id']
+        extra_specs = self.params['extra_specs']
         if vol_type_name:
             vol_type_id = self.conn.block_storage.find_type(vol_type_name, ignore_missing=False).id
         try:
-            res = volume_ops(self, self.conn, authtoken, tenant_id, vol_type_id)
+            res = volume_ops(self, self.conn, authtoken, tenant_id, vol_type_id, extra_specs)
             self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
 
 def main():
-    module = VolumeTypeInfoModule()
+    module = VolumeTypeUpdateModule()
     module()
 
 

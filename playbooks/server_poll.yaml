@@ -1,0 +1,18 @@
+---
+  - name: Server Details Playbook
+    hosts: localhost
+    gather_facts: no
+    vars:
+         vm_id: "VM_ID"   # <-- change here only    
+    tasks:
+       - name: Perform Server Operations
+         openstack.cloud.server_info:
+            cloud: "powervc8"
+            id: "{{ vm_id }}"
+            validate_certs: no
+         register: result
+         until: result.servers[0].status == "ACTIVE"
+         retries: 30
+         delay: 10
+
+         

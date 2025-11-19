@@ -7,27 +7,27 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: volume_type_info
+module: snapshot_info
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Fetches the Volume Type/Storage Templates Details
+short_description: Fetches the Snapshot Details
 description:
-  - This playbook helps in performing the Volume Type/Storage Templates Fetch operations on the Storage Name provided.
+  - This playbook helps in performing the Snapshot Fetch operations on the Snapshot provided.
 options:
   name:
     description:
-      - Name of the Volume Type or Storage Template
+      - Name of the Snapshot
     required: true
     type: str
   id:
     description:
-      - ID of the Volume Type or Storage Template
+      - ID of the Snapshot
     type: str
 
 '''
 
 EXAMPLES = '''
-  - name: List Storage Templates/Volume Type Details Playbook
+  - name: Snapshot Details Playbook
     hosts: localhost
     gather_facts: no
     vars:
@@ -39,36 +39,36 @@ EXAMPLES = '''
       project_domain_name: PROJECT_DOMAIN_NAME
       user_domain_name: USER_DOMAIN_NAME
     tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
+       - name: Perform Snapshot Details Operation
+         ibm.powervc.snapshot_info:
             auth: "{{ auth }}"
-            name: "VOLUME_TYPE_NAME"
+            name: "SNAPSHOT_NAME"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: List Storage Templates/Volume Type Details Playbook using IDs
+  - name: Snapshot Details Playbook using Snapshot Name
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
+       - name: Perform Snapshot Details Operation
+         ibm.powervc.snapshot_info:
             cloud: "CLOUD_NAME"
-            id: "VOLUME_TYPE_ID"
+            id: "SNAPSHOT_ID"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: List Storage Templates/Volume Type Details Playbook using the Volume Name
+  - name: Snapshot Details Playbook using the Snapshot IDs
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
+       - name: Perform Snapshot Details Operation
+         ibm.powervc.snapshot_info:
             cloud: "CLOUD_NAME"
-            name: "VOLUME_TYPE_NAME"
+            name: "SNAPSHOT_NAME"
             validate_certs: no
          register: result
        - debug:
@@ -77,10 +77,10 @@ EXAMPLES = '''
 
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
-from ansible_collections.ibm.powervc.plugins.module_utils.crud_volume_type_info import volume_ops
+from ansible_collections.ibm.powervc.plugins.module_utils.crud_snapshot_info import snapshot_ops
 
 
-class VolumeTypeInfoModule(OpenStackModule):
+class SnapshotInfoModule(OpenStackModule):
     argument_spec = dict(
         name=dict(),
         id=dict(),
@@ -95,19 +95,19 @@ class VolumeTypeInfoModule(OpenStackModule):
     def run(self):
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
-        vol_type_name = self.params['name']
-        vol_type_id = self.params['id']
-        if vol_type_name:
-            vol_type_id = self.conn.block_storage.find_type(vol_type_name, ignore_missing=False).id
+        snapshot_name = self.params['name']
+        snapshot_id = self.params['id']
+        if snapshot_name:
+            snapshot_id = self.conn.block_storage.find_snapshot(snapshot_name, ignore_missing=False).id
         try:
-            res = volume_ops(self, self.conn, authtoken, tenant_id, vol_type_id)
+            res = snapshot_ops(self, self.conn, authtoken, tenant_id, snapshot_id)
             self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
 
 def main():
-    module = VolumeTypeInfoModule()
+    module = SnapshotInfoModule()
     module()
 
 

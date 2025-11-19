@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-This module performs the Unmanage operations on VMs
+This module performs the Get All Volume Details operation.
 """
 
 import requests
@@ -30,27 +30,19 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
         mod.fail_json(msg=f"No service found with the name '{service_name}'", changed=False)
 
 
-def unmanage_vm(mod, endpoint, vmurl, authtoken, post_data):
+def get_all_volume_details(authtoken, volume_url):
     """
-    Performs UnManage operations on the VM provided
+    Performs Get All Volume Details operation on the host passed
     """
-    headers_scg = {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
-    responce = requests.get(vmurl, headers=headers_scg, verify=False)
-    host_value = responce.json()['server']['OS-EXT-SRV-ATTR:host']
-    unmanage_url = f"{endpoint}/os-hosts/{host_value}/unmanage"
-    responce = requests.post(unmanage_url, headers=headers_scg, json=post_data, verify=False)
+    headers_scg = get_headers(authtoken)
+    responce = requests.get(volume_url, headers=headers_scg, verify=False)
     if responce.ok:
-        return "VM Unmanage action is done"
-    else:
-        mod.fail_json(
-            msg=f"An unexpected error occurred: {responce.json()}", changed=False
-        )
+        return responce.json()
 
 
-def unmanage_ops(mod, connectn, authtoken, tenant_id, vm_id):
-    service_name = "compute"
+def volume_ops(mod, connectn, authtoken, tenant_id, host):
+    service_name = "volume"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
-    unmanage_data = {"servers": [vm_id]}
-    url = f"{endpoint}/servers/{vm_id}"
-    result = unmanage_vm(mod, endpoint, url, authtoken, unmanage_data)
+    volume_url = f"{endpoint}/os-hosts/{host}/all-volumes"
+    result = get_all_volume_details(authtoken, volume_url)
     return result

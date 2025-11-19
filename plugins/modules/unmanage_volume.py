@@ -7,27 +7,31 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: volume_type_info
+module: unmanage_volume
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Fetches the Volume Type/Storage Templates Details
+short_description: Performs Unmanage operations on the Volumes.
 description:
-  - This playbook helps in performing the Volume Type/Storage Templates Fetch operations on the Storage Name provided.
+  - This playbook helps in performing the Unmanage operations on the Volume provided.
 options:
   name:
     description:
-      - Name of the Volume Type or Storage Template
+      - Name of the Volume
     required: true
     type: str
   id:
     description:
-      - ID of the Volume Type or Storage Template
+      - ID of the Volume
+    type: str
+  host_metadata_name:
+    description:
+      - Host Name from the Storage specific metadata
     type: str
 
 '''
 
 EXAMPLES = '''
-  - name: List Storage Templates/Volume Type Details Playbook
+  - name: Volume Unmanage Playbook
     hosts: localhost
     gather_facts: no
     vars:
@@ -39,51 +43,42 @@ EXAMPLES = '''
       project_domain_name: PROJECT_DOMAIN_NAME
       user_domain_name: USER_DOMAIN_NAME
     tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
+       - name: Perform Volume Unmanage Operations
+         ibm.powervc.unmanage_volume:
             auth: "{{ auth }}"
-            name: "VOLUME_TYPE_NAME"
+            name: "VOLUME_NAME"
+            host_metadata_name: "HOST_METADATA_NAME"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: List Storage Templates/Volume Type Details Playbook using IDs
+  - name: Volume Unmanage Playbook
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
+       - name: Perform Volume Unmanage Operations
+         ibm.powervc.unmanage_volume:
             cloud: "CLOUD_NAME"
-            id: "VOLUME_TYPE_ID"
+            id: "VOLUME_ID"
+            host_metadata_name: "HOST_METADATA_NAME"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: List Storage Templates/Volume Type Details Playbook using the Volume Name
-    hosts: localhost
-    gather_facts: no
-    tasks:
-       - name: Perform Volume Type Details Operation
-         ibm.powervc.volume_type_info:
-            cloud: "CLOUD_NAME"
-            name: "VOLUME_TYPE_NAME"
-            validate_certs: no
-         register: result
-       - debug:
-            var: result
 '''
 
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
-from ansible_collections.ibm.powervc.plugins.module_utils.crud_volume_type_info import volume_ops
+from ansible_collections.ibm.powervc.plugins.module_utils.crud_unmanage_vol import unmanage_ops
 
 
-class VolumeTypeInfoModule(OpenStackModule):
+class UnmanageVolModule(OpenStackModule):
     argument_spec = dict(
         name=dict(),
         id=dict(),
+        host_name=dict(required=True),
     )
     module_kwargs = dict(
         supports_check_mode=True,
@@ -95,19 +90,20 @@ class VolumeTypeInfoModule(OpenStackModule):
     def run(self):
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
-        vol_type_name = self.params['name']
-        vol_type_id = self.params['id']
-        if vol_type_name:
-            vol_type_id = self.conn.block_storage.find_type(vol_type_name, ignore_missing=False).id
+        vol_name = self.params['name']
+        vol_id = self.params['id']
+        host = self.params['host_name']
+        if vol_name:
+            vol_id = self.conn.block_storage.find_volume(vol_name, ignore_missing=False).id
         try:
-            res = volume_ops(self, self.conn, authtoken, tenant_id, vol_type_id)
+            res = unmanage_ops(self, self.conn, authtoken, tenant_id, vol_id, host)
             self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
 
 
 def main():
-    module = VolumeTypeInfoModule()
+    module = UnmanageVolModule()
     module()
 
 

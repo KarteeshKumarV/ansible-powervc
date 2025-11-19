@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-This module performs the Unmanage operations on VMs
+This module helps in perfoming the Copy Volume Type operations
 """
 
 import requests
@@ -30,27 +30,23 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
         mod.fail_json(msg=f"No service found with the name '{service_name}'", changed=False)
 
 
-def unmanage_vm(mod, endpoint, vmurl, authtoken, post_data):
-    """
-    Performs UnManage operations on the VM provided
-    """
-    headers_scg = {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
-    responce = requests.get(vmurl, headers=headers_scg, verify=False)
-    host_value = responce.json()['server']['OS-EXT-SRV-ATTR:host']
-    unmanage_url = f"{endpoint}/os-hosts/{host_value}/unmanage"
-    responce = requests.post(unmanage_url, headers=headers_scg, json=post_data, verify=False)
+def copy_voltype(module, authtoken, voltype_url, id, name):
+    headers_scg = get_headers(authtoken)
+    voltypeid_url = f"{voltype_url}/{id}"
+    responce = requests.get(voltypeid_url, headers=headers_scg, verify=False)
+    data = responce.json()
+    data["volume_type"].pop("id", None)
+    data["volume_type"]["name"] = name
+    data["volume_type"]["extra_specs"]["drivers:display_name"] = name
+    data["volume_type"].pop("is_public", None)
+    responce = requests.post(voltype_url, headers=headers_scg, json=data, verify=False)
     if responce.ok:
-        return "VM Unmanage action is done"
-    else:
-        mod.fail_json(
-            msg=f"An unexpected error occurred: {responce.json()}", changed=False
-        )
+        return responce.json()
 
 
-def unmanage_ops(mod, connectn, authtoken, tenant_id, vm_id):
-    service_name = "compute"
+def copy_voltype_ops(mod, connectn, authtoken, tenant_id, voltemp_id, name):
+    service_name = "volume"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
-    unmanage_data = {"servers": [vm_id]}
-    url = f"{endpoint}/servers/{vm_id}"
-    result = unmanage_vm(mod, endpoint, url, authtoken, unmanage_data)
+    voltype_url = f"{endpoint}/types"
+    result = copy_voltype(mod, authtoken, voltype_url, voltemp_id, name)
     return result
