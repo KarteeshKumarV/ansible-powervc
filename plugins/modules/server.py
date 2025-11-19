@@ -49,7 +49,7 @@ options:
   user_data:
     description:
       - activation_input data which is passed to the instance.
-    type: str    
+    type: str
   network:
      description:
        - Name or ID of a network to attach this instance to. A simpler
@@ -135,7 +135,7 @@ EXAMPLES = '''
           userdata: |
             #!/bin/sh
             apt update
-            apt -y full-upgrade          
+            apt -y full-upgrade
           nics:
             - network_name: "NETWORK_NAME"
               fixed_ip: "FIXED_IP" # "fixed_ip: 192.168.10.20"
