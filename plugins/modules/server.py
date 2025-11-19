@@ -46,6 +46,10 @@ options:
     description:
       - The key pair name to be used when creating a instance.
     type: str
+  user_data:
+    description:
+      - activation_input data which is passed to the instance.
+    type: str    
   network:
      description:
        - Name or ID of a network to attach this instance to. A simpler
@@ -128,6 +132,10 @@ EXAMPLES = '''
           timeout: 200
           max_count: "COUNT"
           collocation_rule_name: "COLLOCATION_RULE_NAME"
+          userdata: |
+            #!/bin/sh
+            apt update
+            apt -y full-upgrade          
           nics:
             - network_name: "NETWORK_NAME"
               fixed_ip: "FIXED_IP" # "fixed_ip: 192.168.10.20"

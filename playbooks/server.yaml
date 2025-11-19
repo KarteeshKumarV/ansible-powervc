@@ -42,6 +42,10 @@
           timeout: 200
           max_count: "COUNT"
           collocation_rule_name: "COLLOCATION_RULE_NAME"
+          userdata: |
+            #!/bin/sh
+            apt update
+            apt -y full-upgrade
           nics:
             - network_name: "NETWORK_NAME"
               fixed_ip: "FIXED_IP" # "fixed_ip: 192.168.10.20"
