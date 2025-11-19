@@ -17,13 +17,6 @@ options:
   name:
     description:
       - Name of the VM
-<<<<<<< HEAD
-    type: str
-  id:
-    description:
-      - ID of the VM
-=======
->>>>>>> 187f89e (VM ID/Name as input parameter Changes)
     type: str
   id:
     description:
@@ -82,7 +75,7 @@ EXAMPLES = '''
        - name:  Perform VM Clone Operation on VM with network and IP details
          ibm.powervc.clone_vm:
             auth: "{{ auth }}"
-            vm_name: "VM_NAME"
+            name: "VM_NAME"
             clonevm_name: "CLONEVM_NAME"
             nics:
                 - net-name: "NET-NAME"
