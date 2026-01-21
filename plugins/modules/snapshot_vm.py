@@ -69,19 +69,11 @@ EXAMPLES = '''
   - name: VM All Volume Snapshot Playbook
     hosts: localhost
     gather_facts: no
-    vars:
-     auth:
-      auth_url: https://<POWERVC>:5000/v3
-      project_name: PROJECT-NAME
-      username: USERID
-      password: PASSWORD
-      project_domain_name: PROJECT_DOMAIN_NAME
-      user_domain_name: USER_DOMAIN_NAME
     tasks:
        - name:  Perform VM Snapshot Operations on All the volumes
          ibm.powervc.snapshot_vm:
-            auth: "{{ auth }}"
-            vm_name: "VM_NAME"
+            cloud: "CLOUD_NAME"
+            name: "VM_NAME"
             snapshot_name: "SNAPSHOT_NAME"
             snapshot_description: "SNAPSHOT_DESCRIPTION"
             volume:
@@ -94,19 +86,11 @@ EXAMPLES = '''
   - name: VM Boot Volume Snapshot Playbook
     hosts: localhost
     gather_facts: no
-    vars:
-     auth:
-      auth_url: https://<POWERVC>:5000/v3
-      project_name: PROJECT-NAME
-      username: USERID
-      password: PASSWORD
-      project_domain_name: PROJECT_DOMAIN_NAME
-      user_domain_name: USER_DOMAIN_NAME
     tasks:
        - name:  Perform VM Snapshot Operations on Boot volumes
          ibm.powervc.snapshot_vm:
-            auth: "{{ auth }}"
-            vm_name: "VM_NAME"
+            cloud: "CLOUD_NAME"
+            name: "VM_NAME"
             snapshot_name: "SNAPSHOT_NAME"
             snapshot_description: "SNAPSHOT_DESCRIPTION"
             volume:
