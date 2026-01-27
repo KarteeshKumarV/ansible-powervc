@@ -90,7 +90,7 @@ class RetypeVolModule(OpenStackModule):
         mutually_exclusive=[
             ['name', 'id'],
         ],
-    required_one_of=[
+    required_one_of = [
             ['name', 'id'],
         ]
     )
@@ -107,7 +107,7 @@ class RetypeVolModule(OpenStackModule):
         if storage_template:
             storage_template_id = self.conn.block_storage.find_type(storage_template, ignore_missing=False).id
         try:
-            data = {"os-retype":{"new_type": storage_template_id, "migration_policy": migration_policy}}
+            data = {"os-retype": {"new_type": storage_template_id, "migration_policy": migration_policy}}
             res = retype_ops(self, self.conn, authtoken, tenant_id, vol_id, data)
             self.exit_json(changed=True, result=res)
         except Exception as e:
