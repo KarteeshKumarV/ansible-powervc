@@ -90,7 +90,7 @@ class RetypeVolModule(OpenStackModule):
         mutually_exclusive=[
             ['name', 'id'],
         ],
-    required_one_of = [
+        required_one_of=[
             ['name', 'id'],
         ]
     )
