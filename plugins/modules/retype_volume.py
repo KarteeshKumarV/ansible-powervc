@@ -29,6 +29,7 @@ options:
   migration_policy:
     description:
       - ID of the Host
+    choices: ['never', 'generic', 'on-demand']
     type: str
 
 '''
