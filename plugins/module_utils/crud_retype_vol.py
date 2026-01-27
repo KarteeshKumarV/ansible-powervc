@@ -5,7 +5,6 @@ This module performs the Volume Retype operations.
 """
 
 import requests
-import json
 
 
 def get_headers(authtoken):
