@@ -44,11 +44,10 @@ def maintenance(mod, endpoint, url, authtoken, put_data):
 
 def maintenance_ops(mod, connectn, authtoken, tenant_id, host_display_name_value, status, migrate, target_host):
     service_name = "compute"
-    headers_scg = {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
     url = f"{endpoint}/ego/prs/hypervisor_maintenance/{host_display_name_value}"
     if migrate:
-        data = {"status": status, "migrate":migrate, "target_host":target_host}
+        data = {"status": status, "migrate": migrate, "target_host": target_host}
     else:
         data = {"status": status}
     result = maintenance(mod, endpoint, url, authtoken, data)
