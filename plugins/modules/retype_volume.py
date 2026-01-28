@@ -39,39 +39,45 @@ options:
 '''
 
 EXAMPLES = '''
-  - name: Volume Resize Playbook using Volume ID
+  - name: Resize PowerVC volume with generic migration policy
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Perform Volume Resize Operations using Volume ID
+       - name: Resize PowerVC volume using volume ID
          ibm.powervc.resize_volume:
             cloud: "CLOUDNAME"
-            id: "VM_ID"
-            storage_template: "STORAGE_TEMPLATE"
-            migration_policy: "MIGRATION_POLICY_TYPE"
+            id: "VOLUME_ID"
+            storage_template: "STORAGE_TEMPLATE NAME"
+            migration_policy: "generic"
             validate_certs: no
          register: result
        - debug:
             var: result
 
-  - name: Volume Resize Playbook using Volume Name
+  - name: Resize PowerVC volume with on-demand migration policy
     hosts: localhost
     gather_facts: no
-    vars:
-     auth:
-      auth_url: https://<POWERVC>:5000/v3
-      project_name: PROJECT-NAME
-      username: USERID
-      password: PASSWORD
-      project_domain_name: PROJECT_DOMAIN_NAME
-      user_domain_name: USER_DOMAIN_NAME
     tasks:
-       - name: Perform Resize Volume Operations using Volume Name
+       - name: Resize PowerVC volume using volume name
          ibm.powervc.resize_volume:
-            auth: "{{ auth }}"
-            id: "VM_ID"
-            storage_template: "STORAGE_TEMPLATE"
-            migration_policy: "MIGRATION_POLICY_TYPE"
+            cloud: "CLOUDNAME"
+            name: "VOLUME_NAME"
+            storage_template: "STORAGE_TEMPLATE NAME"
+            migration_policy: "on-demand"
+            validate_certs: no
+         register: result
+       - debug:
+            var: result
+
+  - name: Resize PowerVC Volume with default migration policy
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Resize Volume Operations using Volume Name
+         ibm.powervc.resize_volume:
+            cloud: "CLOUD"
+            id: "VOLUME_ID"
+            storage_template: "STORAGE_TEMPLATE NAME"
             validate_certs: no
          register: result
        - debug:
