@@ -17,7 +17,7 @@ description:
 options:
   host:
     description:
-      - ID of the Host
+      - HYPERVISOR_ID/MTMS of the Host
     required: true
     type: str
   status:
@@ -48,7 +48,6 @@ EXAMPLES = '''
             cloud: "CLOUD"
             host: "HOST_ID"
             status: "enable"
-            validate_certs: no
          register: output
        - debug:
             var: output.result
@@ -63,7 +62,6 @@ EXAMPLES = '''
             host: "HOST_ID"
             status: "enable"
             migrate: "all"
-            validate_certs: no
          register: result
        - debug:
             var: result
@@ -78,7 +76,6 @@ EXAMPLES = '''
             host: "HOST_ID"
             status: "enable"
             migrate: "active_only"
-            validate_certs: no
          register: output
        - debug:
             var: output.result
@@ -92,7 +89,6 @@ EXAMPLES = '''
             cloud: "CLOUD"
             host: "HOST_ID"
             status: "disable"
-            validate_certs: no
          register: output
        - debug:
             var: output.result
@@ -112,7 +108,7 @@ class HostMaintenanceModule(OpenStackModule):
         target_host=dict(),
     )
     module_kwargs = dict(
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
 
     def run(self):
