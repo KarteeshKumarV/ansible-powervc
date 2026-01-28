@@ -7,7 +7,6 @@ This module performs the Maintenance operations on Host
 import requests
 
 
-
 def get_headers(authtoken):
     return {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
 
