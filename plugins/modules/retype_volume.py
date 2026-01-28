@@ -35,6 +35,21 @@ options:
 '''
 
 EXAMPLES = '''
+  - name: Volume Resize Playbook using Volume ID
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Perform Volume Resize Operations using Volume ID
+         ibm.powervc.resize_volume:
+            cloud: "CLOUDNAME"
+            id: "VM_ID"
+            storage_template: "STORAGE_TEMPLATE"
+            migration_policy: "MIGRATION_POLICY_TYPE"
+            validate_certs: no
+         register: result
+       - debug:
+            var: result
+
   - name: Volume Resize Playbook using Volume Name
     hosts: localhost
     gather_facts: no
@@ -58,20 +73,6 @@ EXAMPLES = '''
        - debug:
             var: result
 
-  - name: Volume Resize Playbook using Volume ID
-    hosts: localhost
-    gather_facts: no
-    tasks:
-       - name: Perform Volume Resize Operations using Volume ID
-         ibm.powervc.resize_volume:
-            cloud: "CLOUDNAME"
-            id: "VM_ID"
-            storage_template: "STORAGE_TEMPLATE"
-            migration_policy: "MIGRATION_POLICY_TYPE"
-            validate_certs: no
-         register: result
-       - debug:
-            var: result
 '''
 
 
