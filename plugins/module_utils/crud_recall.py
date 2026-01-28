@@ -34,7 +34,7 @@ def put_recall(mod, endpoint, url, authtoken, put_data):
     headers_scg = {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
     responce = requests.put(url, headers=headers_scg, verify=False)
     if responce.ok:
-        return f"Recall Host Operation Done"
+        return "Recall host operation completed successfully"
     else:
         mod.fail_json(
             msg=f"An unexpected error occurred:{responce.json()}", changed=False
@@ -43,7 +43,6 @@ def put_recall(mod, endpoint, url, authtoken, put_data):
 
 def recall_ops(mod, connectn, authtoken, tenant_id, host_display_name_value):
     service_name = "compute"
-    headers_scg = {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
     url = f"{endpoint}/os-hosts/{host_display_name_value}/recall-vm"
     data = {"recall_vm": "true"}
