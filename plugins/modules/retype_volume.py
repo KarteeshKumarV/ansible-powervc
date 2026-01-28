@@ -7,10 +7,10 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: resize_volume
+module: retype_volume
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Performs the Resize operations on the Volume.
+short_description: Performs the Retype operations on the Volume.
 description:
   - This playbook helps in performing the volume operations on the Volume provided.
 options:
@@ -39,11 +39,11 @@ options:
 '''
 
 EXAMPLES = '''
-  - name: Resize PowerVC volume with generic migration policy
+  - name: Retype PowerVC volume with generic migration policy
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Resize PowerVC volume using volume ID
+       - name: Retype PowerVC volume using volume ID
          ibm.powervc.resize_volume:
             cloud: "CLOUDNAME"
             id: "VOLUME_ID"
@@ -54,7 +54,7 @@ EXAMPLES = '''
        - debug:
             var: result
 
-  - name: Resize PowerVC volume with on-demand migration policy
+  - name: Retype PowerVC volume with on-demand migration policy
     hosts: localhost
     gather_facts: no
     tasks:
@@ -69,7 +69,7 @@ EXAMPLES = '''
        - debug:
             var: result
 
-  - name: Resize PowerVC Volume with default migration policy
+  - name: Retype PowerVC Volume with default migration policy
     hosts: localhost
     gather_facts: no
     tasks:
