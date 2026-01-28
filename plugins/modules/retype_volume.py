@@ -17,18 +17,22 @@ options:
   name:
     description:
       - Name of the Volume
+    default: null
     type: str
   id:
     description:
       - ID of the Volume
+    default: null
     type: str
   storage_template:
     description:
       - ID of the Host
+    default: null
     type: str
   migration_policy:
     description:
       - ID of the Host
+    default: 'never'
     choices: ['never', 'generic', 'on-demand']
     type: str
 
