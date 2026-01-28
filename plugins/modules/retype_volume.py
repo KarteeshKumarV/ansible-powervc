@@ -44,7 +44,7 @@ EXAMPLES = '''
     gather_facts: no
     tasks:
        - name: Retype PowerVC volume using volume ID
-         ibm.powervc.resize_volume:
+         ibm.powervc.retype_volume:
             cloud: "CLOUDNAME"
             id: "VOLUME_ID"
             storage_template: "STORAGE_TEMPLATE NAME"
@@ -58,8 +58,8 @@ EXAMPLES = '''
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Resize PowerVC volume using volume name
-         ibm.powervc.resize_volume:
+       - name: retype PowerVC volume using volume name
+         ibm.powervc.retype_volume:
             cloud: "CLOUDNAME"
             name: "VOLUME_NAME"
             storage_template: "STORAGE_TEMPLATE NAME"
@@ -73,8 +73,8 @@ EXAMPLES = '''
     hosts: localhost
     gather_facts: no
     tasks:
-       - name: Resize Volume Operations using Volume Name
-         ibm.powervc.resize_volume:
+       - name: retype Volume Operations using Volume Name
+         ibm.powervc.retype_volume:
             cloud: "CLOUD"
             id: "VOLUME_ID"
             storage_template: "STORAGE_TEMPLATE NAME"
