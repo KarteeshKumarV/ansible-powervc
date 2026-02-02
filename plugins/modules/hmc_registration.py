@@ -14,25 +14,26 @@ short_description: Register or unregister an HMC host in IBM PowerVC.
 description:
   - Register or unregister a HMC managed host in IBM PowerVC.
 options:
-  host_display_name:
+  name:
     description:
       - Display name of the HMC host.
-    required: true
     type: str
   access_ip:
     description:
       - Management IP address of the HMC host.
-    required: true
     type: str
-  user_id:
+  user:
     description:
       - User ID of the HMC host.
-    required: true
     type: str
   password:
     description:
       - Password for the HMC host user.
     required: true
+    type: str
+  host_id:
+    description:
+      - UUID of the HMC host.
     type: str
   state:
     description:
@@ -50,16 +51,14 @@ EXAMPLES = '''
        - name: Register the HMC host
          ibm.powervc.hmc_registration:
             cloud: "CLOUD"
-            host_display_name: "HOST_DISPLAY_NAME"
-            host_type: "HOST_TYPE"
+            name: "HOST_DISPLAY_NAME"
             access_ip: "IP_ADDRESS"
-            user_id: "USER_ID"
+            user: "USER_ID"
             password: "PASSWORD"
             state: present
-            validate_certs: no
-         register: result
+         register: output
        - debug:
-            var: result
+            var: output.result
 
   - name: Unregister an HMC host
     hosts: localhost
@@ -68,12 +67,11 @@ EXAMPLES = '''
        - name: Unregister the HMC host
          ibm.powervc.hmc_registration:
             cloud: "CLOUD"
-            host_display_name: "HOST_DISPLAY_NAME"
+            host_id: "HMC_UUID"
             state: absent
-            validate_certs: no
-         register: result
+         register: output
        - debug:
-            var: result
+            var: output.result
 
 '''
 
@@ -84,16 +82,15 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_hmc_registration 
 
 class HostAddModule(OpenStackModule):
     argument_spec = dict(
-        host_id=dict(required=False),
-        user_id=dict(required=False),
-        access_ip=dict(required=False),
-        host_display_name=dict(),
-        password=dict(type='str', no_log=True),
-        host_type=dict(),
-        state=dict(choices=['absent', 'present']),
+        host_id=dict(),
+        user=dict(),
+        access_ip=dict(),
+        name=dict(),
+        password=dict(no_log=True),
+        state=dict(required=True, choices=['absent', 'present']),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     def run(self):
@@ -101,8 +98,8 @@ class HostAddModule(OpenStackModule):
             authtoken = self.conn.auth_token
             tenant_id = self.conn.session.get_project_id()
             host_id = self.params['host_id']
-            user_id = self.params['user_id']
-            host_display_name = self.params['host_display_name']
+            user = self.params['user']
+            name = self.params['name']
             access_ip = self.params['access_ip']
             password = self.params['password']
             state = self.params['state']
@@ -113,8 +110,8 @@ class HostAddModule(OpenStackModule):
                     "hmc": {
                         "registration": {
                             "access_ip": access_ip,
-                            "user_id": user_id,
-                            "hmc_display_name": host_display_name,
+                            "user_id": user,
+                            "hmc_display_name": name,
                             "password": password,
                             "auto_add_certificate": True
                         }
