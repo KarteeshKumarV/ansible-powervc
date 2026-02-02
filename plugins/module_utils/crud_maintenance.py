@@ -34,7 +34,7 @@ def maintenance(mod, endpoint, url, authtoken, put_data):
     headers_scg = {"X-Auth-Token": authtoken, "Content-Type": "application/json"}
     responce = requests.put(url, headers=headers_scg, json=put_data, verify=False)
     if responce.ok:
-        return f"Maintenance action is done {responce.json()}"
+        return f"Maintenance action has been performed - {responce.json()}"
     else:
         mod.fail_json(
             msg=f"An unexpected error occurred:{responce.json()}", changed=False

@@ -49,9 +49,9 @@ EXAMPLES = '''
             host: "HOST_ID"
             status: "enable"
             validate_certs: no
-         register: result
+         register: output
        - debug:
-            var: result
+            var: output.result
 
   - name: Enable Host Manintenance and migrate All VMs based on Placement Policy
     hosts: localhost
@@ -79,9 +79,9 @@ EXAMPLES = '''
             status: "enable"
             migrate: "active_only"
             validate_certs: no
-         register: result
+         register: output
        - debug:
-            var: result
+            var: output.result
 
   - name: Disable Host maintenance
     hosts: localhost
@@ -93,9 +93,9 @@ EXAMPLES = '''
             host: "HOST_ID"
             status: "disable"
             validate_certs: no
-         register: result
+         register: output
        - debug:
-            var: result
+            var: output.result
 
 '''
 
