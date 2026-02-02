@@ -32,6 +32,7 @@ def get_endpoint_url_by_service_name(connectn, service_name, tenant_id):
     else:
         return f"No service found with the name '{service_name}'"
 
+
 def delete_host(mod, authtoken, host_url):
     """
     Deletes the Host
@@ -44,6 +45,7 @@ def delete_host(mod, authtoken, host_url):
         mod.fail_json(
             msg=f"An unexpected error occurred: {responce.json()}", changed=False
         )
+
 
 def post_host(module, authtoken, host_url, post_data):
     """
@@ -58,7 +60,7 @@ def post_host(module, authtoken, host_url, post_data):
         )
     else:
         module.fail_json(
-                msg=f"Failed in Adding the host: {responce.json()}",
+            msg=f"Failed in Adding the host: {responce.json()}",
             changed=False,
         )
 
