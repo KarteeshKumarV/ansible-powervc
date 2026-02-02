@@ -24,7 +24,7 @@ options:
       - Type of the host being registered.
     required: true
     choices: [powervm]
-	type: str
+    type: str
   access_ip:
     description:
       - Management IP address of the NovaLink host.
