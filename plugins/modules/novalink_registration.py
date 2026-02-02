@@ -102,7 +102,6 @@ class HostAddModule(OpenStackModule):
         supports_check_mode=True
     )
 
-
     def run(self):
         try:
             authtoken = self.conn.auth_token
@@ -118,22 +117,22 @@ class HostAddModule(OpenStackModule):
                 data = None
             elif state == "present":
                 data = {
-                          "host": {
-                          "registration": {
-                          "access_ip": access_ip,
-                          "user_id": user_id,
-                          "host_type": host_type,
-                          "asynchronous": True,
-                          "host_standby": False,
-                          "host_group": "Default Group",
-                          "host_display_name": host_display_name,
-                          "password": password,
-                          "force_unmanage": False,
-                          "auto_add_host_key": True,
-                          "force_switch": False
-                                           }
-                                   }
-                         }
+                    "host": {
+                        "registration": {
+                            "access_ip": access_ip,
+                            "user_id": user_id,
+                            "host_type": host_type,
+                            "asynchronous": True,
+                            "host_standby": False,
+                            "host_group": "Default Group",
+                            "host_display_name": host_display_name,
+                            "password": password,
+                            "force_unmanage": False,
+                            "auto_add_host_key": True,
+                            "force_switch": False
+                        }
+                    }
+                }
             res = host_ops(self, self.conn, authtoken, tenant_id, state, host_id, data)
             self.exit_json(changed=False, result=res)
         except Exception as e:
