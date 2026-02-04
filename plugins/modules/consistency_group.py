@@ -121,7 +121,7 @@ class CreateCGModule(OpenStackModule):
             for vname in vol_name:
                 vol_id.append(self.conn.block_storage.find_volume(vname, ignore_missing=False).id)
         try:
-            vol_data  = ",".join(vol_id)
+            vol_data = ",".join(vol_id)
             vol_data = {"group": {"add_volumes": vol_data}}
             res = createcg_ops(self, self.conn, authtoken, tenant_id, name, vol_data, group_type, storage_template, description)
             self.exit_json(changed=True, result=res)
@@ -136,3 +136,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
