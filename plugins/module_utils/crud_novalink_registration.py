@@ -32,20 +32,18 @@ def get_endpoint_url_by_service_name(connectn, service_name, tenant_id):
     else:
         return f"No service found with the name '{service_name}'"
 
-
-def delete_host(mod, authtoken, host_url):
+def delete_host(mod, authtoken, host_url, host_id):
     """
-    Deletes the Host
+    Removes the Host
     """
     headers_scg = get_headers(authtoken)
     responce = requests.delete(host_url, headers=headers_scg, verify=False)
     if responce.ok:
-        return "Deleted the provided Host"
+        return f"Removed the Novalink Host: {host_id}"
     else:
         mod.fail_json(
             msg=f"An unexpected error occurred: {responce.json()}", changed=False
         )
-
 
 def post_host(module, authtoken, host_url, post_data):
     headers_scg = get_headers(authtoken)
@@ -57,7 +55,7 @@ def post_host(module, authtoken, host_url, post_data):
         )
     else:
         module.fail_json(
-            msg=f"Failed in Adding the host: {responce.json()}",
+                msg=f"Failed in Adding the host: {responce.json()}",
             changed=False,
         )
 
@@ -69,8 +67,11 @@ def host_ops(mod, connectn, authtoken, tenant_id, state, host_id, data):
     service_name = "compute"
     endpoint = get_endpoint_url_by_service_name(connectn, service_name, tenant_id)
     if state == 'absent':
-        host_url = endpoint + "/os-hosts/" + host_id
-        result = delete_host(mod, authtoken, host_url)
+        if data == "uninstall_novalink":
+            host_url = f"{endpoint}/os-hosts/{host_id}/uninstall"
+        else:
+            host_url = f"{endpoint}/os-hosts/{host_id}"
+        result = delete_host(mod, authtoken, host_url, host_id)
     elif state == 'present':
         host_url = endpoint + "/os-hosts"
         result = post_host(mod, authtoken, host_url, data)
