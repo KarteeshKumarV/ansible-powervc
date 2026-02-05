@@ -172,7 +172,6 @@ class HostAddModule(OpenStackModule):
         supports_check_mode=True
     )
 
-
     def run(self):
         try:
             authtoken = self.conn.auth_token

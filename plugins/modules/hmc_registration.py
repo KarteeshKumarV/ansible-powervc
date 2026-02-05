@@ -93,7 +93,6 @@ class HostAddModule(OpenStackModule):
         supports_check_mode=True
     )
 
-
     def run(self):
         try:
             authtoken = self.conn.auth_token
@@ -110,11 +109,11 @@ class HostAddModule(OpenStackModule):
                 data = {
                     "hmc": {
                         "registration": {
-                        "access_ip": access_ip,
-                        "user_id": user,
-                        "hmc_display_name": name,
-                        "password": password,
-                        "auto_add_certificate": True
+                            "access_ip": access_ip,
+                            "user_id": user,
+                            "hmc_display_name": name,
+                            "password": password,
+                            "auto_add_certificate": True
                         }
                     }
                 }
