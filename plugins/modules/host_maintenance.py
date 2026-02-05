@@ -48,7 +48,6 @@ EXAMPLES = '''
             cloud: "CLOUD"
             host: "HOST_ID"
             status: "enable"
-            validate_certs: no
          register: output
        - debug:
             var: output.result
@@ -63,7 +62,6 @@ EXAMPLES = '''
             host: "HOST_ID"
             status: "enable"
             migrate: "all"
-            validate_certs: no
          register: result
        - debug:
             var: result
@@ -78,7 +76,6 @@ EXAMPLES = '''
             host: "HOST_ID"
             status: "enable"
             migrate: "active_only"
-            validate_certs: no
          register: output
        - debug:
             var: output.result
@@ -92,7 +89,6 @@ EXAMPLES = '''
             cloud: "CLOUD"
             host: "HOST_ID"
             status: "disable"
-            validate_certs: no
          register: output
        - debug:
             var: output.result
