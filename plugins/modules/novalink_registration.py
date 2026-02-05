@@ -155,16 +155,16 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_novalink_registra
 
 class HostAddModule(OpenStackModule):
     argument_spec = dict(
-        host_id=dict(required=False),
-        user=dict(required=False),
-        access_ip=dict(required=False),
-        name=dict(),
-        host_group=dict(default="Default Group", choices=["Default Group","Default Reservation Group"], required=False),
+        host_id=dict(type='str', required=False),
+        user=dict(type='str', required=False),
+        access_ip=dict(type='str', required=False),
+        name=dict(type='str'),
+        host_group=dict(default="Default Group", choices=["Default Group", "Default Reservation Group"], required=False),
         password=dict(type='str', no_log=True),
         stand_by=dict(type='bool', default=False),
         uninstall=dict(type='bool', default=False),
         private_key=dict(no_log=True),
-        standby_tag=dict(default="unplanned_maintenance", choices=["unplanned_maintenance","planned_maintenance","provisioning"], required=False),
+        standby_tag=dict(default="unplanned_maintenance", choices=["unplanned_maintenance", "planned_maintenance", "provisioning"], required=False),
         state=dict(choices=['absent', 'present'], required=True),
         force=dict(type='bool', default=False),
     )
