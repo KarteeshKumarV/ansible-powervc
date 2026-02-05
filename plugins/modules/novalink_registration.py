@@ -203,19 +203,19 @@ class HostAddModule(OpenStackModule):
 
             if state == "present":
                 registration = {
-                          "access_ip": access_ip,
-                          "user_id": user,
-                          "host_type": "powervm",
-                          "asynchronous": True,
-                          "host_standby": stand_by,
-                          "host_group": host_group,
-                          "host_display_name": name,
-                          "password": password,
-                          "private_key_data": private_key_data,
-                          "force_unmanage": False,
-                          "auto_add_host_key": True,
-                          "force_switch": force
-                                 }
+                    "access_ip": access_ip,
+                    "user_id": user,
+                    "host_type": "powervm",
+                    "asynchronous": True,
+                    "host_standby": stand_by,
+                    "host_group": host_group,
+                    "host_display_name": name,
+                    "password": password,
+                    "private_key_data": private_key_data,
+                    "force_unmanage": False,
+                    "auto_add_host_key": True,
+                    "force_switch": force
+                }
                 if stand_by:
                     registration["standby_tag"] = standby_tag
                 data = {
