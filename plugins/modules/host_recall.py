@@ -32,7 +32,6 @@ EXAMPLES = '''
          ibm.powervc.host_recall:
             cloud: "CLOUD"
             host: "HOST_ID"
-            validate_certs: no
          register: result
        - debug:
             var: result
@@ -53,7 +52,6 @@ EXAMPLES = '''
          ibm.powervc.host_recall:
             auth: "{{ auth }}"
             host: "HOST_ID"
-            validate_certs: no
          register: result
        - debug:
             var: result
