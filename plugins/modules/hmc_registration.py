@@ -108,16 +108,16 @@ class HostAddModule(OpenStackModule):
                 data = None
             elif state == "present":
                 data = {
-                          "hmc": {
-                          "registration": {
-                          "access_ip": access_ip,
-                          "user_id": user,
-                          "hmc_display_name": name,
-                          "password": password,
-                          "auto_add_certificate": True
-                                           }
-                                   }
-                         }
+                    "hmc": {
+                        "registration": {
+                        "access_ip": access_ip,
+                        "user_id": user,
+                        "hmc_display_name": name,
+                        "password": password,
+                        "auto_add_certificate": True
+                        }
+                    }
+                }
             res = host_ops(self, self.conn, authtoken, tenant_id, state, host_id, data)
             self.exit_json(changed=False, result=res)
         except Exception as e:
