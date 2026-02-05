@@ -24,7 +24,7 @@ options:
       - Type of the host being registered.
     required: true
     choices: [powervm]
-    type: str
+        type: str
   access_ip:
     description:
       - Management IP address of the NovaLink host.
@@ -91,48 +91,67 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_novalink_registra
 class HostAddModule(OpenStackModule):
     argument_spec = dict(
         host_id=dict(required=False),
-        user_id=dict(required=False),
+        user=dict(required=False),
         access_ip=dict(required=False),
-        host_display_name=dict(),
+        name=dict(),
+        host_group=dict(default="Default Group", choices=["Default Group","Default-Reservation-Group"], required=False),
         password=dict(type='str', no_log=True),
-        host_type=dict(),
-        state=dict(choices=['absent', 'present']),
+        stand_by=dict(type='bool', default=False),
+        private_key_data=dict(no_log=True),
+        standby_tag=dict(default="unplanned_maintenance", choices=["unplanned_maintenance","planned_maintenance","provisioning"], required=False),
+        state=dict(choices=['absent', 'present'], required=True),
+        force=dict(type='bool', default=False),
     )
     module_kwargs = dict(
         supports_check_mode=True
     )
+
 
     def run(self):
         try:
             authtoken = self.conn.auth_token
             tenant_id = self.conn.session.get_project_id()
             host_id = self.params['host_id']
-            user_id = self.params['user_id']
-            host_display_name = self.params['host_display_name']
-            host_type = self.params['host_type']
+            user = self.params['user']
+            name = self.params['name']
             access_ip = self.params['access_ip']
             password = self.params['password']
+            private_key_data = self.params['private_key_data']
+            host_group = self.params['host_group']
+            stand_by = self.params['stand_by']
+            standby_tag = self.params['standby_tag']
+            force = self.params['force']
             state = self.params['state']
-            if state == "absent":
-                data = None
-            elif state == "present":
-                data = {
-                    "host": {
-                        "registration": {
-                            "access_ip": access_ip,
-                            "user_id": user_id,
-                            "host_type": host_type,
-                            "asynchronous": True,
-                            "host_standby": False,
-                            "host_group": "Default Group",
-                            "host_display_name": host_display_name,
-                            "password": password,
-                            "force_unmanage": False,
-                            "auto_add_host_key": True,
-                            "force_switch": False
+
+            if state == "absent" and not host_id:
+                self.fail_json(
+                    msg="host_id must be provided when state is 'absent'",
+                    changed=False
+                )
+
+            data = None
+            if state == "present":
+                registration = {
+                          "access_ip": access_ip,
+                          "user_id": user,
+                          "host_type": "powervm",
+                          "asynchronous": True,
+                          "host_standby": stand_by,
+                          "host_group": host_group,
+                          "host_display_name": name,
+                          "password": password,
+                          "private_key_data": private_key_data,
+                          "force_unmanage": False,
+                          "auto_add_host_key": True,
+                          "force_switch": force
+                                 }
+                if stand_by:
+                    registration["standby_tag"] = standby_tag
+                    data = {
+                        "host": {
+                            "registration": registration
                         }
                     }
-                }
             res = host_ops(self, self.conn, authtoken, tenant_id, state, host_id, data)
             self.exit_json(changed=False, result=res)
         except Exception as e:
