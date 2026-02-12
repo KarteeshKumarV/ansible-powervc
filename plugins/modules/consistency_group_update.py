@@ -55,13 +55,13 @@ options:
       name:
         description:
           - List of volume names.
-          - Required if C(update=add/remove) and C(id) not provided.
+          - Required if (update=add/remove) and (id) not provided.
         type: list
         elements: str
       id:
         description:
           - List of volume IDs.
-          - Required if C(update=add/remove) and C(name) not provided.
+          - Required if (update=add/remove) and (name) not provided.
         type: list
         elements: str
 '''
@@ -146,16 +146,11 @@ class UpdateCGModule(OpenStackModule):
         volume = self.params.get('volume')
 
         vol_data = None
-
-        # -------------------------
-        # Volume Handling (Optional)
-        # -------------------------
         if volume:
             update_type = volume.get("update")
             name_list = volume.get("name")
             id_list = volume.get("id")
 
-            # Validation
             if not name_list and not id_list:
                 self.fail_json(
                     msg="Either volume.name or volume.id must be provided"
@@ -187,14 +182,11 @@ class UpdateCGModule(OpenStackModule):
             else:
                 vol_data = {"remove_volumes": vol_string}
 
-        # -------------------------
-        # Check Mode Support
-        # -------------------------
         if self.check_mode:
             self.exit_json(
                 changed=bool(name or description or vol_data),
                 msg="Check mode: no changes applied"
-            )                    
+            )
 
         try:
             res = updatecg_ops(self, self.conn, authtoken, tenant_id, cg_id, name, description, vol_data)
@@ -217,4 +209,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
