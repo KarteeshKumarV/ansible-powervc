@@ -54,7 +54,8 @@ def create_consistency_group(module, createcg_url, authtoken, post_data, vol_dat
 def createcg_ops(mod, connectn, authtoken, tenant_id, name, vol_data, group_type, storage_provider, description):
     service_name = "volume"
     endpoint = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
-    post_data = {"group": {"name": name, "group_type": group_type , "volume_types": [storage_provider],"description": description}}
+    post_data = {"group": {"name": name, "group_type": group_type , "volume_types": [storage_provider], "description": description}}
     createcg_url = f"{endpoint}/groups"
     result = create_consistency_group(mod, createcg_url, authtoken, post_data, vol_data)
     return result
+
