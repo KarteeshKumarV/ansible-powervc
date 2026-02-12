@@ -47,9 +47,7 @@ def update_consistency_group(module, updatecg_url, authtoken, post_data):
 
     response = requests.put(updatecg_url, headers=headers, json=post_data, verify=False)
     if response.ok:
-        return (
-                f"Consistency Group has been updated : {post_data}",
-        )
+        return f"Consistency Group has been updated: {post_data}"
     else:
         module.fail_json(
             msg=f"{response.json()}",
@@ -90,4 +88,3 @@ def updatecg_ops(mod, connectn, authtoken, tenant_id,
     result = update_consistency_group(mod, updatecg_url, authtoken, post_data)
 
     return result
-
