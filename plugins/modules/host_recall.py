@@ -17,7 +17,7 @@ description:
 options:
   host:
     description:
-      - ID of the compute host to recall virtual machines.
+      - HYPERVISOR_ID/MTMS of the compute host to recall virtual machines.
     required: true
     type: str
 
@@ -67,7 +67,7 @@ class HostRecallModule(OpenStackModule):
         host=dict(required=True)
     )
     module_kwargs = dict(
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
 
     def run(self):

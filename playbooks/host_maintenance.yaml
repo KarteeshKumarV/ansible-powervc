@@ -1,0 +1,53 @@
+  - name: Enable Host Manintenance Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Enable Maintenance mode
+         ibm.powervc.host_maintenance:
+            cloud: "CLOUD"
+            host: "HOST_ID"
+            status: "enable"
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Enable Host Manintenance and migrate All VMs based on Placement Policy
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Enable maintenance mode and migrate all VMs
+         ibm.powervc.host_maintenance:
+            cloud: "CLOUD"
+            host: "HOST_ID"
+            status: "enable"
+            migrate: "all"
+         register: result
+       - debug:
+            var: result
+
+  - name: Enable Host Manintenance and migrate Only Active VMs based on Placement Policy
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Enable maintenance mode and migrate only active VMs
+         ibm.powervc.host_maintenance:
+            cloud: "CLOUD"
+            host: "HOST_ID"
+            status: "enable"
+            migrate: "active_only"
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Disable Host maintenance
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Disable the host maintenance mode
+         ibm.powervc.host_maintenance:
+            cloud: "CLOUD"
+            host: "HOST_ID"
+            status: "disable"
+         register: output
+       - debug:
+            var: output.result

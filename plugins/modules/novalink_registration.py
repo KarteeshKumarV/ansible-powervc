@@ -73,7 +73,7 @@ EXAMPLES = '''
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
             access_ip: "IP_ADDRESS"
-            user_id: "USER_ID"
+            user: "USER_ID"
             password: "PASSWORD"
             force: True
             state: present
@@ -90,7 +90,7 @@ EXAMPLES = '''
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
             access_ip: "IP_ADDRESS"
-            user_id: "USER_ID"
+            user: "USER_ID"
             password: "PASSWORD"
             stand_by: True
             standby_tag: "planned_maintenance"
@@ -109,7 +109,7 @@ EXAMPLES = '''
             name: "HOST_DISPLAY_NAME"
             host_type: "HOST_TYPE"
             access_ip: "IP_ADDRESS"
-            user_id: "USER_ID"
+            user: "USER_ID"
             private_key: |
               -----BEGIN RSA PRIVATE KEY-----
               -------------------------------
@@ -169,7 +169,7 @@ class HostAddModule(OpenStackModule):
         force=dict(type='bool', default=False),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     def run(self):

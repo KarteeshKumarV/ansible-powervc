@@ -1,0 +1,81 @@
+  - name: Register a NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Register the NovaLink host
+         ibm.powervc.novalink_registration:
+            cloud: "CLOUD"
+            name: "HOST_DISPLAY_NAME"
+            access_ip: "IP_ADDRESS"
+            user: "USER_ID"
+            password: "PASSWORD"
+            force: True
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Register a NovaLink host in standby mode
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Register the NovaLink host
+         ibm.powervc.novalink_registration:
+            cloud: "CLOUD"
+            name: "HOST_DISPLAY_NAME"
+            access_ip: "IP_ADDRESS"
+            user: "USER_ID"
+            password: "PASSWORD"
+            stand_by: True
+            standby_tag: "planned_maintenance"
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Register a NovaLink host using private key
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Register the NovaLink host
+         ibm.powervc.novalink_registration:
+            cloud: "CLOUD"
+            name: "HOST_DISPLAY_NAME"
+            host_type: "HOST_TYPE"
+            access_ip: "IP_ADDRESS"
+            user: "USER_ID"
+            private_key: |
+              -----BEGIN RSA PRIVATE KEY-----
+              -------------------------------
+              -----END RSA PRIVATE KEY-----
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Unregister a NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Unregister the NovaLink host
+         ibm.powervc.novalink_registration:
+            cloud: "CLOUD"
+            host_id: "HYPERVISOR_ID/MTMS"
+            state: absent
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Removes the PowerVC software from the NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Removes the PowerVC software from host
+         ibm.powervc.novalink_registration:
+            cloud: "CLOUD"
+            host_id: "HYPERVISOR_ID/MTMS"
+            uninstall: True
+            state: absent
+         register: output
+       - debug:
+            var: output.result
