@@ -115,7 +115,7 @@ class SnapshotVMModule(OpenStackModule):
         snapshot_description=dict(required=False),
     )
     module_kwargs = dict(
-        supports_check_mode=True,
+        supports_check_mode=False,
         mutually_exclusive=[
             ['name', 'id'],
         ]
