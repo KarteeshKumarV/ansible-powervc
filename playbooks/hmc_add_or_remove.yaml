@@ -1,0 +1,28 @@
+  - name: Register an HMC host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Register the HMC host
+         ibm.powervc.hmc_registration:
+            cloud: "CLOUD"
+            name: "HOST_DISPLAY_NAME"
+            access_ip: "IP_ADDRESS"
+            user: "USER_ID"
+            password: "PASSWORD"
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Unregister an HMC host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Unregister the HMC host
+         ibm.powervc.hmc_registration:
+            cloud: "CLOUD"
+            host_id: "HMC_UUID"
+            state: absent
+         register: output
+       - debug:
+            var: output.result

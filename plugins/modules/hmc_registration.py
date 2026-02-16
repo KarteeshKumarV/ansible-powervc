@@ -90,7 +90,7 @@ class HostAddModule(OpenStackModule):
         state=dict(required=True, choices=['absent', 'present']),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     def run(self):

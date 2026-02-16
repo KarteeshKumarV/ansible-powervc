@@ -17,7 +17,7 @@ description:
 options:
   host:
     description:
-      - ID of the Host
+      - HYPERVISOR_ID/MTMS of the Host
     required: true
     type: str
   status:
@@ -108,7 +108,7 @@ class HostMaintenanceModule(OpenStackModule):
         target_host=dict(),
     )
     module_kwargs = dict(
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
 
     def run(self):
