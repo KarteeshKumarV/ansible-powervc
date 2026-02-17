@@ -36,3 +36,11 @@ Notes
 - unmanage_volume
 - snapshot_info 
 
+Version 1.2.0
+-------------
+Notes
+* Below modules are added as part of this version 1.2.0.
+- novalink_registration
+- hmc_registration
+- host_maintenance
+- host_recall
