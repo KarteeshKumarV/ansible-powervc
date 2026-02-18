@@ -3,73 +3,91 @@
 DOCUMENTATION = r'''
 ---
 module: consistency_group
-
 short_description: Create and update PowerVC Consistency Groups
-
 description:
   - Create or update PowerVC Storage Consistency Groups.
   - Supports updating name, description, and adding/removing volumes.
   - Update operations are performed using group ID.
-  - Create operation requires name and at least one volume type.
-
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 options:
-
   id:
     description:
       - ID of the consistency group.
       - Required for update operations.
     type: str
-
   name:
     description:
       - Name of the consistency group.
-      - Required for create.
-      - Optional for update (to rename group).
+      - Required for create operation.
+      - Can be updated during update operation.
     type: str
-
   description:
     description:
       - Description of the consistency group.
-      - Optional.
+      - Can be updated during update operation.
     type: str
-
   group_type:
     description:
-      - Group type to associate with the consistency group.
-      - Optional (create only).
+      - Group type of the consistency group.
+      - Required during create operation.
     type: str
-
   storage_template:
     description:
-      - List of storage templates (volume types).
-      - Used to derive volume_types during create.
+      - List of storage templates (volume types) to associate during create.
+      - Combined with volume types derived from provided volumes.
     type: list
     elements: str
-
   volume_name:
     description:
-      - List of volume names.
-      - Used during create or update.
+      - List of volume names to attach during create operation.
+      - Mutually exclusive with C(volume_id).
     type: list
     elements: str
-
   volume_id:
     description:
-      - List of volume IDs.
-      - Used during create or update.
+      - List of volume IDs to attach during create operation.
+      - Mutually exclusive with C(volume_name).
     type: list
     elements: str
-
-  update_type:
+  update:
     description:
-      - Required when modifying volumes during update.
-      - C(add) to add volumes.
-      - C(remove) to remove volumes.
-    type: str
-    choices: ["add", "remove"]
+      - Modify an existing consistency group.
+      - Allows adding and/or removing volumes.
+      - Both C(add) and C(remove) sections are optional.
+    type: dict
+    suboptions:
+      add:
+        description:
+          - Volumes to add to the consistency group.
+        type: dict
+        suboptions:
+          volume_name:
+            description:
+              - List of volume names to add.
+            type: list
+            elements: str
+          volume_id:
+            description:
+              - List of volume IDs to add.
+            type: list
+            elements: str
+      remove:
+        description:
+          - Volumes to remove from the consistency group.
+        type: dict
+        suboptions:
+          volume_name:
+            description:
+              - List of volume names to remove.
+            type: list
+            elements: str
+          volume_id:
+            description:
+              - List of volume IDs to remove.
+            type: list
+            elements: str
 
-author:
-  - Karteesh Kumar Vipparapelli (@vkarteesh)
 '''
 
 EXAMPLES = r'''
