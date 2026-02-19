@@ -72,6 +72,7 @@ def wait_for_group_available(module, url, headers, group_name):
         changed=False,
     )
 
+
 def create_consistency_group(module, createcg_url, authtoken, post_data, vol_data):
     headers = get_headers(authtoken)
     response = requests.post(
