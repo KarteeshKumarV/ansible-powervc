@@ -294,7 +294,6 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_consistency_group
 
 
 class ConsistencyGroupModule(OpenStackModule):
-
     argument_spec = dict(
         id=dict(type='str'),  # Required for update
         name=dict(type='str'),
@@ -332,7 +331,6 @@ class ConsistencyGroupModule(OpenStackModule):
     )
 
     def run(self):
-
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
         group_id = self.params.get('id')
@@ -356,29 +354,24 @@ class ConsistencyGroupModule(OpenStackModule):
             update_payload = {}
             vol_data = {}
             changed = False
-
             # Name update
             if name and name != existing_group.name:
                 update_payload["name"] = name
                 changed = True
-
             # Description update
             if description and description != existing_group.description:
                 update_payload["description"] = description
                 changed = True
-
             # Resolve volume names
             if volume_name:
                 volume_id = [
                     self.conn.block_storage.find_volume(v, ignore_missing=False).id
                     for v in volume_name
                 ]
-
             # Volume operations
             if update_data:
                 add_ids = []
                 remove_ids = []
-
                 add_section = update_data.get("add")
                 if add_section:
                     if add_section.get("volume_name"):
@@ -399,28 +392,23 @@ class ConsistencyGroupModule(OpenStackModule):
                             )
                             remove_ids.append(resolved.id)
                     if remove_section.get("volume_id"):
-                       remove_ids.extend(remove_section.get("volume_id"))
-
+                        remove_ids.extend(remove_section.get("volume_id"))
                 if add_ids:
                     vol_data["add_volumes"] = ",".join(add_ids)
                     changed = True
-
                 if remove_ids:
                     vol_data["remove_volumes"] = ",".join(remove_ids)
                     changed = True
-
             if not changed:
                 self.exit_json(
                     changed=False,
                     msg="No updates required"
                 )
-
             if self.check_mode:
                 self.exit_json(
                     changed=True,
                     msg="Consistency group would be updated"
                 )
-
             result = updatecg_ops(
                 mod=self,
                 connectn=self.conn,
@@ -437,7 +425,6 @@ class ConsistencyGroupModule(OpenStackModule):
         # CREATE OPERATION
         # ==========================================================
         else:
-
             if not name:
                 self.fail_json(
                     msg="name is required for create operation",
@@ -447,51 +434,41 @@ class ConsistencyGroupModule(OpenStackModule):
                 name,
                 ignore_missing=True
             )
-
             if existing_group:
                 self.exit_json(
                     changed=False,
                     msg=f"Consistency Group '{name}' already exists"
                 )
-
             # Resolve volume names
             if volume_name:
                 volume_id = [
                     self.conn.block_storage.find_volume(v, ignore_missing=False).id
                     for v in volume_name
                 ]
-
             vol_data = None
             if volume_id:
                 vol_string = ",".join(volume_id)
                 vol_data = {"add_volumes": vol_string}
-
             # Collect volume types
             volume_types_set = set()
-
             if volume_id:
                 for vid in volume_id:
                     volume = self.conn.block_storage.get_volume(vid)
                     volume_types_set.add(volume.volume_type)
-
             if storage_template:
                 for vt in storage_template:
                     volume_types_set.add(vt)
-
             volume_types = list(volume_types_set)
-
             if not volume_types:
                 self.fail_json(
                     msg="At least one volume type must be provided",
                     changed=False
                 )
-
             if self.check_mode:
                 self.exit_json(
                     changed=True,
                     msg="Consistency group would be created"
                 )
-
             result = createcg_ops(
                 mod=self,
                 connectn=self.conn,
@@ -503,7 +480,6 @@ class ConsistencyGroupModule(OpenStackModule):
                 description=description,
                 vol_data=vol_data
             )
-
             self.exit_json(changed=True, result=result)
 
 
