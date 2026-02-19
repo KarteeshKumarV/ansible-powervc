@@ -380,13 +380,12 @@ class ConsistencyGroupModule(OpenStackModule):
                 remove_ids = []
 
                 add_section = update_data.get("add")
-
                 if add_section:
                     if add_section.get("volume_name"):
                         for v in add_section.get("volume_name"):
                             resolved = self.conn.block_storage.find_volume(
-                                        v, ignore_missing=False
-                                        )
+                                v, ignore_missing=False
+                            )
                             add_ids.append(resolved.id)
                     if add_section.get("volume_id"):
                         add_ids.extend(add_section.get("volume_id"))
@@ -396,8 +395,8 @@ class ConsistencyGroupModule(OpenStackModule):
                     if remove_section.get("volume_name"):
                         for v in remove_section.get("volume_name"):
                             resolved = self.conn.block_storage.find_volume(
-                                                v, ignore_missing=False
-                                        )
+                                v, ignore_missing=False
+                            )
                             remove_ids.append(resolved.id)
                     if remove_section.get("volume_id"):
                        remove_ids.extend(remove_section.get("volume_id"))
@@ -409,7 +408,6 @@ class ConsistencyGroupModule(OpenStackModule):
                 if remove_ids:
                     vol_data["remove_volumes"] = ",".join(remove_ids)
                     changed = True
-
 
             if not changed:
                 self.exit_json(
@@ -445,7 +443,6 @@ class ConsistencyGroupModule(OpenStackModule):
                     msg="name is required for create operation",
                     changed=False
                 )
-
             existing_group = self.conn.block_storage.find_group(
                 name,
                 ignore_missing=True
