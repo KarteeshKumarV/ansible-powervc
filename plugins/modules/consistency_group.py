@@ -300,30 +300,28 @@ class ConsistencyGroupModule(OpenStackModule):
         name=dict(type='str'),
         description=dict(type='str'),
         group_type=dict(type='str'),
-
         storage_template=dict(type='list', elements='str'),
         volume_name=dict(type='list', elements='str'),
         volume_id=dict(type='list', elements='str'),
         update=dict(
-                type='dict',
-                options=dict(
-                        add=dict(
-                                type='dict',
-                                options=dict(
-                                        volume_name=dict(type='list', elements='str'),
-                                        volume_id=dict(type='list', elements='str'),
-                                )
-                        ),
-                        remove=dict(
-                                type='dict',
-                                options=dict(
-                                        volume_name=dict(type='list', elements='str'),
-                                        volume_id=dict(type='list', elements='str'),
-                                )
-                        )
+            type='dict',
+            options=dict(
+                add=dict(
+                    type='dict',
+                    options=dict(
+                        volume_name=dict(type='list', elements='str'),
+                        volume_id=dict(type='list', elements='str'),
+                    )
+                ),
+                remove=dict(
+                    type='dict',
+                    options=dict(
+                        volume_name=dict(type='list', elements='str'),
+                        volume_id=dict(type='list', elements='str'),
+                    )
                 )
+            )
         )
-
     )
 
     module_kwargs = dict(
@@ -337,7 +335,6 @@ class ConsistencyGroupModule(OpenStackModule):
 
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
-
         group_id = self.params.get('id')
         name = self.params.get('name')
         description = self.params.get('description')
@@ -350,15 +347,12 @@ class ConsistencyGroupModule(OpenStackModule):
         # UPDATE OPERATION (If ID is provided)
         # ==========================================================
         if group_id:
-
             existing_group = self.conn.block_storage.get_group(group_id)
-
             if not existing_group:
                 self.fail_json(
                     msg=f"Consistency group with id '{group_id}' not found",
                     changed=False
                 )
-
             update_payload = {}
             vol_data = {}
             changed = False
@@ -388,42 +382,33 @@ class ConsistencyGroupModule(OpenStackModule):
                 add_section = update_data.get("add")
 
                 if add_section:
-
-                        # Resolve volume_name
-                        if add_section.get("volume_name"):
-                                for v in add_section.get("volume_name"):
-                                        resolved = self.conn.block_storage.find_volume(
-                                                v, ignore_missing=False
+                    if add_section.get("volume_name"):
+                        for v in add_section.get("volume_name"):
+                            resolved = self.conn.block_storage.find_volume(
+                                        v, ignore_missing=False
                                         )
-                                        add_ids.append(resolved.id)
-
-                        # Direct volume_id
-                        if add_section.get("volume_id"):
-                                add_ids.extend(add_section.get("volume_id"))
+                            add_ids.append(resolved.id)
+                    if add_section.get("volume_id"):
+                        add_ids.extend(add_section.get("volume_id"))
 
                 remove_section = update_data.get("remove")
-
                 if remove_section:
-
-                        # Resolve volume_name
-                        if remove_section.get("volume_name"):
-                                for v in remove_section.get("volume_name"):
-                                        resolved = self.conn.block_storage.find_volume(
+                    if remove_section.get("volume_name"):
+                        for v in remove_section.get("volume_name"):
+                            resolved = self.conn.block_storage.find_volume(
                                                 v, ignore_missing=False
                                         )
-                                        remove_ids.append(resolved.id)
-
-                        # Direct volume_id
-                        if remove_section.get("volume_id"):
-                                remove_ids.extend(remove_section.get("volume_id"))
+                            remove_ids.append(resolved.id)
+                    if remove_section.get("volume_id"):
+                       remove_ids.extend(remove_section.get("volume_id"))
 
                 if add_ids:
-                        vol_data["add_volumes"] = ",".join(add_ids)
-                        changed = True
+                    vol_data["add_volumes"] = ",".join(add_ids)
+                    changed = True
 
                 if remove_ids:
-                        vol_data["remove_volumes"] = ",".join(remove_ids)
-                        changed = True
+                    vol_data["remove_volumes"] = ",".join(remove_ids)
+                    changed = True
 
 
             if not changed:
