@@ -184,7 +184,7 @@ EXAMPLES = r'''
       register: output
 
     - debug:
-        var: output.result
+        var: output
 
 
 - name: Rename and Update Description Together
@@ -281,7 +281,7 @@ EXAMPLES = r'''
       register: output
 
     - debug:
-        var: output.result
+        var: output
 
 '''
 
@@ -429,15 +429,6 @@ class ConsistencyGroupModule(OpenStackModule):
                 self.fail_json(
                     msg="name is required for create operation",
                     changed=False
-                )
-            existing_group = self.conn.block_storage.find_group(
-                name,
-                ignore_missing=True
-            )
-            if existing_group:
-                self.exit_json(
-                    changed=False,
-                    msg=f"Consistency Group '{name}' already exists"
                 )
             # Resolve volume names
             if volume_name:
