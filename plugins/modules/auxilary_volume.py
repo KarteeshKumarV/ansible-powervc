@@ -73,7 +73,7 @@ EXAMPLES = r"""
 - name: List all jobs
   ibm.powervc.auxiliary_volume:
     cloud: CLOUD
-    
+
 - name: Get auxiliary volume job details
   ibm.powervc.auxiliary_volume:
     cloud: CLOUD
@@ -92,7 +92,6 @@ from ansible_collections.openstack.cloud.plugins.module_utils.openstack import (
 
 
 class AuxVolModule(OpenStackModule):
-
     argument_spec = dict(
         job_id=dict(type="str"),
         name=dict(type="str"),
@@ -131,7 +130,6 @@ class AuxVolModule(OpenStackModule):
             result = get_aux_vol_by_job(
                 module=self, endpoint=endpoint, authtoken=authtoken, job_id=job_id
             )
-
             self.exit_json(changed=False, result=result)
         # -------------------------------------------------
         # CREATE
