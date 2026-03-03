@@ -96,6 +96,5 @@ def group_action(
             "msg": f"Consistency group '{group_id}' {action} operation triggered successfully",
         }
     else:
-        # Fail fast if JSON is missing or invalid
         result = response.json()
     return result, changed
