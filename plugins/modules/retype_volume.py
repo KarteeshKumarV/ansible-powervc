@@ -1,86 +1,56 @@
 #!/usr/bin/python
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'PowerVC'}
-
-
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: retype_volume
-author:
-    - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Performs the Retype operations on the Volume.
+short_description: Retype an IBM PowerVC volume
 description:
-  - This playbook helps in performing the volume operations on the Volume provided.
+  - Performs retype operation on an existing volume.
+author:
+  - Karteesh Kumar Vipparapelli (@vkarteesh)
 options:
   name:
     description:
-      - Name of the Volume
-    default: null
+      - Name of the volume.
+      - Mutually exclusive with C(id).
     type: str
   id:
     description:
-      - ID of the Volume
-    default: null
+      - ID of the volume.
+      - Mutually exclusive with C(name).
     type: str
-  storage_template:
+  target_template:
     description:
-      - ID of the Host
-    default: null
+      - ID of the storage template (volume type).
     type: str
   migration_policy:
     description:
-      - ID of the Host
-    default: 'never'
-    choices: ['never', 'generic', 'on-demand']
+      - Migration policy for retype operation.
     type: str
-
+    default: never
+    choices:
+      - never
+      - generic
+      - on-demand
 '''
 
-EXAMPLES = '''
-  - name: Retype PowerVC volume with generic migration policy
-    hosts: localhost
-    gather_facts: no
-    tasks:
-       - name: Retype PowerVC volume using volume ID
-         ibm.powervc.retype_volume:
-            cloud: "CLOUDNAME"
-            id: "VOLUME_ID"
-            storage_template: "STORAGE_TEMPLATE NAME"
-            migration_policy: "generic"
-         register: result
-       - debug:
-            var: result
+EXAMPLES = r'''
+- name: Retype volume using ID
+  ibm.powervc.retype_volume:
+    id: "VOLUME_ID"
+    target_template: "STORAGE_TEMPLATE_ID"
+    migration_policy: generic
 
-  - name: Retype PowerVC volume with on-demand migration policy
-    hosts: localhost
-    gather_facts: no
-    tasks:
-       - name: retype PowerVC volume using volume name
-         ibm.powervc.retype_volume:
-            cloud: "CLOUDNAME"
-            name: "VOLUME_NAME"
-            storage_template: "STORAGE_TEMPLATE NAME"
-            migration_policy: "on-demand"
-            validate_certs: no
-         register: result
-       - debug:
-            var: result
+- name: Retype volume using name
+  ibm.powervc.retype_volume:
+    name: "VOLUME_NAME"
+    target_template: "STORAGE_TEMPLATE_ID"
 
-  - name: Retype PowerVC Volume with default migration policy
-    hosts: localhost
-    gather_facts: no
-    tasks:
-       - name: retype Volume Operations using Volume Name
-         ibm.powervc.retype_volume:
-            cloud: "CLOUD"
-            id: "VOLUME_ID"
-            storage_template: "STORAGE_TEMPLATE NAME"
-         register: result
-       - debug:
-            var: result
-
+- name: Retype volume using volume name
+  ibm.powervc.retype_volume:
+    name: "VOLUME_NAME"
+    target_template: "STORAGE_TEMPLATE_ID"
+    migration_policy: "on-demand"
 '''
 
 
@@ -90,19 +60,20 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_retype_vol import
 
 class RetypeVolModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(),
-        id=dict(),
-        migration_policy=dict(default="never", choices=['never', 'generic', 'on-demand']),
-        storage_template=dict(required=True),
+        name=dict(type='str'),
+        id=dict(type='str'),
+        target_template=dict(type='str'),
+        migration_policy=dict(
+            type='str',
+            default="never",
+            choices=['never', 'generic', 'on-demand']
+        ),
     )
+
     module_kwargs = dict(
         supports_check_mode=True,
-        mutually_exclusive=[
-            ['name', 'id'],
-        ],
-        required_one_of=[
-            ['name', 'id'],
-        ]
+        mutually_exclusive=[['name', 'id']],
+        required_one_of=[['name', 'id']]
     )
 
     def run(self):
@@ -110,18 +81,41 @@ class RetypeVolModule(OpenStackModule):
         tenant_id = self.conn.session.get_project_id()
         vol_name = self.params['name']
         vol_id = self.params['id']
-        storage_template = self.params['storage_template']
+        target_template_id = self.params['target_template']
         migration_policy = self.params['migration_policy']
         if vol_name:
-            vol_id = self.conn.block_storage.find_volume(vol_name, ignore_missing=False).id
-        if storage_template:
-            storage_template_id = self.conn.block_storage.find_type(storage_template, ignore_missing=False).id
-        try:
-            data = {"os-retype": {"new_type": storage_template_id, "migration_policy": migration_policy}}
-            res = retype_ops(self, self.conn, authtoken, tenant_id, vol_id, data)
-            self.exit_json(changed=True, result=res)
-        except Exception as e:
-            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
+            volume = self.conn.block_storage.find_volume(
+                vol_name,
+                ignore_missing=False
+            )
+            vol_id = volume.id
+
+        if self.check_mode:
+            self.exit_json(
+                changed=True,
+                msg="Retype operation would be executed"
+            )
+
+        data = {
+            "os-retype": {
+                "new_type": target_template_id,
+                "migration_policy": migration_policy
+            }
+        }
+
+        result = retype_ops(
+            self,
+            self.conn,
+            authtoken,
+            tenant_id,
+            vol_id,
+            data
+        )
+
+        self.exit_json(
+            changed=True,
+            result=result
+        )
 
 
 def main():

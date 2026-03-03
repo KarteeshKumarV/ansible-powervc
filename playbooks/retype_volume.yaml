@@ -1,0 +1,35 @@
+---
+  - name: Retype PowerVC volume with generic migration policy
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Retype PowerVC volume using volume ID
+         ibm.powervc.retype_volume:
+            cloud: "CLOUDNAME"
+            id: "VOLUME_ID"
+            target_template: "STORAGE_TEMPLATE_ID"
+            migration_policy: "generic"
+
+
+  - name: Retype PowerVC volume with on-demand migration policy
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: retype PowerVC volume using volume name
+         ibm.powervc.retype_volume:
+            cloud: "CLOUDNAME"
+            name: "VOLUME_NAME"
+            target_template: "STORAGE_TEMPLATE_ID"
+            migration_policy: "on-demand"
+            validate_certs: no
+
+
+  - name: Retype PowerVC Volume with default migration policy
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: retype Volume Operations using Volume Name
+         ibm.powervc.retype_volume:
+            cloud: "CLOUD"
+            id: "VOLUME_ID"
+            target_template: "STORAGE_TEMPLATE_ID"
