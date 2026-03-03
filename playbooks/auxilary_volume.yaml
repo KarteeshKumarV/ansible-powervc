@@ -1,0 +1,47 @@
+---
+  - name: Create Auxiliary Volume Onboard Job
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Create auxiliary volume onboard job
+         ibm.powervc.auxilary_volume:
+            cloud: CLOUD
+            name: "Test_AuxJob"
+            volumes:
+              - source_project_id: "aaaaaabbbbbbccccccddddd"
+                aux_vols:
+                  - name: aux_vol_01
+                    display_name: AuxVolumeTest1
+            validate_certs: no
+         register: job_output
+
+       - name: Wait for job completion
+         ibm.powervc.auxilary_volume:
+            cloud: CLOUD
+            job_id: "{{ job_output.result.job_id }}"
+            validate_certs: no
+         register: job_status
+         until: job_status.result.status == "SUCCESS"
+         retries: 15
+         delay: 30
+
+
+  - name: List all the auxiliary volume job details
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Fetch auxiliary volume job details
+         ibm.powervc.auxilary_volume:
+            cloud: CLOUD
+            validate_certs: no
+
+  - name: List all the auxiliary volume job details
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Fetch auxiliary volume job details
+         ibm.powervc.auxilary_volume:
+            cloud: CLOUD
+            job_id: "job-123456"
+            validate_certs: no
+            

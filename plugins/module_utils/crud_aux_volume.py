@@ -35,11 +35,6 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
     return endpoint.url.replace("%(tenant_id)s", tenant_id)
 
 
-# ---------------------------------------------------------
-# CREATE AUXILIARY VOLUME ONBOARD JOB
-# ---------------------------------------------------------
-
-
 def create_aux_vol(module, endpoint, authtoken, name, volumes):
     headers = get_headers(authtoken)
     onboard_url = f"{endpoint}/onboard"
@@ -47,7 +42,7 @@ def create_aux_vol(module, endpoint, authtoken, name, volumes):
     response = requests.post(
         onboard_url, headers=headers, json=payload, verify=False, timeout=30
     )
-    if not response.ok:
+    if response.status_code not in [200, 202]:
         module.fail_json(
             msg="Failed to create auxiliary volume onboard task",
             response=response.text,
@@ -60,19 +55,14 @@ def create_aux_vol(module, endpoint, authtoken, name, volumes):
         module.fail_json(
             msg="Job ID not returned from onboard API", response=data, changed=False
         )
-    return {"job_id": job_id, "status": "SUBMITTED"}
-
-
-# ---------------------------------------------------------
-# GET SPECIFIC JOB
-# ---------------------------------------------------------
+    return {"job_id": job_id}
 
 
 def get_aux_vol_by_job(module, endpoint, authtoken, job_id):
     headers = get_headers(authtoken)
     job_url = f"{endpoint}/onboard/{job_id}"
     response = requests.get(job_url, headers=headers, verify=False, timeout=30)
-    if not response.ok:
+    if response.status_code not in [200, 202]:
         module.fail_json(
             msg="Failed to fetch auxiliary volume job",
             response=response.text,
@@ -82,16 +72,11 @@ def get_aux_vol_by_job(module, endpoint, authtoken, job_id):
     return response.json().get("onboard-aux-volumes", {})
 
 
-# ---------------------------------------------------------
-# LIST ALL JOBS
-# ---------------------------------------------------------
-
-
 def get_all_aux_vols(module, endpoint, authtoken):
     headers = get_headers(authtoken)
     onboard_url = f"{endpoint}/onboard"
     response = requests.get(onboard_url, headers=headers, verify=False, timeout=30)
-    if not response.ok:
+    if response.status_code not in [200, 202]:
         module.fail_json(
             msg="Failed to fetch auxiliary volume jobs",
             response=response.text,

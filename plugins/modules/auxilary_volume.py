@@ -67,8 +67,8 @@ EXAMPLES = r"""
     job_id: "{{ job_output.result.job_id }}"
   register: job_status
   until: job_status.result.status == "SUCCESS"
-  retries: 10
-  delay: 5
+  retries: 15
+  delay: 30
 
 - name: List all jobs
   ibm.powervc.auxiliary_volume:
@@ -123,17 +123,11 @@ class AuxVolModule(OpenStackModule):
         endpoint = get_endpoint_url_by_service_name(
             self, self.conn, "volume", tenant_id
         )
-        # -------------------------------------------------
-        # GET SPECIFIC JOB
-        # -------------------------------------------------
         if job_id:
             result = get_aux_vol_by_job(
                 module=self, endpoint=endpoint, authtoken=authtoken, job_id=job_id
             )
             self.exit_json(changed=False, result=result)
-        # -------------------------------------------------
-        # CREATE
-        # -------------------------------------------------
         if name and volumes:
             if self.check_mode:
                 self.exit_json(
@@ -147,7 +141,6 @@ class AuxVolModule(OpenStackModule):
                 volumes=volumes,
             )
             self.exit_json(changed=True, result=result)
-        # LIST ALL JOBS
         result = get_all_aux_vols(module=self, endpoint=endpoint, authtoken=authtoken)
         self.exit_json(changed=False, result=result)
 
