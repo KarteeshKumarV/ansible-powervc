@@ -8,10 +8,10 @@
         cloud: "CLOUD"
         name: "CONSISTENCY_GROUP_NAME"
         group_type: "GROUP_TYPE_NAME"
-        volume_name:
+        volume_names:
           - Volume_Name1
           - Volume_Name2
-        storage_template:
+        storage_templates:
           - TEMPLATE_TYPE
         description: "CONSISTENCY_GROUP DESCRIPTION"
       register: output
@@ -29,7 +29,7 @@
         cloud: "CLOUD"
         name: "CG_USING_IDS"
         group_type: "GROUP_TYPE_NAME"
-        volume_id:
+        volume_ids:
           - 1111-aaaa-bbbb-cccc
           - 2222-dddd-eeee-ffff
         description: "Created using volume IDs"
@@ -47,7 +47,7 @@
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         name: "CG_STORAGE_TEMPLATE"
-        storage_template:
+        storage_templates:
           - TEMPLATE_TYPE
         description: "CG created using storage template"
       register: output
@@ -55,10 +55,6 @@
     - debug:
         var: output
 
-
-# ==========================================================
-# UPDATE OPERATIONS (Requires ID)
-# ==========================================================
 
 - name: Rename an existing Consistency Group
   hosts: localhost
@@ -109,17 +105,17 @@
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Remove and Add volume Names
+    - name: Remove and Add volume IDs
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         id: "CG_ID"
         update:
             add:
-              volume_name:
+              volume_ids:
                   - 1111-aaaa-bbbb-cccc
                   - 2222-aaaa-bbbb-cccc
             remove:
-              volume_name:
+              volume_ids:
                   - 3333-aaaa-bbbb-cccc
                   - 4444-aaaa-bbbb-cccc
       register: output
@@ -137,11 +133,11 @@
         id: "CG_ID"
         update:
             add:
-              volume_name:
+              volume_names:
                   - TestVol1
                   - TestVol2
             remove:
-              volume_name:
+              volume_names:
                   - TestVol3
                   - TestVol3
       register: output
@@ -161,7 +157,7 @@
         id: "CG_ID"
         update:
             add:
-              volume_id:
+              volume_ids:
                   - 4444-dddd-eeee-ffff
       register: output
 
@@ -179,7 +175,7 @@
         id: "CG_ID"
         update:
           remove:
-            volume_name:
+            volume_names:
               - 3333-aaaa-bbbb-cccc
       register: output
 

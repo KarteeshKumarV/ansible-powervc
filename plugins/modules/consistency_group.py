@@ -32,22 +32,22 @@ options:
       - Group type of the consistency group.
       - Required during create operation.
     type: str
-  storage_template:
+  storage_templates:
     description:
       - List of storage templates (volume types) to associate during create.
       - Combined with volume types derived from provided volumes.
     type: list
     elements: str
-  volume_name:
+  volume_names:
     description:
       - List of volume names to attach during create operation.
-      - Mutually exclusive with C(volume_id).
+      - Mutually exclusive with C(volume_ids).
     type: list
     elements: str
-  volume_id:
+  volume_ids:
     description:
       - List of volume IDs to attach during create operation.
-      - Mutually exclusive with C(volume_name).
+      - Mutually exclusive with C(volume_names).
     type: list
     elements: str
   update:
@@ -62,12 +62,12 @@ options:
           - Volumes to add to the consistency group.
         type: dict
         suboptions:
-          volume_name:
+          volume_names:
             description:
               - List of volume names to add.
             type: list
             elements: str
-          volume_id:
+          volume_ids:
             description:
               - List of volume IDs to add.
             type: list
@@ -77,12 +77,12 @@ options:
           - Volumes to remove from the consistency group.
         type: dict
         suboptions:
-          volume_name:
+          volume_names:
             description:
               - List of volume names to remove.
             type: list
             elements: str
-          volume_id:
+          volume_ids:
             description:
               - List of volume IDs to remove.
             type: list
@@ -105,10 +105,10 @@ EXAMPLES = r'''
         cloud: "CLOUD"
         name: "CONSISTENCY_GROUP_NAME"
         group_type: "GROUP_TYPE_NAME"
-        volume_name:
+        volume_names:
           - Volume_Name1
           - Volume_Name2
-        storage_template:
+        storage_templates:
           - TEMPLATE_TYPE
         description: "CONSISTENCY_GROUP DESCRIPTION"
       register: output
@@ -126,7 +126,7 @@ EXAMPLES = r'''
         cloud: "CLOUD"
         name: "CG_USING_IDS"
         group_type: "GROUP_TYPE_NAME"
-        volume_id:
+        volume_ids:
           - 1111-aaaa-bbbb-cccc
           - 2222-dddd-eeee-ffff
         description: "Created using volume IDs"
@@ -144,7 +144,7 @@ EXAMPLES = r'''
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         name: "CG_STORAGE_TEMPLATE"
-        storage_template:
+        storage_templates:
           - TEMPLATE_TYPE
         description: "CG created using storage template"
       register: output
@@ -206,17 +206,17 @@ EXAMPLES = r'''
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Remove and Add volume Names
+    - name: Remove and Add volume IDs
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         id: "CG_ID"
         update:
             add:
-              volume_name:
+              volume_ids:
                   - 1111-aaaa-bbbb-cccc
                   - 2222-aaaa-bbbb-cccc
             remove:
-              volume_name:
+              volume_ids:
                   - 3333-aaaa-bbbb-cccc
                   - 4444-aaaa-bbbb-cccc
       register: output
@@ -234,11 +234,11 @@ EXAMPLES = r'''
         id: "CG_ID"
         update:
             add:
-              volume_name:
+              volume_names:
                   - TestVol1
                   - TestVol2
             remove:
-              volume_name:
+              volume_names:
                   - TestVol3
                   - TestVol3
       register: output
@@ -258,7 +258,7 @@ EXAMPLES = r'''
         id: "CG_ID"
         update:
             add:
-              volume_id:
+              volume_ids:
                   - 4444-dddd-eeee-ffff
       register: output
 
@@ -276,7 +276,7 @@ EXAMPLES = r'''
         id: "CG_ID"
         update:
           remove:
-            volume_name:
+            volume_names:
               - 3333-aaaa-bbbb-cccc
       register: output
 
@@ -299,24 +299,24 @@ class ConsistencyGroupModule(OpenStackModule):
         name=dict(type='str'),
         description=dict(type='str'),
         group_type=dict(type='str'),
-        storage_template=dict(type='list', elements='str'),
-        volume_name=dict(type='list', elements='str'),
-        volume_id=dict(type='list', elements='str'),
+        storage_templates=dict(type='list', elements='str'),
+        volume_names=dict(type='list', elements='str'),
+        volume_ids=dict(type='list', elements='str'),
         update=dict(
             type='dict',
             options=dict(
                 add=dict(
                     type='dict',
                     options=dict(
-                        volume_name=dict(type='list', elements='str'),
-                        volume_id=dict(type='list', elements='str'),
+                        volume_names=dict(type='list', elements='str'),
+                        volume_ids=dict(type='list', elements='str'),
                     )
                 ),
                 remove=dict(
                     type='dict',
                     options=dict(
-                        volume_name=dict(type='list', elements='str'),
-                        volume_id=dict(type='list', elements='str'),
+                        volume_names=dict(type='list', elements='str'),
+                        volume_ids=dict(type='list', elements='str'),
                     )
                 )
             )
@@ -326,7 +326,7 @@ class ConsistencyGroupModule(OpenStackModule):
     module_kwargs = dict(
         supports_check_mode=True,
         mutually_exclusive=[
-            ['volume_name', 'volume_id'],
+            ['volume_names', 'volume_ids'],
         ]
     )
 
@@ -337,9 +337,9 @@ class ConsistencyGroupModule(OpenStackModule):
         name = self.params.get('name')
         description = self.params.get('description')
         group_type = self.params.get('group_type')
-        storage_template = self.params.get('storage_template')
-        volume_name = self.params.get('volume_name')
-        volume_id = self.params.get('volume_id')
+        storage_templates = self.params.get('storage_templates')
+        volume_names = self.params.get('volume_names')
+        volume_ids = self.params.get('volume_ids')
         update_data = self.params.get('update')
         # ==========================================================
         # UPDATE OPERATION (If ID is provided)
@@ -363,10 +363,10 @@ class ConsistencyGroupModule(OpenStackModule):
                 update_payload["description"] = description
                 changed = True
             # Resolve volume names
-            if volume_name:
-                volume_id = [
+            if volume_names:
+                volume_ids = [
                     self.conn.block_storage.find_volume(v, ignore_missing=False).id
-                    for v in volume_name
+                    for v in volume_names
                 ]
             # Volume operations
             if update_data:
@@ -374,25 +374,25 @@ class ConsistencyGroupModule(OpenStackModule):
                 remove_ids = []
                 add_section = update_data.get("add")
                 if add_section:
-                    if add_section.get("volume_name"):
-                        for v in add_section.get("volume_name"):
+                    if add_section.get("volume_names"):
+                        for v in add_section.get("volume_names"):
                             resolved = self.conn.block_storage.find_volume(
                                 v, ignore_missing=False
                             )
                             add_ids.append(resolved.id)
-                    if add_section.get("volume_id"):
-                        add_ids.extend(add_section.get("volume_id"))
+                    if add_section.get("volume_ids"):
+                        add_ids.extend(add_section.get("volume_ids"))
 
                 remove_section = update_data.get("remove")
                 if remove_section:
-                    if remove_section.get("volume_name"):
-                        for v in remove_section.get("volume_name"):
+                    if remove_section.get("volume_names"):
+                        for v in remove_section.get("volume_names"):
                             resolved = self.conn.block_storage.find_volume(
                                 v, ignore_missing=False
                             )
                             remove_ids.append(resolved.id)
-                    if remove_section.get("volume_id"):
-                        remove_ids.extend(remove_section.get("volume_id"))
+                    if remove_section.get("volume_ids"):
+                        remove_ids.extend(remove_section.get("volume_ids"))
                 if add_ids:
                     vol_data["add_volumes"] = ",".join(add_ids)
                     changed = True
@@ -431,23 +431,23 @@ class ConsistencyGroupModule(OpenStackModule):
                     changed=False
                 )
             # Resolve volume names
-            if volume_name:
-                volume_id = [
+            if volume_names:
+                volume_ids = [
                     self.conn.block_storage.find_volume(v, ignore_missing=False).id
-                    for v in volume_name
+                    for v in volume_names
                 ]
             vol_data = None
-            if volume_id:
-                vol_string = ",".join(volume_id)
+            if volume_ids:
+                vol_string = ",".join(volume_ids)
                 vol_data = {"add_volumes": vol_string}
             # Collect volume types
             volume_types_set = set()
-            if volume_id:
-                for vid in volume_id:
+            if volume_ids:
+                for vid in volume_ids:
                     volume = self.conn.block_storage.get_volume(vid)
                     volume_types_set.add(volume.volume_type)
-            if storage_template:
-                for vt in storage_template:
+            if storage_templates:
+                for vt in storage_templates:
                     volume_types_set.add(vt)
             volume_types = list(volume_types_set)
             if not volume_types:
