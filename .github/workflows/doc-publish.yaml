@@ -58,7 +58,7 @@ jobs:
         with:
           name: powervc-doc-artifact
           path: .
-      - uses: actions/configure-pages@v4
+      - uses: actions/configure-pages@v5
         with:
           # User need to set this secret on github actions
           token: ${{ secrets.TOKEN_PAM }}
