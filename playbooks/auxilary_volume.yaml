@@ -35,7 +35,7 @@
             cloud: CLOUD
             validate_certs: no
 
-  - name: List all the auxiliary volume job details
+  - name: List the specific auxiliary volume job details
     hosts: localhost
     gather_facts: no
     tasks:
