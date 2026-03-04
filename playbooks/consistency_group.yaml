@@ -1,0 +1,183 @@
+---
+- name: Create a Consistency Group using Volume Names
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create a Consistency Group
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        name: "CONSISTENCY_GROUP_NAME"
+        group_type: "GROUP_TYPE_NAME"
+        volume_names:
+          - Volume_Name1
+          - Volume_Name2
+        storage_templates:
+          - TEMPLATE_TYPE
+        description: "CONSISTENCY_GROUP DESCRIPTION"
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Create a Consistency Group using Volume IDs
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create CG using Volume IDs
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        name: "CG_USING_IDS"
+        group_type: "GROUP_TYPE_NAME"
+        volume_ids:
+          - 1111-aaaa-bbbb-cccc
+          - 2222-dddd-eeee-ffff
+        description: "Created using volume IDs"
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Create a Consistency Group using Storage Template
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create CG with storage template
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        name: "CG_STORAGE_TEMPLATE"
+        storage_templates:
+          - TEMPLATE_TYPE
+        description: "CG created using storage template"
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Rename an existing Consistency Group
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Rename CG
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        name: "NEW_CG_NAME"
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Update Description of a Consistency Group
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Update CG description
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        description: "Updated CG description"
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Rename and Update Description Together
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Update name and description
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        name: "RENAMED_CG"
+        description: "Updated description"
+      register: output
+
+    - debug:
+        var: output
+
+- name: Remove and Add Volumes by ID
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Remove and Add volume IDs
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        update:
+            add:
+              volume_ids:
+                  - 1111-aaaa-bbbb-cccc
+                  - 2222-aaaa-bbbb-cccc
+            remove:
+              volume_ids:
+                  - 3333-aaaa-bbbb-cccc
+                  - 4444-aaaa-bbbb-cccc
+      register: output
+
+    - debug:
+        var: output
+
+- name: Remove and Add Volumes by Name
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Remove and Add volume Names
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        update:
+            add:
+              volume_names:
+                  - TestVol1
+                  - TestVol2
+            remove:
+              volume_names:
+                  - TestVol3
+                  - TestVol3
+      register: output
+
+    - debug:
+        var: output
+
+
+
+- name: Add Volumes by ID
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Add volume IDs
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        update:
+            add:
+              volume_ids:
+                  - 4444-dddd-eeee-ffff
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Remove Volumes by Names
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Remove volume by Names
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        update:
+          remove:
+            volume_names:
+              - 3333-aaaa-bbbb-cccc
+      register: output
+
+    - debug:
+        var: output
