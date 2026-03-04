@@ -27,22 +27,13 @@ options:
 '''
 
 EXAMPLES = '''
-  - name: List Storage Templates/Volume Type Details Playbook
+  - name: List all the volume type details
     hosts: localhost
     gather_facts: no
-    vars:
-     auth:
-      auth_url: https://<POWERVC>:5000/v3
-      project_name: PROJECT-NAME
-      username: USERID
-      password: PASSWORD
-      project_domain_name: PROJECT_DOMAIN_NAME
-      user_domain_name: USER_DOMAIN_NAME
     tasks:
-       - name: Perform Volume Type Details Operation
+       - name: Fetch Volume Type Details
          ibm.powervc.volume_type_info:
-            auth: "{{ auth }}"
-            name: "VOLUME_TYPE_NAME"
+            cloud: "CLOUD_NAME"
             validate_certs: no
          register: result
        - debug:
@@ -101,9 +92,9 @@ class VolumeTypeInfoModule(OpenStackModule):
             vol_type_id = self.conn.block_storage.find_type(vol_type_name, ignore_missing=False).id
         try:
             res = volume_ops(self, self.conn, authtoken, tenant_id, vol_type_id)
-            self.exit_json(changed=True, result=res)
+            self.exit_json(changed=False, result=res)
         except Exception as e:
-            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
+            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
 
 
 def main():
