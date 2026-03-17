@@ -40,9 +40,9 @@ Availability
 Version 1.2.0
 -------------
 Notes
-  * Novalink and HMC registration modules are added.
-  * Host Maintenance and Host Recall modules are added as part of this version 1.2.0.
-  
+  * novalink_registration and hmc_registration registration modules are added.
+  * host_maintenance and host_recall modules are added as part of this version 1.2.0.
+
 Availability
   * `Galaxy v1.2.0`_
   * `GitHub v1.2.0`_
@@ -52,3 +52,22 @@ Availability
 
 .. _GitHub v1.2.0:
    https://github.com/IBM/ansible-powervc/releases/download/v1.2.0/ibm-powervc-1.2.0.tar.gz
+
+Version 1.3.0
+-------------
+Notes
+  * consistency_group module is added for managing Consistency Groups in PowerVC.
+  * group_action module is added to perform actions on Consistency Groups.
+  * auxiliary_volume module is added to manage auxiliary volume onboarding jobs.
+  * retype_volume module is added to perform retype operations on volumes.
+
+Availability
+  * `Galaxy v1.3.0`_
+  * `GitHub v1.3.0`_
+
+.. _Galaxy v1.3.0:
+   https://galaxy.ansible.com/download/ibm-powervc-1.3.0.tar.gz
+
+.. _GitHub v1.3.0:
+   https://github.com/IBM/ansible-powervc/releases/download/v1.3.0/ibm-powervc-1.3.0.tar.gz
+
