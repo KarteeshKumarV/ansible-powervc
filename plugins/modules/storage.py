@@ -236,6 +236,8 @@ class StorageModule(OpenStackModule):
                 update_fields["volume_pool_name"] = volume_pool
             if display_name:
                 update_fields["host_display_name"] = display_name
+            if restart:
+                update_fields["restart"] = restart
             update_fields.update(extra)
             if update_fields:
                 body = {
