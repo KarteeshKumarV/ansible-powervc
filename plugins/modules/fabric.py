@@ -126,7 +126,7 @@ class FabricModule(OpenStackModule):
         ssh_key=dict(type="str", no_log=True),
         name=dict(type="str"),
         type=dict(type="str", choices=["brocade", "cisco", "generic"]),
-        zoning_policy=dict(type="str", choices=["initiator-target", "initiator","initiator-vfc"]),
+        zoning_policy=dict(type="str", choices=["initiator-target", "initiator", "initiator-vfc"]),
         auto_add_host_key=dict(type="bool", default=True),
         virtual_fabric_id=dict(type="str"),
         port=dict(type="str", default="22"),
@@ -134,7 +134,6 @@ class FabricModule(OpenStackModule):
         restart=dict(type="bool"),
     )
     module_kwargs = dict(supports_check_mode=True)
-
 
     def run(self):
         authtoken = self.conn.auth_token
@@ -204,8 +203,8 @@ class FabricModule(OpenStackModule):
                 update_fields["restart"] = restart
             if update_fields:
                 body = {
-                        "registration": update_fields
-                    }
+                    "registration": update_fields
+                }
         result = fabric_ops(
             module=self,
             endpoint=endpoint,
