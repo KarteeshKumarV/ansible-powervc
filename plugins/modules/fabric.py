@@ -4,7 +4,9 @@ DOCUMENTATION = r'''
 module: fabric
 short_description: Manage SAN fabrics in PowerVC
 description:
-  - Register, delete, update or retrieve SAN fabrics in PowerVC.
+  - Register, delete, or retrieve SAN fabrics in PowerVC.
+author:
+    - Karteesh Kumar Vipparapelli (@vkarteesh)
 options:
   state:
     description:
@@ -48,10 +50,6 @@ options:
       - Automatically add host key.
     type: bool
     default: True
-  virtual_fabric_id:
-    description:
-      - Virtual Fabric ID used to connect to a Brocade switch.
-    type: str
   port:
     description:
       - SSH port used to connect to a Cisco switch.
@@ -75,7 +73,7 @@ EXAMPLES = r'''
     cloud: powervc
     id: fab123
 
-# Register fabric
+# Register Brocade fabric
 - name: Register fabric
   ibm.powervc.fabric:
     cloud: powervc
@@ -87,20 +85,25 @@ EXAMPLES = r'''
     type: brocade
     zoning_policy: initiator
 
+# Register Cisco fabric
+- name: Register fabric
+  ibm.powervc.fabric:
+    cloud: powervc
+    state: present
+    host: 9.2.4.5
+    user: admin
+    password: password
+    name: Fabric2
+    type: brocade
+    vsan: 1
+    zoning_policy: initiator
+
 # Delete fabric
 - name: Delete fabric
   ibm.powervc.fabric:
     cloud: powervc
     state: absent
     id: fab123
-
-# Update fabric name
-- name: Update fabric
-  ibm.powervc.fabric:
-    cloud: powervc
-    state: absent
-    id: fab123
-    name: Fabric12
 '''
 
 
@@ -123,7 +126,7 @@ class FabricModule(OpenStackModule):
         ssh_key=dict(type="str", no_log=True),
         name=dict(type="str"),
         type=dict(type="str", choices=["brocade", "cisco", "generic"]),
-        zoning_policy=dict(type="str", choices=["initiator-target", "initiator", "initiator-vfc"]),
+        zoning_policy=dict(type="str", choices=["initiator-target", "initiator","initiator-vfc"]),
         auto_add_host_key=dict(type="bool", default=True),
         virtual_fabric_id=dict(type="str"),
         port=dict(type="str", default="22"),
@@ -136,6 +139,9 @@ class FabricModule(OpenStackModule):
     def run(self):
         authtoken = self.conn.auth_token
         tenant_id = self.conn.session.get_project_id()
+        validate_certs = self.params.get("validate_certs")
+        if validate_certs is False:
+            self.conn.session.verify = False
         verify = self.conn.session.verify
         state = self.params.get("state")
         fabric_id = self.params.get("id")
@@ -163,12 +169,15 @@ class FabricModule(OpenStackModule):
             registration = {
                 "access_ip": host,
                 "user_id": user,
-                "password": password,
                 "fabric_display_name": name,
                 "fabric_type": type,
                 "zoning_policy": zoning_policy,
                 "auto_add_host_key": auto_add_host_key,
             }
+            if password:
+                registration["password"] = password
+            if private_key_data:
+                registration["private_key_data"] = private_key_data
             if type == "brocade":
                 registration["virtual_fabric_id"] = virtual_fabric_id
             if type == "cisco":
@@ -195,8 +204,8 @@ class FabricModule(OpenStackModule):
                 update_fields["restart"] = restart
             if update_fields:
                 body = {
-                    "registration": update_fields
-                }
+                        "registration": update_fields
+                    }
         result = fabric_ops(
             module=self,
             endpoint=endpoint,

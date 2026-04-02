@@ -32,7 +32,16 @@ def get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id):
     return endpoint.url.replace("%(tenant_id)s", tenant_id)
 
 
-def fabric_ops(module, endpoint, authtoken, tenant_id, verify, state, fabric_id=None, body=None):
+def fabric_ops(
+    module,
+    endpoint,
+    authtoken,
+    tenant_id,
+    verify,
+    state,
+    fabric_id=None,
+    body=None,
+):
     headers = get_headers(authtoken)
     if state == "absent":
         if not fabric_id:
