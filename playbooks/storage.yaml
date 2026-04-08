@@ -1,0 +1,197 @@
+---
+- name: Get All Storage Systems Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Fetch all storage systems
+      ibm.powervc.storage:
+        cloud: "powervc"
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+
+- name: Get Specific Storage Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Fetch storage by host_name
+      ibm.powervc.storage:
+        cloud: "powervc"
+        host_name: "storage123"
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+
+- name: Register SVC Storage (Password) Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Register SVC storage
+      ibm.powervc.storage:
+        cloud: "powervc"
+        state: present
+        type: "svc"
+        host: "1.2.4.5"
+        user: "superuser"
+        password: "passw0rd"
+        volume_pool: "Pool0"
+        name: "SVC-1.2.4.5"
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+
+- name: Register SVC Storage (SSH Key) Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Register SVC storage using SSH key
+      ibm.powervc.storage:
+        cloud: "powervc"
+        state: present
+        type: "svc"
+        host: "1.2.4.5"
+        user: "superuser"
+        ssh_key: |
+          -----BEGIN OPENSSH PRIVATE KEY-----
+          -----------------------------------
+          -----END OPENSSH PRIVATE KEY-----
+        volume_pool: "Pool0"
+        name: "SVC-1.2.4.5"
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+
+- name: Register pure storage
+  hosts: localhost
+  tasks:
+     - name: Register storage
+       ibm.powervc.storage:
+          cloud: "powervc9"
+          state: present
+          host: 4.5.6.7
+          user: pureuser
+          password: purepassword
+          name: Pure4.5.6.7
+          type: purestorage
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+- name: Register ds8k storage
+  hosts: localhost
+  tasks:
+     - name: Register storage
+       ibm.powervc.storage:
+          cloud: "powervc9"
+          state: present
+          host: 3.4.5.6
+          user: ds8kuser
+          password: password
+          name: ds8k3.4.5.6
+          type: ds8k
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+- name: Register Hitachi Storage Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Register Hitachi storage
+      ibm.powervc.storage:
+        cloud: "powervc"
+        state: present
+        type: "hitachi"
+        host: "1.2.3.4"
+        user: "maintenance"
+        password: "passw0rd"
+        volume_pool: "PowerVC1"
+        name: "Hitachi"
+        extra_params:
+          rest_api_ip: "1.2.3.4"
+          port: 23451
+          hitachi_ldev_start: 2000
+          hitachi_ldev_end: 3000
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+
+- name: Register HPE Storage Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Register HPE storage
+      ibm.powervc.storage:
+        cloud: "powervc"
+        state: present
+        type: "hpe"
+        host: "10.10.10.10"
+        user: "admin"
+        password: "password"
+        volume_pool: "Pool1"
+        host_display_name: "HPE-Storage"
+        extra_params:
+          port: 443
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+
+- name: Register PowerMAX Storage Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Register PowerMAX storage
+      ibm.powervc.storage:
+        cloud: "powervc"
+        state: present
+        type: "vmax_rest"
+        host: "20.20.20.20"
+        user: "admin"
+        password: "password"
+        volume_pool: "Pool2"
+        host_display_name: "PowerMAX-Storage"
+        extra_params:
+          port: 8443
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
+
+
+- name: Delete Storage Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Delete storage
+      ibm.powervc.storage:
+        cloud: "powervc"
+        host_name: "storage123"
+        state: absent
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
