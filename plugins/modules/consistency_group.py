@@ -60,29 +60,39 @@ options:
     default: present    
   update:
     description:
-      - Update configuration for adding/removing volumes.
+      - Modify an existing consistency group.
+      - Allows adding and/or removing volumes.
+      - Both C(add) and C(remove) sections are optional.
     type: dict
     suboptions:
       add:
         description:
-          - Volumes to add.
+          - Volumes to add to the consistency group.
         type: dict
         suboptions:
           volume_names:
+            description:
+              - List of volume names to add.          
             type: list
             elements: str
           volume_ids:
+            description:
+              - List of volume IDs to add.          
             type: list
             elements: str
       remove:
         description:
-          - Volumes to remove.
+          - Volumes to remove from the consistency group.
         type: dict
         suboptions:
           volume_names:
+            description:
+              - List of volume names to remove.          
             type: list
             elements: str
           volume_ids:
+            description:
+              - List of volume IDs to add.          
             type: list
             elements: str
 '''

@@ -3,17 +3,17 @@
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Create a Consistency Group
+    - name: Create Consistency Group
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
-        name: "CONSISTENCY_GROUP_NAME"
-        group_type: "GROUP_TYPE_NAME"
+        name: "CG_WITH_NAMES"
+        group_type: "GROUP_TYPE"
         volume_names:
-          - Volume_Name1
-          - Volume_Name2
+          - Volume1
+          - Volume2
         storage_templates:
-          - TEMPLATE_TYPE
-        description: "CONSISTENCY_GROUP DESCRIPTION"
+          - TEMPLATE1
+        description: "Created using volume names"
       register: output
 
     - debug:
@@ -24,14 +24,14 @@
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Create CG using Volume IDs
+    - name: Create Consistency Group using IDs
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
-        name: "CG_USING_IDS"
-        group_type: "GROUP_TYPE_NAME"
+        name: "CG_WITH_IDS"
+        group_type: "GROUP_TYPE"
         volume_ids:
-          - 1111-aaaa-bbbb-cccc
-          - 2222-dddd-eeee-ffff
+          - 1111-aaaa-bbbb
+          - 2222-cccc-dddd
         description: "Created using volume IDs"
       register: output
 
@@ -39,22 +39,57 @@
         var: output
 
 
-- name: Create a Consistency Group using Storage Template
+- name: Create a Consistency Group using Storage Templates only
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Create CG with storage template
+    - name: Create Consistency Group with templates
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
-        name: "CG_STORAGE_TEMPLATE"
+        name: "CG_WITH_TEMPLATE"
         storage_templates:
-          - TEMPLATE_TYPE
-        description: "CG created using storage template"
+          - TEMPLATE1
+        description: "Created using storage template"
       register: output
 
     - debug:
         var: output
 
+
+# ==========================================================
+# GET OPERATIONS
+# ==========================================================
+
+- name: Get all Consistency Groups
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Fetch all groups
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Get specific Consistency Group by ID
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Fetch specific group
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+      register: output
+
+    - debug:
+        var: output
+
+
+# ==========================================================
+# UPDATE OPERATIONS (Requires ID)
+# ==========================================================
 
 - name: Rename an existing Consistency Group
   hosts: localhost
@@ -64,7 +99,7 @@
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         id: "CG_ID"
-        name: "NEW_CG_NAME"
+        name: "NEW_NAME"
       register: output
 
     - debug:
@@ -75,108 +110,124 @@
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Update CG description
+    - name: Update description
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         id: "CG_ID"
-        description: "Updated CG description"
-      register: output
-
-    - debug:
-        var: output
-
-
-- name: Rename and Update Description Together
-  hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Update name and description
-      ibm.powervc.consistency_group:
-        cloud: "CLOUD"
-        id: "CG_ID"
-        name: "RENAMED_CG"
         description: "Updated description"
       register: output
 
     - debug:
         var: output
 
-- name: Remove and Add Volumes by ID
+
+- name: Update Name and Description together
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Remove and Add volume IDs
+    - name: Update both fields
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         id: "CG_ID"
-        update:
-            add:
-              volume_ids:
-                  - 1111-aaaa-bbbb-cccc
-                  - 2222-aaaa-bbbb-cccc
-            remove:
-              volume_ids:
-                  - 3333-aaaa-bbbb-cccc
-                  - 4444-aaaa-bbbb-cccc
+        name: "UPDATED_NAME"
+        description: "Updated description"
       register: output
 
     - debug:
         var: output
-
-- name: Remove and Add Volumes by Name
-  hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Remove and Add volume Names
-      ibm.powervc.consistency_group:
-        cloud: "CLOUD"
-        id: "CG_ID"
-        update:
-            add:
-              volume_names:
-                  - TestVol1
-                  - TestVol2
-            remove:
-              volume_names:
-                  - TestVol3
-                  - TestVol3
-      register: output
-
-    - debug:
-        var: output
-
 
 
 - name: Add Volumes by ID
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Add volume IDs
+    - name: Add volumes
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         id: "CG_ID"
         update:
-            add:
-              volume_ids:
-                  - 4444-dddd-eeee-ffff
+          add:
+            volume_ids:
+              - 1111-aaaa-bbbb
       register: output
 
     - debug:
         var: output
 
 
-- name: Remove Volumes by Names
+- name: Remove Volumes by Name
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Remove volume by Names
+    - name: Remove volumes
       ibm.powervc.consistency_group:
         cloud: "CLOUD"
         id: "CG_ID"
         update:
           remove:
             volume_names:
-              - 3333-aaaa-bbbb-cccc
+              - Volume1
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Add and Remove Volumes together (IDs)
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Modify volumes
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        update:
+          add:
+            volume_ids:
+              - 1111-aaaa-bbbb
+          remove:
+            volume_ids:
+              - 2222-cccc-dddd
+      register: output
+
+    - debug:
+        var: output
+
+
+- name: Add and Remove Volumes together (Names)
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Modify volumes by names
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        update:
+          add:
+            volume_names:
+              - Volume2
+          remove:
+            volume_names:
+              - Volume3
+      register: output
+
+    - debug:
+        var: output
+
+
+# ==========================================================
+# DELETE OPERATIONS
+# ==========================================================
+
+- name: Delete Consistency Group (default deletes volumes)
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Delete CG
+      ibm.powervc.consistency_group:
+        cloud: "CLOUD"
+        id: "CG_ID"
+        state: absent
       register: output
 
     - debug:
