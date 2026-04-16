@@ -203,6 +203,7 @@ def updatecg_ops(mod, connectn, authtoken, tenant_id,
         }
     )
 
+
 def getcg_ops(mod, connectn, authtoken, tenant_id, group_id=None):
     service_name = "volume"
     endpoint = get_endpoint_url_by_service_name(
@@ -260,7 +261,7 @@ def deletecg_ops(mod, connectn, authtoken, tenant_id, group_id, delete_volumes):
     response = requests.post(
         url,
         headers=headers,
-        json = {"delete":{"delete-volumes": delete_volumes}},
+        json={"delete": {"delete-volumes": delete_volumes}},
         verify=False,
         timeout=30
     )
