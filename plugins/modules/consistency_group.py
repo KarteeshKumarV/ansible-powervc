@@ -77,7 +77,7 @@ options:
             elements: str
           volume_ids:
             description:
-              - List of volume IDs to add.        
+              - List of volume IDs to add.
             type: list
             elements: str
       remove:
@@ -92,7 +92,7 @@ options:
             elements: str
           volume_ids:
             description:
-              - List of volume IDs to add.     
+              - List of volume IDs to add.
             type: list
             elements: str
 '''
