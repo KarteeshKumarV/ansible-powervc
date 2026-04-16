@@ -111,7 +111,10 @@ def create_consistency_group(module, createcg_url, authtoken, post_data, vol_dat
                 changed=False,
             )
         wait_for_group_available(module, group_url, headers, group_name)
-    return f"Consistency Group '{group_name}' created successfully"
+    return dict(
+        changed=True,
+        msg=f"Consistency group '{group_name}' created successfully",
+        result=response.json())
 
 
 def createcg_ops(mod, connectn, authtoken, tenant_id,
@@ -189,4 +192,88 @@ def updatecg_ops(mod, connectn, authtoken, tenant_id,
                 changed=False
             )
         wait_for_group_available(mod, group_url, headers, group_name)
-    return f"Consistency Group '{group_name}' updated successfully"
+    return dict(
+        changed=True,
+        msg=f"Consistency group '{group_name}' updated successfully",
+        result={
+            "group": {
+                "id": group_id,
+                "name": group_name
+            }
+        }
+    )
+
+def getcg_ops(mod, connectn, authtoken, tenant_id, group_id=None):
+    service_name = "volume"
+    endpoint = get_endpoint_url_by_service_name(
+        mod, connectn, service_name, tenant_id
+    )
+    headers = get_headers(authtoken)
+    if group_id:
+        url = f"{endpoint}/consistencygroups/{group_id}"
+        response = requests.get(
+            url,
+            headers=headers,
+            verify=False,
+            timeout=30
+        )
+        if not response.ok:
+            mod.fail_json(
+                msg=f"Failed to fetch consistency group: {response.json()}",
+                changed=False
+            )
+        return dict(
+            changed=False,
+            result=response.json()
+        )
+    else:
+        url = f"{endpoint}/consistencygroups"
+        response = requests.get(
+            url,
+            headers=headers,
+            verify=False,
+            timeout=30
+        )
+        if not response.ok:
+            mod.fail_json(
+                msg=f"Failed to fetch consistency groups: {response.json()}",
+                changed=False
+            )
+        return dict(
+            changed=False,
+            result=response.json()
+        )
+
+
+def deletecg_ops(mod, connectn, authtoken, tenant_id, group_id, delete_volumes):
+    service_name = "volume"
+    endpoint = get_endpoint_url_by_service_name(
+        mod, connectn, service_name, tenant_id
+    )
+    headers = get_headers(authtoken)
+    if not group_id:
+        mod.fail_json(
+            msg="group_id is required for delete operation",
+            changed=False
+        )
+    url = f"{endpoint}/groups/{group_id}/action"
+    response = requests.post(
+        url,
+        headers=headers,
+        json = {"delete":{"delete-volumes": delete_volumes}},
+        verify=False,
+        timeout=30
+    )
+    if response.status_code in [200, 202, 204]:
+        return dict(
+            changed=True,
+            msg=f"Delete operation for consistency group '{group_id}' initiated successfully"
+        )
+    try:
+        error_msg = response.json()
+    except ValueError:
+        error_msg = response.text
+    mod.fail_json(
+        msg=f"Failed to delete consistency group: {error_msg}",
+        changed=False
+    )
