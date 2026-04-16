@@ -57,7 +57,7 @@ options:
       - Desired state of the consistency group.
     type: str
     choices: [present, absent]
-    default: present    
+    default: present
   update:
     description:
       - Modify an existing consistency group.
@@ -72,12 +72,12 @@ options:
         suboptions:
           volume_names:
             description:
-              - List of volume names to add.          
+              - List of volume names to add.
             type: list
             elements: str
           volume_ids:
             description:
-              - List of volume IDs to add.          
+              - List of volume IDs to add.        
             type: list
             elements: str
       remove:
@@ -87,12 +87,12 @@ options:
         suboptions:
           volume_names:
             description:
-              - List of volume names to remove.          
+              - List of volume names to remove.
             type: list
             elements: str
           volume_ids:
             description:
-              - List of volume IDs to add.          
+              - List of volume IDs to add.     
             type: list
             elements: str
 '''

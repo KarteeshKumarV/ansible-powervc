@@ -56,10 +56,6 @@
         var: output
 
 
-# ==========================================================
-# GET OPERATIONS
-# ==========================================================
-
 - name: Get all Consistency Groups
   hosts: localhost
   gather_facts: no
@@ -86,10 +82,6 @@
     - debug:
         var: output
 
-
-# ==========================================================
-# UPDATE OPERATIONS (Requires ID)
-# ==========================================================
 
 - name: Rename an existing Consistency Group
   hosts: localhost
@@ -215,11 +207,7 @@
         var: output
 
 
-# ==========================================================
-# DELETE OPERATIONS
-# ==========================================================
-
-- name: Delete Consistency Group (default deletes volumes)
+- name: Delete Consistency Group
   hosts: localhost
   gather_facts: no
   tasks:
