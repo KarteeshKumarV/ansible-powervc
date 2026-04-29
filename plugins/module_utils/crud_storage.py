@@ -76,7 +76,7 @@ def storage_ops(module, endpoint, authtoken, tenant_id, verify, state, storage_i
         response = requests.get(url, headers=headers, verify=verify)
         if response.status_code != 200:
             module.fail_json(
-                msg=f"Failed to fetch stoarge details",
+                msg="Failed to fetch stoarge details",
                 status_code=response.status_code,
                 response=response.text,
             )
