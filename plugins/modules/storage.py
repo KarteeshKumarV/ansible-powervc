@@ -90,21 +90,6 @@ EXAMPLES = r'''
     volume_pool: Pool0
     name: SVC-1.2.4.5
 
-# Register SVC storage using sshkey
-- name: Register SVC storage
-  ibm.powervc.storage:
-    cloud: powervc
-    state: present
-    type: svc
-    host: 1.2.4.5
-    user: superuser
-    ssh_key: |
-        -----BEGIN OPENSSH PRIVATE KEY-----
-		-----------------------------------
-		-----END OPENSSH PRIVATE KEY-----
-    volume_pool: Pool0
-    name: SVC-1.2.4.5
-
 # Register Hitachi storage
 - name: Register Hitachi storage
   ibm.powervc.storage:
@@ -112,15 +97,21 @@ EXAMPLES = r'''
     state: present
     type: hitachi
     host: 1.2.3.4
-    user: maintenance
+    user: user
     password: passw0rd
     volume_pool: PowerVC1
     name: Hitachi
     extra_params:
-      rest_api_ip: {host}
+      auto_add_certificate: true
+      rest_api_ip: 1.2.3.4
       port: 23451
       hitachi_ldev_start: 2000
       hitachi_ldev_end: 3000
+      default_fc_ports:
+        - CL1-A
+      target_fc_ports:
+        - CL1-A
+      hitachi_thin_pool: Pool0
 
 # Register HPE storage
 - name: Register HPE storage
@@ -148,7 +139,9 @@ EXAMPLES = r'''
     volume_pool: Pool2
     host_display_name: PowerMAX-Storage
     extra_params:
+      auto_add_certificate: true
       port: 8443
+      storage_array_id: "000120000"
 
 # Delete storage
 - name: Delete storage
@@ -223,19 +216,28 @@ class StorageModule(OpenStackModule):
                 registration["private_key_data"] = private_key_data
             # Hitachi
             if stype == "hitachi":
-                port = extra.get("port", 23451)
-                extra["port"] = port
-                required = ["hitachi_ldev_start", "hitachi_ldev_end", "rest_api_ip", "port"]
-                for field in required:
-                    if field not in extra:
-                        self.fail_json(msg=f"Missing '{field}' in extra_params for Hitachi")
-            # HPE port mandatory, default 443
-            if stype == "hpe":
-                port = extra.get("port", 443)
-                extra["port"] = port
-            # vmax_rest port mandatory, default 8443
+                # Supported extra_params examples:
+                # rest_api_ip
+                # rest_api_port
+                # hitachi_ldev_start
+                # hitachi_ldev_end
+                # default_fc_ports
+                # target_fc_ports
+                # hitachi_thin_pool
+                # auto_add_certificate
+                rest_api_port = extra.get("rest_api_port", 443)
+                extra["rest_api_port"] = rest_api_port
+            # PowerMax port mandatory, default 443
             if stype == "vmax_rest":
-                port = extra.get("port", 8443)
+                # Supported extra_params examples:
+                # ssh_port
+                # storage_array_id
+                # auto_add_certificate
+                ssh_port = extra.get("ssh_port", 8443)
+                extra["ssh_port"] = ssh_port
+            if stype == "hpe":
+                # port
+                port = extra.get("port", 443)
                 extra["port"] = port
             registration.update(extra)
             body = {
