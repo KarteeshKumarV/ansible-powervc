@@ -177,7 +177,6 @@ class StorageModule(OpenStackModule):
     )
     module_kwargs = dict(supports_check_mode=True)
 
-
     def run(self):
         state = self.params.get("state")
         storage_id = self.params.get("host_name")
