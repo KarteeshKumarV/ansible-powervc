@@ -1,0 +1,103 @@
+---
+  - name: Get All Fabrics Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Fetch all fabrics
+        ibm.powervc.fabric:
+          cloud: "powervc"
+        register: result
+      - name: Display result
+        debug:
+          var: result
+
+
+  - name: Get Specific Fabric Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Fetch specific fabric
+        ibm.powervc.fabric:
+          cloud: "powervc"
+          id: "fab123"
+        register: result
+      - name: Display result
+        debug:
+          var: result
+
+
+  - name: Register Brocade Fabric Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Register a new fabric
+        ibm.powervc.fabric:
+          cloud: "powervc"
+          state: present
+          type: "brocade"
+          host: "9.2.4.6"
+          user: "admin"
+          password: "password"
+          name: "Fabric1"
+          zoning_policy: "initiator"
+          validate_certs: no
+        register: result
+    - name: Display result
+      debug:
+        var: result
+
+
+  - name: Register Cisco Fabric Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Register a new fabric
+        ibm.powervc.fabric:
+          cloud: "powervc"
+          state: present
+		  type: "cisco"
+          host: "9.2.4.5"
+          user: "admin"
+          password: "password"
+          name: "Fabric2"
+		  vsan: 1
+          zoning_policy: "initiator"
+          validate_certs: no
+        register: result
+    - name: Display result
+      debug:
+        var: result
+
+
+  - name: Update Fabric Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Update name for the fabric
+        ibm.powervc.fabric:
+          cloud: "powervc"
+          state: present
+          id: "fab123"
+          name: "Fabric1-Updated"
+          validate_certs: no
+      register: result
+      - name: Display result
+        debug:
+          var: result
+
+
+  - name: Delete Fabric Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Delete a fabric
+        ibm.powervc.fabric:
+          cloud: "powervc"
+          state: absent
+          id: "fab123"
+        register: result
+
+    - name: Display result
+      debug:
+        var: result
+
