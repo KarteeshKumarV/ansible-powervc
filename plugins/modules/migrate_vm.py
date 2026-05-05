@@ -19,7 +19,7 @@ author:
 options:
   name:
     description:
-      - Name of the virtual machine to migrate.  
+      - Name of the virtual machine to migrate.
     type: str
   id:
     description:
@@ -65,70 +65,104 @@ options:
 '''
 
 EXAMPLES = r'''
-# Live migration using VM name
-- name: Live migrate VM
-  ibm.powervc.migrate_vm:
-    cloud: powervc
-    name: test-vm
-    host: compute-host-2
-    migration_type: live
+---
+- name: Live migrate VM using VM name
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration using VM name
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_215ABCD
+        migration_type: live
 
-# Live migration using VM id
-- name: Live migrate VM using id
-  ibm.powervc.migrate_vm:
-    cloud: powervc
-    id: "8f4d9b4f-1234-5678-abcd-123456789abc"
-    host: compute-host-2
-    migration_type: live
+- name: Live migrate VM using VM ID
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration using VM ID
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        id: "8f4d9b4f-1234-5678-abcd-123456789abc"
+        host: 828384A_215ABCD
+        migration_type: live
 
-# Live migration with block migration
 - name: Live migrate VM with block migration
-  ibm.powervc.migrate_vm:
-    cloud: powervc
-    name: test-vm
-    host: compute-host-3
-    migration_type: live
-    block_migration: true
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform block live migration
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_215ABCD
+        migration_type: live
+        block_migration: true
 
-# Live migration across host groups
 - name: Live migrate VM across host groups
-  ibm.powervc.migrate_vm:
-    cloud: powervc
-    name: test-vm
-    host: compute-host-4
-    migration_type: live
-    ignore_az: true
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration across host groups
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_215ABCD
+        migration_type: live
+        ignore_az: true
 
-# Cold migration
 - name: Cold migrate VM
-  ibm.powervc.migrate_vm:
-    cloud: powervc
-    name: test-vm
-    host: compute-host-5
-    migration_type: cold
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform cold migration
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_215ABCD
+        migration_type: cold
 
-# Cold migration across host groups
 - name: Cold migrate VM across host groups
-  ibm.powervc.migrate_vm:
-    cloud: powervc
-    name: test-vm
-    host: compute-host-6
-    migration_type: cold
-    ignore_az: true
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform cold migration across host groups
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_216ABCD
+        migration_type: cold
+        ignore_az: true
 
-# Force live migration
 - name: Force live migration
-  ibm.powervc.migrate_vm:
-    cloud: powervc
-    name: test-vm
-    host: compute-host-7
-    migration_type: live
-    force: true
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform forced live migration
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_216ABCD
+        migration_type: live
+        force: true
 
+- name: Live migration with disk overcommit
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration with disk overcommit
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_217ABCD
+        migration_type: live
+        disk_over_commit: true
 '''
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_migrate import migrate_ops
+
 
 class MigrateVMModule(OpenStackModule):
     argument_spec = dict(
