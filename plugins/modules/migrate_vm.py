@@ -1,87 +1,168 @@
 #!/usr/bin/python
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'PowerVC'}
+ANSIBLE_METADATA = {
+    'metadata_version': '1.1',
+    'status': ['preview'],
+    'supported_by': 'PowerVC'
+}
 
-
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: migrate_vm
+short_description: Perform live or cold VM migration in IBM PowerVC
+description:
+  - Supports live migration.
+  - Supports cold migration.
+  - Supports migration across host groups using ignore_az.
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Migrating the Virtual Machine from one host to the other
-description:
-  - This playbook helps in performing the Migrate operations on the VM provided.
 options:
   name:
     description:
-      - Name of the VM
+      - Name of the virtual machine to migrate.  
     type: str
   id:
     description:
-      - ID of the VM
+      - UUID of the virtual machine to migrate.
     type: str
   host:
     description:
-      - Name of the Host
+      - MTMS of the arget compute host where the virtual machine will be migrated.
     type: str
-
+    required: true
+  migration_type:
+    description:
+      - Type of migration to perform.
+      - C(live) performs live migration.
+      - C(cold) performs cold migration.
+    choices:
+      - live
+      - cold
+    type: str
+  ignore_az:
+    description:
+      - Allows migration across availability zones or host groups.
+    type: bool
+    default: false
+  block_migration:
+    description:
+      - Enable block migration during live migration.
+      - Applicable only for live migration.
+    type: bool
+    default: false
+  disk_over_commit:
+    description:
+      - Allow disk overcommit during live migration.
+      - Applicable only for live migration.
+    type: bool
+    default: true
+  force:
+    description:
+      - Force live migration operation.
+      - Applicable only for live migration.
+    type: bool
+    default: false
 '''
 
-EXAMPLES = '''
-  - name: VM Migrate Playbook
-    hosts: localhost
-    gather_facts: no
-    vars:
-     auth:
-      auth_url: https://<POWERVC>:5000/v3
-      project_name: PROJECT-NAME
-      username: USERID
-      password: PASSWORD
-      project_domain_name: PROJECT_DOMAIN_NAME
-      user_domain_name: USER_DOMAIN_NAME
-    tasks:
-       - name: Perform VM Migrate Operations
-         ibm.powervc.migate_vm:
-            auth: "{{ auth }}"
-            name: "NAME"
-            host: "HOST_ID"
-            validate_certs: no
-         register: result
-       - debug:
-            var: result
+EXAMPLES = r'''
+# Live migration using VM name
+- name: Live migrate VM
+  ibm.powervc.migrate_vm:
+    cloud: powervc
+    name: test-vm
+    host: compute-host-2
+    migration_type: live
 
-  - name: VM Migrate Playbook
-    hosts: localhost
-    gather_facts: no
-    tasks:
-       - name: Perform VM Migrate Operations
-         ibm.powervc.migate_vm:
-            cloud: "CLOUD_NAME"
-            name: "NAME"
-            host: "HOST_ID"
-            validate_certs: no
-         register: result
-       - debug:
-            var: result
+# Live migration using VM id
+- name: Live migrate VM using id
+  ibm.powervc.migrate_vm:
+    cloud: powervc
+    id: "8f4d9b4f-1234-5678-abcd-123456789abc"
+    host: compute-host-2
+    migration_type: live
+
+# Live migration with block migration
+- name: Live migrate VM with block migration
+  ibm.powervc.migrate_vm:
+    cloud: powervc
+    name: test-vm
+    host: compute-host-3
+    migration_type: live
+    block_migration: true
+
+# Live migration across host groups
+- name: Live migrate VM across host groups
+  ibm.powervc.migrate_vm:
+    cloud: powervc
+    name: test-vm
+    host: compute-host-4
+    migration_type: live
+    ignore_az: true
+
+# Cold migration
+- name: Cold migrate VM
+  ibm.powervc.migrate_vm:
+    cloud: powervc
+    name: test-vm
+    host: compute-host-5
+    migration_type: cold
+
+# Cold migration across host groups
+- name: Cold migrate VM across host groups
+  ibm.powervc.migrate_vm:
+    cloud: powervc
+    name: test-vm
+    host: compute-host-6
+    migration_type: cold
+    ignore_az: true
+
+# Force live migration
+- name: Force live migration
+  ibm.powervc.migrate_vm:
+    cloud: powervc
+    name: test-vm
+    host: compute-host-7
+    migration_type: live
+    force: true
 
 '''
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_migrate import migrate_ops
 
-
 class MigrateVMModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(),
-        id=dict(),
-        host=dict(required=True),
+        name=dict(type='str'),
+        id=dict(type='str'),
+        host=dict(
+            type='str',
+            required=True
+        ),
+        migration_type=dict(
+            type='str',
+            choices=['live', 'cold']
+        ),
+        ignore_az=dict(
+            type='bool',
+            default=False
+        ),
+        block_migration=dict(
+            type='bool',
+            default=False
+        ),
+        disk_over_commit=dict(
+            type='bool',
+            default=True
+        ),
+        force=dict(
+            type='bool',
+            default=False
+        ),
     )
     module_kwargs = dict(
         supports_check_mode=True,
         mutually_exclusive=[
-            ['name', 'id'],
+            ['name', 'id']
         ]
     )
 
@@ -91,14 +172,62 @@ class MigrateVMModule(OpenStackModule):
         vm_name = self.params['name']
         vm_id = self.params['id']
         host = self.params['host']
+        migration_type = self.params['migration_type']
+        ignore_az = self.params['ignore_az']
+        validate_certs = self.params.get("validate_certs")
+        if validate_certs is False:
+            self.conn.session.verify = False
+        verify = self.conn.session.verify
         if vm_name:
-            vm_id = self.conn.compute.find_server(vm_name, ignore_missing=False).id
+            server = self.conn.compute.find_server(
+                vm_name,
+                ignore_missing=False
+            )
+            vm_id = server.id
         try:
-            data = {"os-migrateLive": {"host": host, "block_migration": "false", "disk_over_commit": "true"}}
-            res = migrate_ops(self, self.conn, authtoken, tenant_id, vm_id, host, data)
-            self.exit_json(changed=True, result=res)
-        except Exception as e:
-            self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=True)
+            # LIVE MIGRATION
+            if migration_type == "live":
+                payload = {
+                    "os-migrateLive": {
+                        "host": host,
+                        "block_migration": self.params[
+                            'block_migration'
+                        ],
+                        "disk_over_commit": self.params[
+                            'disk_over_commit'
+                        ],
+                        "force": self.params['force'],
+                        "ignore_az": ignore_az
+                    }
+                }
+
+            # COLD MIGRATION
+            elif migration_type == "cold":
+                payload = {
+                    "migrate": {
+                        "host": host,
+                        "ignore_az": ignore_az
+                    }
+                }
+            result = migrate_ops(
+                mod=self,
+                connection=self.conn,
+                auth_token=authtoken,
+                tenant_id=tenant_id,
+                verify=verify,
+                vm_id=vm_id,
+                payload=payload
+            )
+            self.exit_json(
+                changed=True,
+                result=result
+            )
+
+        except Exception as ex:
+            self.fail_json(
+                msg=str(ex),
+                changed=False
+            )
 
 
 def main():
