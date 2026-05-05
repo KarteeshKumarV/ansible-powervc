@@ -34,7 +34,7 @@ options:
       - Password for storage authentication.
     type: str
     no_log: true
-  private_key_data:
+  ssh_key:
     description:
       - Private key for authentication.
     type: str
@@ -112,20 +112,6 @@ EXAMPLES = r'''
       target_fc_ports:
         - CL1-A
       hitachi_thin_pool: Pool0
-
-# Register HPE storage
-- name: Register HPE storage
-  ibm.powervc.storage:
-    cloud: powervc
-    state: present
-    type: hpe
-    host: 10.10.10.10
-    user: admin
-    password: password
-    volume_pool: Pool1
-    host_display_name: HPE-Storage
-    extra_params:
-      port: 443
 
 # Register PowerMAX storage
 - name: Register PowerMAX storage
