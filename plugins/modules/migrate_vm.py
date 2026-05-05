@@ -30,7 +30,7 @@ options:
       - MTMS of the arget compute host where the virtual machine will be migrated.
     type: str
     required: true
-  migration_type:
+  type:
     description:
       - Type of migration to perform.
       - C(live) performs live migration.
@@ -75,7 +75,7 @@ EXAMPLES = r'''
         cloud: powervc
         name: test-vm
         host: 828384A_215ABCD
-        migration_type: live
+        type: live
 
 - name: Live migrate VM using VM ID
   hosts: localhost
@@ -86,7 +86,7 @@ EXAMPLES = r'''
         cloud: powervc
         id: "8f4d9b4f-1234-5678-abcd-123456789abc"
         host: 828384A_215ABCD
-        migration_type: live
+        type: live
 
 - name: Live migrate VM with block migration
   hosts: localhost
@@ -97,7 +97,7 @@ EXAMPLES = r'''
         cloud: powervc
         name: test-vm
         host: 828384A_215ABCD
-        migration_type: live
+        type: live
         block_migration: true
 
 - name: Live migrate VM across host groups
@@ -109,7 +109,7 @@ EXAMPLES = r'''
         cloud: powervc
         name: test-vm
         host: 828384A_215ABCD
-        migration_type: live
+        type: live
         ignore_az: true
 
 - name: Cold migrate VM
@@ -121,7 +121,7 @@ EXAMPLES = r'''
         cloud: powervc
         name: test-vm
         host: 828384A_215ABCD
-        migration_type: cold
+        type: cold
 
 - name: Cold migrate VM across host groups
   hosts: localhost
@@ -132,7 +132,7 @@ EXAMPLES = r'''
         cloud: powervc
         name: test-vm
         host: 828384A_216ABCD
-        migration_type: cold
+        type: cold
         ignore_az: true
 
 - name: Force live migration
@@ -144,7 +144,7 @@ EXAMPLES = r'''
         cloud: powervc
         name: test-vm
         host: 828384A_216ABCD
-        migration_type: live
+        type: live
         force: true
 
 - name: Live migration with disk overcommit
@@ -156,7 +156,7 @@ EXAMPLES = r'''
         cloud: powervc
         name: test-vm
         host: 828384A_217ABCD
-        migration_type: live
+        type: live
         disk_over_commit: true
 '''
 
@@ -172,7 +172,7 @@ class MigrateVMModule(OpenStackModule):
             type='str',
             required=True
         ),
-        migration_type=dict(
+        type=dict(
             type='str',
             choices=['live', 'cold']
         ),
@@ -206,7 +206,7 @@ class MigrateVMModule(OpenStackModule):
         vm_name = self.params['name']
         vm_id = self.params['id']
         host = self.params['host']
-        migration_type = self.params['migration_type']
+        migration_type = self.params['type']
         ignore_az = self.params['ignore_az']
         validate_certs = self.params.get("validate_certs")
         if validate_certs is False:
