@@ -6,6 +6,7 @@ CRUD utility for PowerVC VM migration operations.
 Supports:
 - Live migration
 - Cold migration
+- Placement policy based migration
 - Cross host-group migration using ignore_az
 """
 
@@ -15,7 +16,8 @@ import requests
 def get_headers(auth_token):
     return {
         "X-Auth-Token": auth_token,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Openstack-API-Version": "compute 2.56"
     }
 
 
@@ -66,7 +68,10 @@ def migrate_vm(
     vm_url,
     auth_token,
     verify,
-    payload
+    payload,
+    migration_type,
+    vm_identifier,
+    host
 ):
     headers = get_headers(auth_token)
     response = requests.post(
@@ -80,10 +85,19 @@ def migrate_vm(
             msg="Failed to migrate VM",
             status_code=response.status_code,
             response=response.text,
+            changed=False
         )
+    if host:
+        migration_target = f"host {host}"
+    else:
+        migration_target = "placement policy"
     return dict(
         changed=True,
-        msg="VM migration initiated successfully",
+        msg=(
+            f"{migration_type.capitalize()} migration initiated "
+            f"for VM '{vm_identifier}' "
+            f"using {migration_target}"
+        )
     )
 
 
@@ -94,7 +108,10 @@ def migrate_ops(
     tenant_id,
     verify,
     vm_id,
-    payload
+    payload,
+    migration_type,
+    vm_identifier,
+    host
 ):
     service_name = "compute"
     endpoint = get_endpoint_url_by_service_name(
@@ -109,6 +126,9 @@ def migrate_ops(
         vm_url=url,
         auth_token=auth_token,
         verify=verify,
-        payload=payload
+        payload=payload,
+        migration_type=migration_type,
+        vm_identifier=vm_identifier,
+        host=host
     )
     return result

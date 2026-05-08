@@ -2,107 +2,120 @@
 - name: Live migrate VM using VM name
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Perform live migration using VM name
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
-        host: 828384A_215ABCD
-        migration_type: live
-
+        type: live
 
 - name: Live migrate VM using VM ID
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Perform live migration using VM ID
       ibm.powervc.migrate_vm:
         cloud: powervc
         id: "8f4d9b4f-1234-5678-abcd-123456789abc"
-        host: 828384A_215ABCD
-        migration_type: live
+        type: live
 
+- name: Live migrate VM with target host
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration to specific host
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_215ABCD
+        type: live
+
+- name: Live migrate VM with placement policy
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration using placement policy
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        type: live
 
 - name: Live migrate VM with block migration
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Perform block live migration
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
         host: 828384A_215ABCD
-        migration_type: live
+        type: live
         block_migration: true
-
 
 - name: Live migrate VM across host groups
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Perform live migration across host groups
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
         host: 828384A_215ABCD
-        migration_type: live
+        type: live
         ignore_az: true
-
 
 - name: Cold migrate VM
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Perform cold migration
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
-        host: 828384A_215ABCD
-        migration_type: cold
+        type: cold
 
+- name: Cold migrate VM with placement policy
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform cold migration using placement policy
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        type: cold
 
 - name: Cold migrate VM across host groups
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Perform cold migration across host groups
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
         host: 828384A_216ABCD
-        migration_type: cold
+        type: cold
         ignore_az: true
-
 
 - name: Force live migration
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Perform forced live migration
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
         host: 828384A_216ABCD
-        migration_type: live
+        type: live
         force: true
-
 
 - name: Live migration with disk overcommit
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Perform live migration with disk overcommit
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
         host: 828384A_217ABCD
-        migration_type: live
+        type: live
         disk_over_commit: true

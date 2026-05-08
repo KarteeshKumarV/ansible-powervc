@@ -11,9 +11,11 @@ DOCUMENTATION = r'''
 module: migrate_vm
 short_description: Perform live or cold VM migration in IBM PowerVC
 description:
-  - Supports live migration.
-  - Supports cold migration.
-  - Supports migration across host groups using ignore_az.
+  - Supports live and cold VM migration in IBM PowerVC.
+  - Live migration moves a running virtual machine.
+  - Cold migration moves a powered off virtual machine.
+  - Supports migration to a specified host or placement policy based host selection.
+  - Supports cross host-group migration using ignore_az.
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
 options:
@@ -27,18 +29,20 @@ options:
     type: str
   host:
     description:
-      - MTMS of the arget compute host where the virtual machine will be migrated.
+      - MTMS of the target compute host.
+      - If not specified, the destination host is selected using placement policy.
+      - Required when ignore_az is set to true.
     type: str
-    required: true
   type:
     description:
       - Type of migration to perform.
-      - C(live) performs live migration.
-      - C(cold) performs cold migration.
+      - C(live) migrates a running virtual machine.
+      - C(cold) migrates a powered off virtual machine.
     choices:
       - live
       - cold
     type: str
+    required: true
   ignore_az:
     description:
       - Allows migration across availability zones or host groups.
@@ -46,19 +50,19 @@ options:
     default: false
   block_migration:
     description:
-      - Enable block migration during live migration.
+      - Enables block migration during live migration.
       - Applicable only for live migration.
     type: bool
     default: false
   disk_over_commit:
     description:
-      - Allow disk overcommit during live migration.
+      - Enables disk overcommit during live migration.
       - Applicable only for live migration.
     type: bool
     default: true
   force:
     description:
-      - Force live migration operation.
+      - Forces live migration without scheduler verification.
       - Applicable only for live migration.
     type: bool
     default: false
@@ -74,7 +78,6 @@ EXAMPLES = r'''
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
-        host: 828384A_215ABCD
         type: live
 
 - name: Live migrate VM using VM ID
@@ -85,7 +88,27 @@ EXAMPLES = r'''
       ibm.powervc.migrate_vm:
         cloud: powervc
         id: "8f4d9b4f-1234-5678-abcd-123456789abc"
+        type: live
+
+- name: Live migrate VM with target host
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration to specific host
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
         host: 828384A_215ABCD
+        type: live
+
+- name: Live migrate VM with placement policy
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration using placement policy
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
         type: live
 
 - name: Live migrate VM with block migration
@@ -120,7 +143,16 @@ EXAMPLES = r'''
       ibm.powervc.migrate_vm:
         cloud: powervc
         name: test-vm
-        host: 828384A_215ABCD
+        type: cold
+
+- name: Cold migrate VM with placement policy
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform cold migration using placement policy
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
         type: cold
 
 - name: Cold migrate VM across host groups
@@ -168,13 +200,11 @@ class MigrateVMModule(OpenStackModule):
     argument_spec = dict(
         name=dict(type='str'),
         id=dict(type='str'),
-        host=dict(
-            type='str',
-            required=True
-        ),
+        host=dict(type='str'),
         type=dict(
             type='str',
-            choices=['live', 'cold']
+            choices=['live', 'cold'],
+            required=True
         ),
         ignore_az=dict(
             type='bool',
@@ -208,34 +238,36 @@ class MigrateVMModule(OpenStackModule):
         host = self.params['host']
         migration_type = self.params['type']
         ignore_az = self.params['ignore_az']
+        block_migration = self.params['block_migration']
+        disk_over_commit = self.params['disk_over_commit']
+        force = self.params['force']
         validate_certs = self.params.get("validate_certs")
         if validate_certs is False:
             self.conn.session.verify = False
         verify = self.conn.session.verify
+        if ignore_az and not host:
+            self.fail_json(
+                msg="host is mandatory when ignore_az=True",
+                changed=False
+            )
         if vm_name:
             server = self.conn.compute.find_server(
                 vm_name,
                 ignore_missing=False
             )
             vm_id = server.id
+        vm_identifier = vm_name if vm_name else vm_id
         try:
-            # LIVE MIGRATION
             if migration_type == "live":
                 payload = {
                     "os-migrateLive": {
                         "host": host,
-                        "block_migration": self.params[
-                            'block_migration'
-                        ],
-                        "disk_over_commit": self.params[
-                            'disk_over_commit'
-                        ],
-                        "force": self.params['force'],
+                        "block_migration": block_migration,
+                        "disk_over_commit": disk_over_commit,
+                        "force": force,
                         "ignore_az": ignore_az
                     }
                 }
-
-            # COLD MIGRATION
             elif migration_type == "cold":
                 payload = {
                     "migrate": {
@@ -250,14 +282,18 @@ class MigrateVMModule(OpenStackModule):
                 tenant_id=tenant_id,
                 verify=verify,
                 vm_id=vm_id,
-                payload=payload
+                payload=payload,
+                migration_type=migration_type,
+                vm_identifier=vm_identifier,
+                host=host
             )
+
             self.exit_json(
                 changed=True,
                 result=result
             )
-
         except Exception as ex:
+
             self.fail_json(
                 msg=str(ex),
                 changed=False
