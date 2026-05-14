@@ -1,35 +1,121 @@
-  - name: VM Migrate Playbook
-    hosts: localhost
-    gather_facts: no
-    vars:
-     auth:
-      auth_url: https://<POWERVC>:5000/v3
-      project_name: PROJECT-NAME
-      username: USERID
-      password: PASSWORD
-      project_domain_name: PROJECT_DOMAIN_NAME
-      user_domain_name: USER_DOMAIN_NAME
-    tasks:
-       - name: Perform VM Migrate Operations
-         ibm.powervc.migate_vm:
-            auth: "{{ AUTH }}"
-            name: "NAME"
-            host: "HOST_ID"
-            validate_certs: no
-         register: result
-       - debug:
-            var: result
+---
+- name: Live migrate VM using VM name
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration using VM name
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        type: live
 
-  - name: VM Migrate Playbook
-    hosts: localhost
-    gather_facts: no
-    tasks:
-       - name: Perform VM Migrate Operations
-         ibm.powervc.migate_vm:
-            cloud: "CLOUD_NAME"
-            name: "NAME"
-            host: "HOST_ID"
-            validate_certs: no
-         register: result
-       - debug:
-            var: result
+- name: Live migrate VM using VM ID
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration using VM ID
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        id: "8f4d9b4f-1234-5678-abcd-123456789abc"
+        type: live
+
+- name: Live migrate VM with target host
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration to specific host
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_215ABCD
+        type: live
+
+- name: Live migrate VM with placement policy
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration using placement policy
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        type: live
+
+- name: Live migrate VM with block migration
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform block live migration
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_215ABCD
+        type: live
+        block_migration: true
+
+- name: Live migrate VM across host groups
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration across host groups
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_215ABCD
+        type: live
+        ignore_az: true
+
+- name: Cold migrate VM
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform cold migration
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        type: cold
+
+- name: Cold migrate VM with placement policy
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform cold migration using placement policy
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        type: cold
+
+- name: Cold migrate VM across host groups
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform cold migration across host groups
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_216ABCD
+        type: cold
+        ignore_az: true
+
+- name: Force live migration
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform forced live migration
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_216ABCD
+        type: live
+        force: true
+
+- name: Live migration with disk overcommit
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Perform live migration with disk overcommit
+      ibm.powervc.migrate_vm:
+        cloud: powervc
+        name: test-vm
+        host: 828384A_217ABCD
+        type: live
+        disk_over_commit: true
