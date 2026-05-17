@@ -1,108 +1,118 @@
+# server.py
+
 #!/usr/bin/python
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'PowerVC'}
-
+ANSIBLE_METADATA = {
+    'metadata_version': '1.1',
+    'status': ['preview'],
+    'supported_by': 'PowerVC'
+}
 
 DOCUMENTATION = '''
 ---
 module: server
-author:
-    - Karteesh Kumar Vipparapelli (@vkarteesh)
-short_description: Create/Delete the Virtual Machines from PowerVC.
+
+short_description: Create/Delete/Update PowerVC Virtual Machines
+
 description:
-  - This playbook helps in performing the Create and Delete VM operations.
+  - Create VM
+  - Delete VM
+  - Assign/Unassign Virtual Serial Number (VSN)
 
 options:
+
   name:
     description:
-      - Name of the Server
+      - Name of the VM
+    type: str
+
+  id:
+    description:
+      - ID of the VM
     type: str
 
   flavor:
     description:
-      - Name of the flavor
+      - Flavor name
     type: str
 
   image:
     description:
-      - Name of the image
+      - Image name
     type: str
 
   host:
     description:
-      - ID of the host
+      - Host name
     type: str
 
   collocation_rule_name:
     description:
-      - Name of the collocation_rule_name
+      - Collocation rule name
     type: str
 
   max_count:
     description:
-      - The maximum number of servers to create.
-    type: str
+      - Maximum VM count
+    type: int
 
   scg_id:
     description:
-      - ID of the Storage Connectivity Group.
+      - Storage Connectivity Group ID
     type: str
 
   key_name:
     description:
-      - The key pair name to be used when creating a instance.
+      - SSH key name
     type: str
 
   user_data:
     description:
-      - activation_input data which is passed to the instance.
+      - Cloud-init/userdata
     type: str
 
   virtual_serial_number:
     description:
-      - Virtual Serial Number (VSN) for the VM.
-      - Valid values are auto, none, or a valid 7 character alpha numeric VSN.
+      - Virtual Serial Number
+      - Valid values:
+      - auto
+      - none
+      - valid 7-char VSN like ABCD007
     type: str
 
-  network:
-     description:
-       - Name or ID of a network to attach this instance to.
-       - A simpler version of the I(nics) parameter.
-       - Only one of I(network) or I(nics) should be supplied.
-       - This server attribute cannot be updated.
-     type: str
-
   nics:
-     description:
-       - A list of networks to which the instance's interface should
-         be attached.
-       - Networks may be referenced by network_id/network_name
-     type: list
-     elements: raw
-     default: []
+    description:
+      - VM networks
+    type: list
+    elements: raw
+    default: []
 
   image_volume_override:
-     description:
-       - A list of volume id and templated id which will be attached to the VM.
-       - Referenced by volume_id and template_id.
-     type: list
-     elements: raw
-     default: []
+    description:
+      - Volume/template mapping
+    type: list
+    elements: raw
+    default: []
 
   volume_name:
-     description:
-       - A list of volumes that are to be attached to the VM
-     type: list
-     elements: raw
-     default: []
+    description:
+      - Volume names
+    type: list
+    elements: raw
+    default: []
+
+  volume_id:
+    description:
+      - Volume IDs
+    type: list
+    elements: str
+    default: []
 
   state:
     description:
-      - VM Operation to be perfomed
-    choices: [absent, present, assign_vsn, unassign_vsn]
-    required: yes
+      - Desired state
+    choices: [present, absent]
+    required: true
     type: str
 '''
 
@@ -177,12 +187,7 @@ class ServerOpsModule(OpenStackModule):
         ),
 
         state=dict(
-            choices=[
-                'absent',
-                'present',
-                'assign_vsn',
-                'unassign_vsn'
-            ]
+            choices=['present', 'absent']
         ),
     )
 
@@ -295,54 +300,16 @@ class ServerOpsModule(OpenStackModule):
             if not isinstance(net, dict):
 
                 self.fail_json(
-                    msg="Each entry in the "
-                        "'image_volume_override' parameter must be a dict."
+                    msg="Each entry in image_volume_override must be dict."
                 )
 
             if net.get('volume_id'):
 
                 image_volume_override.append(net)
 
-            elif net.get('net-name'):
-
-                network_id = self.conn.network.find_network(
-                    net['net-name'],
-                    ignore_missing=False
-                ).id
-
-                net = copy.deepcopy(net)
-
-                del net['net-name']
-
-                net['uuid'] = network_id
-
-                image_volume_override.append(net)
-
             elif net.get('template_id'):
 
                 image_volume_override.append(net)
-
-            elif net.get('port_id'):
-
-                image_volume_override.append(net)
-
-            elif net.get('port_name'):
-
-                port_id = self.conn.network.find_port(
-                    net['port-name'],
-                    ignore_missing=False
-                ).id
-
-                net = copy.deepcopy(net)
-
-                del net['port_name']
-
-                net['port'] = port_id
-
-                image_volume_override.append(net)
-
-            if 'tag' in net:
-                image_volume_override[-1]['tag'] = net['tag']
 
         return image_volume_override
 
@@ -353,7 +320,6 @@ class ServerOpsModule(OpenStackModule):
             authtoken = self.conn.auth_token
 
             vm_name = self.params['name']
-
             vmid = self.params['id']
 
             state = self.params['state']
@@ -386,237 +352,209 @@ class ServerOpsModule(OpenStackModule):
 
             tenant_id = self.conn.session.get_project_id()
 
+            server = self.conn.compute.find_server(
+                vm_name,
+                ignore_missing=True
+            )
+
             if state == "present":
 
-                flavor_id = self.conn.compute.find_flavor(
-                    flavor,
-                    ignore_missing=False
-                ).id
+                #
+                # UPDATE EXISTING VM VSN
+                #
 
-                imageRef = self.conn.compute.find_image(
-                    image,
-                    ignore_missing=False
-                ).id
+                if server and virtual_serial_number is not None:
 
-                nics = self._parse_nics()
+                    if virtual_serial_number == "none":
 
-                if user_data:
+                        vm_data = {
+                            "unassign_vsn": None
+                        }
 
-                    base64_encoded = base64.b64encode(
-                        user_data.encode('utf-8')
+                    else:
+
+                        vm_data = {
+                            "assign_vsn": {
+                                "virtual_serial_number":
+                                    virtual_serial_number
+                            }
+                        }
+
+                    res = server_ops(
+                        self,
+                        self.conn,
+                        authtoken,
+                        tenant_id,
+                        vm_name,
+                        "vsn_update",
+                        vm_data,
+                        vm_id=server.id
                     )
 
-                    userdata = base64_encoded.decode('utf-8')
+                #
+                # CREATE VM
+                #
 
                 else:
 
-                    userdata = None
+                    flavor_id = self.conn.compute.find_flavor(
+                        flavor,
+                        ignore_missing=False
+                    ).id
 
-                if not volume_id:
+                    imageRef = self.conn.compute.find_image(
+                        image,
+                        ignore_missing=False
+                    ).id
 
-                    vol_id = []
+                    nics = self._parse_nics()
 
-                    for name in volume_name:
+                    if user_data:
 
-                        vol_id.append(
-                            self.conn.block_storage.find_volume(
-                                name,
-                                ignore_missing=False
-                            ).id
+                        base64_encoded = base64.b64encode(
+                            user_data.encode('utf-8')
                         )
 
-                    vol_list = []
+                        userdata = base64_encoded.decode('utf-8')
 
-                    index = 1
+                    else:
 
-                    for uuid in vol_id:
+                        userdata = None
 
-                        entry = {
-                            "boot_index": index,
-                            "delete_on_termination": False,
-                            "destination_type": "volume",
-                            "source_type": "volume",
-                            "uuid": uuid
-                        }
+                    if not volume_id:
 
-                        vol_list.append(entry)
+                        vol_id = []
 
-                        index += 1
+                        for name in volume_name:
 
-                elif volume_id:
+                            vol_id.append(
+                                self.conn.block_storage.find_volume(
+                                    name,
+                                    ignore_missing=False
+                                ).id
+                            )
 
-                    vol_list = []
+                        vol_list = []
 
-                    index = 1
+                        index = 1
 
-                    for uuid in volume_id:
+                        for uuid in vol_id:
 
-                        entry = {
-                            "boot_index": index,
-                            "delete_on_termination": False,
-                            "destination_type": "volume",
-                            "source_type": "volume",
-                            "uuid": uuid
-                        }
+                            entry = {
+                                "boot_index": index,
+                                "delete_on_termination": False,
+                                "destination_type": "volume",
+                                "source_type": "volume",
+                                "uuid": uuid
+                            }
 
-                        vol_list.append(entry)
+                            vol_list.append(entry)
 
-                        index += 1
+                            index += 1
 
-                volid = None
+                    else:
 
-                template_id = None
+                        vol_list = []
 
-                if image_vol_template:
+                        index = 1
 
-                    volid = image_vol_template[0].get(
-                        'volume_id',
-                        None
+                        for uuid in volume_id:
+
+                            entry = {
+                                "boot_index": index,
+                                "delete_on_termination": False,
+                                "destination_type": "volume",
+                                "source_type": "volume",
+                                "uuid": uuid
+                            }
+
+                            vol_list.append(entry)
+
+                            index += 1
+
+                    volid = None
+
+                    template_id = None
+
+                    if image_vol_template:
+
+                        volid = image_vol_template[0].get(
+                            'volume_id',
+                            None
+                        )
+
+                        template_id = image_vol_template[0].get(
+                            'template_id',
+                            None
+                        )
+
+                    flavor = server_flavor(
+                        self,
+                        self.conn,
+                        authtoken,
+                        tenant_id,
+                        flavor_id,
+                        imageRef,
+                        volid,
+                        template_id,
+                        scg_id
                     )
 
-                    template_id = image_vol_template[0].get(
-                        'template_id',
-                        None
+                    collocation_rule_id = get_collocation_rules_id(
+                        self,
+                        self.conn,
+                        authtoken,
+                        tenant_id,
+                        collocation_rule
                     )
 
-                flavor = server_flavor(
-                    self,
-                    self.conn,
-                    authtoken,
-                    tenant_id,
-                    flavor_id,
-                    imageRef,
-                    volid,
-                    template_id,
-                    scg_id
-                )
+                    if availability_zone:
+                        availability_zone = ":" + availability_zone
 
-                collocation_rule_id = get_collocation_rules_id(
-                    self,
-                    self.conn,
-                    authtoken,
-                    tenant_id,
-                    collocation_rule
-                )
-
-                if availability_zone:
-                    availability_zone = ":" + availability_zone
-
-                uuid_value = None
-
-                net_port = any(
-                    "port" in net
-                    for net in nics
-                )
-
-                net_uuid = any(
-                    "uuid" in net
-                    for net in nics
-                )
-
-                if net_port and net_uuid:
-
-                    nics = [
-                        net for net in nics
-                        if not (uuid_value := net.get('uuid'))
-                    ]
-
-                elif net_uuid and not net_port:
-
-                    for net in nics:
-
-                        if "uuid" in net:
-
-                            uuid_value = net["uuid"]
-
-                            break
-
-                vm_data = {
-                    "server": {
-                        "name": vm_name,
-                        "imageRef": imageRef,
-                        "key_name": key_name,
-                        "availability_zone": availability_zone,
-                        "block_device_mapping_v2": vol_list,
-                        "max_count": max_count,
-                        "config_drive": True,
-                        "user_data": userdata,
-                        "networks": nics,
-                        "metadata": {
-                            "primary_network": uuid_value
+                    vm_data = {
+                        "server": {
+                            "name": vm_name,
+                            "imageRef": imageRef,
+                            "key_name": key_name,
+                            "availability_zone": availability_zone,
+                            "block_device_mapping_v2": vol_list,
+                            "max_count": max_count,
+                            "config_drive": True,
+                            "user_data": userdata,
+                            "networks": nics,
+                            "powervm:virtual_serial_number":
+                                virtual_serial_number,
+                            "flavor": flavor
                         },
-                        "powervm:virtual_serial_number":
-                            virtual_serial_number,
-                        "flavor": flavor
-                    },
-                    "os:scheduler_hints": collocation_rule_id
-                }
-
-                res = server_ops(
-                    self,
-                    self.conn,
-                    authtoken,
-                    tenant_id,
-                    vm_name,
-                    state,
-                    vm_data,
-                    vm_id=None
-                )
-
-            elif state == "assign_vsn":
-
-                vm_data = {
-                    "assign_vsn": {
-                        "virtual_serial_number":
-                            virtual_serial_number
+                        "os:scheduler_hints": collocation_rule_id
                     }
-                }
 
-                res = server_ops(
-                    self,
-                    self.conn,
-                    authtoken,
-                    tenant_id,
-                    vm_name,
-                    state,
-                    vm_data,
-                    vm_id=vmid
-                )
-
-            elif state == "unassign_vsn":
-
-                vm_data = {
-                    "unassign_vsn": None
-                }
-
-                res = server_ops(
-                    self,
-                    self.conn,
-                    authtoken,
-                    tenant_id,
-                    vm_name,
-                    state,
-                    vm_data,
-                    vm_id=vmid
-                )
+                    res = server_ops(
+                        self,
+                        self.conn,
+                        authtoken,
+                        tenant_id,
+                        vm_name,
+                        "present",
+                        vm_data,
+                        vm_id=None
+                    )
 
             elif state == "absent":
 
-                vm_data = None
-
                 res = server_ops(
                     self,
                     self.conn,
                     authtoken,
                     tenant_id,
                     vm_name,
-                    state,
-                    vm_data,
+                    "absent",
+                    None,
                     vm_id=vmid
                 )
 
             self.exit_json(
-                changed=False,
+                changed=True,
                 result=res
             )
 

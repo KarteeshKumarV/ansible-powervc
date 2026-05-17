@@ -1,14 +1,13 @@
-#!/usr/bin/python
+# crud_server.py
 
-"""
-This module performs the PowerVC Server Create/delete operations
-"""
+#!/usr/bin/python
 
 import requests
 import json
 
 
 def get_headers(authtoken):
+
     return {
         "X-Auth-Token": authtoken,
         "Content-Type": "application/json"
@@ -49,22 +48,9 @@ def get_endpoint_url_by_service_name(
             None
         )
 
-        if endpoint:
-            return endpoint.url.replace(
-                "%(tenant_id)s",
-                tenant_id
-            )
-
-        else:
-            mod.fail_json(
-                msg=f"No endpoint found for service '{service_name}'",
-                changed=False
-            )
-
-    else:
-        mod.fail_json(
-            msg=f"No service found with the name '{service_name}'",
-            changed=False
+        return endpoint.url.replace(
+            "%(tenant_id)s",
+            tenant_id
         )
 
 
@@ -207,9 +193,6 @@ def server_flavor(
 
 
 def create_vm(headers_vm, vm_url, data, vm_name):
-    """
-    Performs VM Create operation
-    """
 
     responce = requests.post(
         vm_url,
@@ -233,15 +216,7 @@ def create_vm(headers_vm, vm_url, data, vm_name):
         )
 
 
-def vsn_action(
-        headers_vm,
-        vm_url,
-        data,
-        vm_name,
-        operation):
-    """
-    Performs VSN assign/unassign operation
-    """
+def vsn_action(headers_vm, vm_url, data, vm_name):
 
     responce = requests.post(
         vm_url,
@@ -253,22 +228,19 @@ def vsn_action(
     if responce.ok:
 
         return (
-            f"VSN {operation} operation completed for VM '{vm_name}'",
+            f"VSN operation completed for VM '{vm_name}'",
             responce.json() if responce.text else {}
         )
 
     else:
 
         return (
-            f"VSN {operation} operation failed for VM '{vm_name}'",
+            f"VSN operation failed for VM '{vm_name}'",
             responce.json()
         )
 
 
 def delete_vm(headers_vm, vm_url, vm_name):
-    """
-    Performs VM Delete operation
-    """
 
     responce = requests.delete(
         vm_url,
@@ -304,17 +276,14 @@ def server_ops(
 
     headers_vm = get_headers(authtoken)
 
-    if not vm_id and state in [
-            'absent',
-            'assign_vsn',
-            'unassign_vsn']:
-
-        vm_id = mod.conn.compute.find_server(
-            vm_name,
-            ignore_missing=False
-        ).id
-
     if state == 'absent':
+
+        if not vm_id:
+
+            vm_id = mod.conn.compute.find_server(
+                vm_name,
+                ignore_missing=False
+            ).id
 
         vm_url = f"{endpoint}/servers/{vm_id}"
 
@@ -351,7 +320,7 @@ def server_ops(
             vm_name
         )
 
-    elif state == 'assign_vsn':
+    elif state == 'vsn_update':
 
         vm_url = f"{endpoint}/servers/{vm_id}/action"
 
@@ -359,20 +328,7 @@ def server_ops(
             headers_vm,
             vm_url,
             data,
-            vm_name,
-            "assign"
-        )
-
-    elif state == 'unassign_vsn':
-
-        vm_url = f"{endpoint}/servers/{vm_id}/action"
-
-        result = vsn_action(
-            headers_vm,
-            vm_url,
-            data,
-            vm_name,
-            "unassign"
+            vm_name
         )
 
     return result
