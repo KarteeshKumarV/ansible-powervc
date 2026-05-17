@@ -74,10 +74,9 @@ options:
   virtual_serial_number:
     description:
       - Virtual Serial Number
-      - Valid values:
       - auto
       - none
-      - valid 7-char VSN like ABCD007
+      - ABCD007
     type: str
 
   nics:
@@ -116,6 +115,312 @@ options:
     type: str
 '''
 
+EXAMPLES = '''
+
+  - name: PowerVC Create VM Playbook
+    hosts: localhost
+    gather_facts: no
+    vars:
+      auth:
+        auth_url: https://<POWERVC>:5000/v3
+        project_name: PROJECT_NAME
+        username: USERID
+        password: PASSWORD
+        project_domain_name: Default
+        user_domain_name: Default
+
+    tasks:
+
+      - name: Create VM
+        ibm.powervc.server:
+          auth: "{{ auth }}"
+          name: "VM_NAME"
+          image: "IMAGE_NAME"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_NAME"
+
+          nics:
+            - network_name: "NETWORK_NAME"
+              fixed_ip: "192.168.10.20"
+
+          volume_name:
+            - "volume1"
+            - "volume2"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: PowerVC Create VM using cloud entry
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Create VM using clouds.yaml
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "VM_NAME"
+
+          image: "IMAGE_NAME"
+
+          flavor: "FLAVOR_NAME"
+
+          host: "HOST_NAME"
+
+          user_data: |
+            #!/bin/bash
+            yum update -y
+
+          nics:
+            - network_name: "NETWORK_NAME"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: PowerVC Create VM with SCG
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Create VM with Storage Connectivity Group
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "VM_NAME"
+
+          image: "IMAGE_NAME"
+
+          flavor: "FLAVOR_NAME"
+
+          host: "HOST_NAME"
+
+          scg_id: "SCG_ID"
+
+          nics:
+            - network_name: "NETWORK_NAME"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: PowerVC Create VM with image volume override
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Create VM with image volume override
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "VM_NAME"
+
+          image: "IMAGE_NAME"
+
+          flavor: "FLAVOR_NAME"
+
+          host: "HOST_NAME"
+
+          image_volume_override:
+            - volume_id: "VOLUME_ID"
+              template_id: "TEMPLATE_ID"
+
+          nics:
+            - network_name: "NETWORK_NAME"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: PowerVC Delete VM
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Delete VM
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "VM_NAME"
+
+          state: absent
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: Create VM with auto generated VSN
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Create VM with auto VSN
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "vsn_auto_vm"
+
+          image: "IMAGE_NAME"
+
+          flavor: "FLAVOR_NAME"
+
+          host: "HOST_NAME"
+
+          virtual_serial_number: "auto"
+
+          nics:
+            - network_name: "NETWORK_NAME"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: Create VM with custom VSN
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Create VM using custom VSN
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "vsn_custom_vm"
+
+          image: "IMAGE_NAME"
+
+          flavor: "FLAVOR_NAME"
+
+          host: "HOST_NAME"
+
+          virtual_serial_number: "ABCD007"
+
+          nics:
+            - network_name: "NETWORK_NAME"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: Assign auto VSN to existing VM
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Assign auto VSN
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "existing_vm"
+
+          virtual_serial_number: "auto"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: Assign custom VSN to existing VM
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Assign custom VSN
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "existing_vm"
+
+          virtual_serial_number: "ABCD007"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+
+  - name: Unassign VSN from existing VM
+    hosts: localhost
+    gather_facts: no
+
+    tasks:
+
+      - name: Unassign VSN
+        ibm.powervc.server:
+          cloud: "powervc"
+
+          name: "existing_vm"
+
+          virtual_serial_number: "none"
+
+          state: present
+
+          validate_certs: false
+
+        register: result
+
+      - debug:
+          var: result
+
+'''
+
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_server import (
@@ -131,7 +436,9 @@ import base64
 class ServerOpsModule(OpenStackModule):
 
     argument_spec = dict(
+
         name=dict(required=False),
+
         id=dict(required=False),
 
         volume_id=dict(
@@ -147,8 +454,11 @@ class ServerOpsModule(OpenStackModule):
         ),
 
         flavor=dict(),
+
         image=dict(),
+
         key_name=dict(),
+
         host=dict(),
 
         metadata=dict(
@@ -202,6 +512,7 @@ class ServerOpsModule(OpenStackModule):
         stringified_nets = self.params['nics']
 
         if not isinstance(stringified_nets, list):
+
             self.fail_json(
                 msg="The 'nics' parameter must be a list."
             )
@@ -320,6 +631,7 @@ class ServerOpsModule(OpenStackModule):
             authtoken = self.conn.auth_token
 
             vm_name = self.params['name']
+
             vmid = self.params['id']
 
             state = self.params['state']
@@ -356,6 +668,10 @@ class ServerOpsModule(OpenStackModule):
                 vm_name,
                 ignore_missing=True
             )
+
+            #
+            # PRESENT
+            #
 
             if state == "present":
 
@@ -497,7 +813,8 @@ class ServerOpsModule(OpenStackModule):
                         imageRef,
                         volid,
                         template_id,
-                        scg_id
+                        scg_id,
+                        virtual_serial_number
                     )
 
                     collocation_rule_id = get_collocation_rules_id(
@@ -539,6 +856,10 @@ class ServerOpsModule(OpenStackModule):
                         vm_data,
                         vm_id=None
                     )
+
+            #
+            # ABSENT
+            #
 
             elif state == "absent":
 

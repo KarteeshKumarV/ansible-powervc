@@ -2,6 +2,10 @@
 
 #!/usr/bin/python
 
+"""
+This module performs the PowerVC Server Create/Delete/VSN operations
+"""
+
 import requests
 import json
 
@@ -48,9 +52,25 @@ def get_endpoint_url_by_service_name(
             None
         )
 
-        return endpoint.url.replace(
-            "%(tenant_id)s",
-            tenant_id
+        if endpoint:
+
+            return endpoint.url.replace(
+                "%(tenant_id)s",
+                tenant_id
+            )
+
+        else:
+
+            mod.fail_json(
+                msg=f"No endpoint found for service '{service_name}'",
+                changed=False
+            )
+
+    else:
+
+        mod.fail_json(
+            msg=f"No service found with the name '{service_name}'",
+            changed=False
         )
 
 
@@ -104,7 +124,8 @@ def server_flavor(
         image_id,
         volid,
         template_id,
-        scg_id):
+        scg_id,
+        virtual_serial_number):
 
     service_name = "compute"
 
@@ -183,6 +204,16 @@ def server_flavor(
         flavor_specs['extra_specs'][
             'powervm:storage_connectivity_group'
         ] = scg_id
+
+    #
+    # VSN EXTRA SPEC
+    #
+
+    if virtual_serial_number:
+
+        flavor_specs['extra_specs'][
+            'powervm:virtual_serial_number'
+        ] = virtual_serial_number
 
     flavor_data = {
         **flavor_details,
