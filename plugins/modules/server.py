@@ -1,5 +1,3 @@
-# server.py
-
 #!/usr/bin/python
 
 ANSIBLE_METADATA = {
@@ -11,66 +9,52 @@ ANSIBLE_METADATA = {
 DOCUMENTATION = '''
 ---
 module: server
-
 short_description: Create/Delete/Update PowerVC Virtual Machines
-
 description:
   - Create VM
   - Delete VM
   - Assign/Unassign Virtual Serial Number (VSN)
-
 options:
-
   name:
     description:
       - Name of the VM
     type: str
-
   id:
     description:
       - ID of the VM
     type: str
-
   flavor:
     description:
       - Flavor name
     type: str
-
   image:
     description:
       - Image name
     type: str
-
   host:
     description:
       - Host name
     type: str
-
   collocation_rule_name:
     description:
       - Collocation rule name
     type: str
-
   max_count:
     description:
       - Maximum VM count
     type: int
-
   scg_id:
     description:
       - Storage Connectivity Group ID
     type: str
-
   key_name:
     description:
       - SSH key name
     type: str
-
   user_data:
     description:
       - Cloud-init/userdata
     type: str
-
   virtual_serial_number:
     description:
       - Virtual Serial Number
@@ -78,35 +62,30 @@ options:
       - none
       - ABCD007
     type: str
-
   nics:
     description:
       - VM networks
     type: list
     elements: raw
     default: []
-
   image_volume_override:
     description:
       - Volume/template mapping
     type: list
     elements: raw
     default: []
-
   volume_name:
     description:
       - Volume names
     type: list
     elements: raw
     default: []
-
   volume_id:
     description:
       - Volume IDs
     type: list
     elements: str
     default: []
-
   state:
     description:
       - Desired state
@@ -434,89 +413,63 @@ import base64
 
 
 class ServerOpsModule(OpenStackModule):
-
     argument_spec = dict(
-
         name=dict(required=False),
-
         id=dict(required=False),
-
         volume_id=dict(
             default=[],
             type='list',
             elements='str'
         ),
-
         volume_name=dict(
             default=[],
             type='list',
             elements='str'
         ),
-
         flavor=dict(),
-
         image=dict(),
-
         key_name=dict(),
-
         host=dict(),
-
         metadata=dict(
             type='raw',
             aliases=['meta']
         ),
-
         nics=dict(
             default=[],
             type='list',
             elements='raw'
         ),
-
         image_volume_override=dict(
             default=[],
             type='list',
             elements='raw'
         ),
-
         network=dict(),
-
         user_data=dict(),
-
         virtual_serial_number=dict(type='str'),
-
         max_count=dict(type='int'),
-
         collocation_rule_name=dict(),
-
         scg_id=dict(),
-
         security_groups=dict(
             default=[],
             type='list',
             elements='str'
         ),
-
         state=dict(
             choices=['present', 'absent']
         ),
     )
-
     module_kwargs = dict(
         supports_check_mode=True
     )
 
     def _parse_nics(self):
-
         nics = []
-
         stringified_nets = self.params['nics']
-
         if not isinstance(stringified_nets, list):
-
             self.fail_json(
                 msg="The 'nics' parameter must be a list."
             )
-
         nets = [
             (
                 dict((nested_net.split('='),))
@@ -525,78 +478,50 @@ class ServerOpsModule(OpenStackModule):
             if isinstance(net, str) else net
             for net in stringified_nets
         ]
-
         for net in nets:
-
             if not isinstance(net, dict):
-
                 self.fail_json(
                     msg="Each entry in the 'nics' parameter must be a dict."
                 )
-
             if net.get('network_id'):
-
                 nics.append({
                     "uuid": net["network_id"]
                 })
-
             elif net.get('network_name'):
-
                 network_id = self.conn.network.find_network(
                     net['network_name'],
                     ignore_missing=False
                 ).id
-
                 net = copy.deepcopy(net)
-
                 del net['network_name']
-
                 net['uuid'] = network_id
-
                 nics.append(net)
-
             elif net.get('fixed_ip'):
-
                 nics.append(net)
-
             elif net.get('port_id'):
-
                 nics.append({
                     "port": net["port_id"]
                 })
-
             elif net.get('port_name'):
-
                 port_id = self.conn.network.find_port(
                     net['port_name'],
                     ignore_missing=False
                 ).id
-
                 net = copy.deepcopy(net)
-
                 del net['port_name']
-
                 net['port'] = port_id
-
                 nics.append(net)
-
             if 'tag' in net:
                 nics[-1]['tag'] = net['tag']
-
         return nics
 
     def _parse_image_volume_override(self):
-
         image_volume_override = []
-
         stringified_nets = self.params['image_volume_override']
-
         if not isinstance(stringified_nets, list):
-
             self.fail_json(
                 msg="The 'image_volume_override' parameter must be a list."
             )
-
         nets = [
             (
                 dict((nested_net.split('='),))
@@ -605,97 +530,60 @@ class ServerOpsModule(OpenStackModule):
             if isinstance(net, str) else net
             for net in stringified_nets
         ]
-
         for net in nets:
-
             if not isinstance(net, dict):
-
                 self.fail_json(
                     msg="Each entry in image_volume_override must be dict."
                 )
-
             if net.get('volume_id'):
-
                 image_volume_override.append(net)
-
             elif net.get('template_id'):
-
                 image_volume_override.append(net)
-
         return image_volume_override
 
     def run(self):
-
         try:
-
             authtoken = self.conn.auth_token
-
             vm_name = self.params['name']
-
             vmid = self.params['id']
-
             state = self.params['state']
-
             image = self.params['image']
-
             max_count = self.params['max_count']
-
             availability_zone = self.params['host']
-
             flavor = self.params['flavor']
-
             collocation_rule = self.params['collocation_rule_name']
-
             nics = self.params['nics']
-
             image_vol_template = self.params['image_volume_override']
-
             key_name = self.params['key_name']
-
             volume_name = self.params['volume_name']
-
             volume_id = self.params['volume_id']
-
             scg_id = self.params['scg_id']
-
             user_data = self.params['user_data']
-
             virtual_serial_number = self.params['virtual_serial_number']
-
             tenant_id = self.conn.session.get_project_id()
-
             server = self.conn.compute.find_server(
                 vm_name,
                 ignore_missing=True
             )
-
             #
             # PRESENT
             #
-
             if state == "present":
-
                 #
                 # UPDATE EXISTING VM VSN
                 #
-
                 if server and virtual_serial_number is not None:
-
                     if virtual_serial_number == "none":
-
                         vm_data = {
                             "unassign_vsn": None
                         }
-
                     else:
-
                         vm_data = {
                             "assign_vsn": {
                                 "virtual_serial_number":
                                     virtual_serial_number
                             }
                         }
-
                     res = server_ops(
                         self,
                         self.conn,
@@ -710,9 +598,7 @@ class ServerOpsModule(OpenStackModule):
                 #
                 # CREATE VM
                 #
-
                 else:
-
                     flavor_id = self.conn.compute.find_flavor(
                         flavor,
                         ignore_missing=False
@@ -722,40 +608,26 @@ class ServerOpsModule(OpenStackModule):
                         image,
                         ignore_missing=False
                     ).id
-
                     nics = self._parse_nics()
-
                     if user_data:
-
                         base64_encoded = base64.b64encode(
                             user_data.encode('utf-8')
                         )
-
                         userdata = base64_encoded.decode('utf-8')
-
                     else:
-
                         userdata = None
-
                     if not volume_id:
-
                         vol_id = []
-
                         for name in volume_name:
-
                             vol_id.append(
                                 self.conn.block_storage.find_volume(
                                     name,
                                     ignore_missing=False
                                 ).id
                             )
-
                         vol_list = []
-
                         index = 1
-
                         for uuid in vol_id:
-
                             entry = {
                                 "boot_index": index,
                                 "delete_on_termination": False,
@@ -763,19 +635,12 @@ class ServerOpsModule(OpenStackModule):
                                 "source_type": "volume",
                                 "uuid": uuid
                             }
-
                             vol_list.append(entry)
-
                             index += 1
-
                     else:
-
                         vol_list = []
-
                         index = 1
-
                         for uuid in volume_id:
-
                             entry = {
                                 "boot_index": index,
                                 "delete_on_termination": False,
@@ -783,17 +648,11 @@ class ServerOpsModule(OpenStackModule):
                                 "source_type": "volume",
                                 "uuid": uuid
                             }
-
                             vol_list.append(entry)
-
                             index += 1
-
                     volid = None
-
                     template_id = None
-
                     if image_vol_template:
-
                         volid = image_vol_template[0].get(
                             'volume_id',
                             None
@@ -803,7 +662,6 @@ class ServerOpsModule(OpenStackModule):
                             'template_id',
                             None
                         )
-
                     flavor = server_flavor(
                         self,
                         self.conn,
@@ -816,7 +674,6 @@ class ServerOpsModule(OpenStackModule):
                         scg_id,
                         virtual_serial_number
                     )
-
                     collocation_rule_id = get_collocation_rules_id(
                         self,
                         self.conn,
@@ -824,10 +681,8 @@ class ServerOpsModule(OpenStackModule):
                         tenant_id,
                         collocation_rule
                     )
-
                     if availability_zone:
                         availability_zone = ":" + availability_zone
-
                     vm_data = {
                         "server": {
                             "name": vm_name,
@@ -862,7 +717,6 @@ class ServerOpsModule(OpenStackModule):
             #
 
             elif state == "absent":
-
                 res = server_ops(
                     self,
                     self.conn,
@@ -873,14 +727,11 @@ class ServerOpsModule(OpenStackModule):
                     None,
                     vm_id=vmid
                 )
-
             self.exit_json(
                 changed=True,
                 result=res
             )
-
         except Exception as e:
-
             self.fail_json(
                 msg=f"An unexpected error occurred: {str(e)}",
                 changed=False
@@ -888,9 +739,7 @@ class ServerOpsModule(OpenStackModule):
 
 
 def main():
-
     module = ServerOpsModule()
-
     module()
 
 
