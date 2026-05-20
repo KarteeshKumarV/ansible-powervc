@@ -62,21 +62,30 @@ options:
       - none
       - ABCD007
     type: str
+  network:
+     description:
+       - Name or ID of a network to attach this instance to. A simpler
+         version of the I(nics) parameter, only one of I(network) or I(nics)
+         should be supplied.
+       - This server attribute cannot be updated.
+     type: str
   nics:
-    description:
-      - VM networks
-    type: list
-    elements: raw
-    default: []
+     description:
+       - A list of networks to which the instance's interface should
+         be attached. Networks may be referenced by network_id/network_name
+     type: list
+     elements: raw
+     default: []
   image_volume_override:
     description:
-      - Volume/template mapping
+       - A list of volume id and templated id which will be attached to the VM.
+         Referenced by volume_id and template_id.
     type: list
     elements: raw
     default: []
   volume_name:
     description:
-      - Volume names
+      - A list of volumes that are to be attached to the VM
     type: list
     elements: raw
     default: []
@@ -107,9 +116,7 @@ EXAMPLES = '''
         password: PASSWORD
         project_domain_name: Default
         user_domain_name: Default
-
     tasks:
-
       - name: Create VM
         ibm.powervc.server:
           auth: "{{ auth }}"
@@ -117,21 +124,15 @@ EXAMPLES = '''
           image: "IMAGE_NAME"
           flavor: "FLAVOR_NAME"
           host: "HOST_NAME"
-
           nics:
             - network_name: "NETWORK_NAME"
               fixed_ip: "192.168.10.20"
-
           volume_name:
             - "volume1"
             - "volume2"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -139,34 +140,22 @@ EXAMPLES = '''
   - name: PowerVC Create VM using cloud entry
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Create VM using clouds.yaml
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "VM_NAME"
-
           image: "IMAGE_NAME"
-
           flavor: "FLAVOR_NAME"
-
           host: "HOST_NAME"
-
           user_data: |
             #!/bin/bash
             yum update -y
-
           nics:
             - network_name: "NETWORK_NAME"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -174,32 +163,20 @@ EXAMPLES = '''
   - name: PowerVC Create VM with SCG
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Create VM with Storage Connectivity Group
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "VM_NAME"
-
           image: "IMAGE_NAME"
-
           flavor: "FLAVOR_NAME"
-
           host: "HOST_NAME"
-
           scg_id: "SCG_ID"
-
           nics:
             - network_name: "NETWORK_NAME"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -207,34 +184,22 @@ EXAMPLES = '''
   - name: PowerVC Create VM with image volume override
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Create VM with image volume override
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "VM_NAME"
-
           image: "IMAGE_NAME"
-
           flavor: "FLAVOR_NAME"
-
           host: "HOST_NAME"
-
           image_volume_override:
             - volume_id: "VOLUME_ID"
               template_id: "TEMPLATE_ID"
-
           nics:
             - network_name: "NETWORK_NAME"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -242,21 +207,14 @@ EXAMPLES = '''
   - name: PowerVC Delete VM
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Delete VM
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "VM_NAME"
-
           state: absent
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -264,32 +222,20 @@ EXAMPLES = '''
   - name: Create VM with auto generated VSN
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Create VM with auto VSN
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "vsn_auto_vm"
-
           image: "IMAGE_NAME"
-
           flavor: "FLAVOR_NAME"
-
           host: "HOST_NAME"
-
           virtual_serial_number: "auto"
-
           nics:
             - network_name: "NETWORK_NAME"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -297,32 +243,20 @@ EXAMPLES = '''
   - name: Create VM with custom VSN
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Create VM using custom VSN
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "vsn_custom_vm"
-
           image: "IMAGE_NAME"
-
           flavor: "FLAVOR_NAME"
-
           host: "HOST_NAME"
-
           virtual_serial_number: "ABCD007"
-
           nics:
             - network_name: "NETWORK_NAME"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -330,23 +264,15 @@ EXAMPLES = '''
   - name: Assign auto VSN to existing VM
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Assign auto VSN
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "existing_vm"
-
           virtual_serial_number: "auto"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -354,23 +280,15 @@ EXAMPLES = '''
   - name: Assign custom VSN to existing VM
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Assign custom VSN
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "existing_vm"
-
           virtual_serial_number: "ABCD007"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
 
@@ -378,26 +296,17 @@ EXAMPLES = '''
   - name: Unassign VSN from existing VM
     hosts: localhost
     gather_facts: no
-
     tasks:
-
       - name: Unassign VSN
         ibm.powervc.server:
           cloud: "powervc"
-
           name: "existing_vm"
-
           virtual_serial_number: "none"
-
           state: present
-
           validate_certs: false
-
         register: result
-
       - debug:
           var: result
-
 '''
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
