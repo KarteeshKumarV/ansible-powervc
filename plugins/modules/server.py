@@ -28,7 +28,7 @@ options:
     type: str
   host:
     description:
-      - ID of the host
+      - MTMS of the host
     type: str
   collocation_rule_name:
     description:
@@ -41,6 +41,11 @@ options:
   scg_id:
     description:
       - ID of the Storage Connectivity Group.
+    type: str
+  virtual_serial_number:
+    description:
+      - Virtual Serial Number (VSN) to be assigned to the VM.
+      - Valid values are C(auto), C(none), or a valid 7-character alpha-numeric VSN.
     type: str
   key_name:
     description:
@@ -79,7 +84,7 @@ options:
      default: []
   state:
     description:
-      - VM Operation to be perfomed
+      - VM Operation to be performed
     choices: [absent, present]
     required: yes
     type: str
@@ -117,7 +122,7 @@ EXAMPLES = '''
           state: present
           validate_certs: no
         register: result
-      - name: Disply server info
+      - name: Display server info
         debug: var=result
 
   - name: PowerVC Create VM Playbook
@@ -132,7 +137,7 @@ EXAMPLES = '''
           timeout: 200
           max_count: "COUNT"
           collocation_rule_name: "COLLOCATION_RULE_NAME"
-          userdata: |
+          user_data: |
             #!/bin/sh
             apt update
             apt -y full-upgrade
@@ -174,7 +179,7 @@ EXAMPLES = '''
           state: present
           validate_certs: false
         register: result
-      - name: Disply server info
+      - name: Display server info
         debug: var=result
 
   - name: PowerVC Create VM Playbook with Storage Connectivity Group
@@ -201,8 +206,50 @@ EXAMPLES = '''
           state: present
           validate_certs: false
         register: result
-      - name: Disply server info
+      - name: Display server info
         debug: var=result
+
+  - name: PowerVC Create VM Playbook with custom VSN
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with custom VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          virtual_serial_number: "ABCD001"
+          nics:
+            - network_name: "NETWORK_NAME"
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
+
+  - name: PowerVC Create VM Playbook with auto VSN
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with auto VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          virtual_serial_number: "auto"
+          nics:
+            - network_name: "NETWORK_NAME"
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
 
   - name: PowerVC Delete VM Playbook
     hosts: localhost
@@ -221,7 +268,7 @@ EXAMPLES = '''
           name: "VM_NAME"
           state: absent
         register: result
-      - name: Disply server info
+      - name: Display server info
         debug: var=result
 
 '''
@@ -252,11 +299,15 @@ class ServerOpsModule(OpenStackModule):
         max_count=dict(type='int'),
         collocation_rule_name=dict(),
         scg_id=dict(),
+        virtual_serial_number=dict(required=False),
         security_groups=dict(default=[], type='list', elements='str'),
         state=dict(choices=['absent', 'present']),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ['name', 'id']
+        ]
     )
 
     def _parse_nics(self):
@@ -361,6 +412,7 @@ class ServerOpsModule(OpenStackModule):
             volume_name = self.params['volume_name']
             volume_id = self.params['volume_id']
             scg_id = self.params['scg_id']
+            virtual_serial_number = self.params['virtual_serial_number']
             user_data = self.params['user_data']
             tenant_id = self.conn.session.get_project_id()
             flavor_id = self.conn.compute.find_flavor(flavor, ignore_missing=False).id
@@ -396,7 +448,7 @@ class ServerOpsModule(OpenStackModule):
                 if image_vol_template:
                     volid = image_vol_template[0].get('volume_id', None)
                     template_id = image_vol_template[0].get('template_id', None)
-                flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id, scg_id)
+                flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id, scg_id, virtual_serial_number)
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
                 if availability_zone:
                     availability_zone = ":" + availability_zone
@@ -431,7 +483,7 @@ class ServerOpsModule(OpenStackModule):
             elif state == "absent":
                 vm_data = None
                 res = server_ops(self, self.conn, authtoken, tenant_id, vm_name, state, vm_data, vm_id=vmid)
-            self.exit_json(changed=False, result=res)
+            self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
 

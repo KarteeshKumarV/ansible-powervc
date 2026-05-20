@@ -45,7 +45,7 @@ def get_collocation_rules_id(mod, connectn, authtoken, tenant_id, collocation_ru
     return collocation_id
 
 
-def server_flavor(mod, connectn, authtoken, tenant_id, flavor_id, image_id, volid, template_id, scg_id):
+def server_flavor(mod, connectn, authtoken, tenant_id, flavor_id, image_id, volid, template_id, scg_id, virtual_serial_number=None):
     service_name = "compute"
     endpoint_compute = get_endpoint_url_by_service_name(mod, connectn, service_name, tenant_id)
     image_url = f"{endpoint_compute}/images/{image_id}"
@@ -69,6 +69,8 @@ def server_flavor(mod, connectn, authtoken, tenant_id, flavor_id, image_id, voli
         flavor_specs['extra_specs'][image_temp_id] = template_id
     if scg_id:
         flavor_specs['extra_specs']['powervm:storage_connectivity_group'] = scg_id
+    if virtual_serial_number is not None:
+        flavor_specs['extra_specs']['powervm:virtual_serial_number'] = virtual_serial_number
     flavor_data = {
         **flavor_details,
         **flavor_specs  # Merge flavor_details and Include flavor_data as "extra_specs"
@@ -82,9 +84,9 @@ def create_vm(headers_vm, vm_url, data, vm_name):
     """
     responce = requests.post(vm_url, headers=headers_vm, json=data, verify=False)
     if responce.ok:
-        return (f"VM '{vm_name}' create operation is done", responce.json())
+        return responce.json()
     else:
-        return (f"VM '{vm_name}' create operation failed", responce.json())
+        return (f"Failed to create VM '{vm_name}'", responce.json())
 
 
 def delete_vm(headers_vm, vm_url, vm_name):
@@ -93,7 +95,7 @@ def delete_vm(headers_vm, vm_url, vm_name):
     """
     responce = requests.delete(vm_url, headers=headers_vm, verify=False)
     if responce.ok:
-        return (f"VM '{vm_name}' has been removed/deleted")
+        return (f"VM '{vm_name}' has been removed successfully")
 
 
 def server_ops(mod, connectn, authtoken, tenant_id, vm_name, state, data, vm_id=None):
