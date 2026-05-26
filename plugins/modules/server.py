@@ -277,14 +277,13 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_server import server_ops, server_flavor, get_collocation_rules_id
 import copy
-# import json
 import base64
 
 
 class ServerOpsModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(required=False),
-        id=dict(required=False),
+        name=dict(),
+        id=dict(),
         volume_id=dict(default=[], type='list', elements='str'),
         volume_name=dict(default=[], type='list', elements='str'),
         flavor=dict(),
@@ -301,7 +300,7 @@ class ServerOpsModule(OpenStackModule):
         scg_id=dict(),
         virtual_serial_number=dict(required=False),
         security_groups=dict(default=[], type='list', elements='str'),
-        state=dict(choices=['absent', 'present']),
+        state=dict(default='present', choices=['absent', 'present']),
     )
     module_kwargs = dict(
         supports_check_mode=True,
@@ -415,34 +414,35 @@ class ServerOpsModule(OpenStackModule):
             virtual_serial_number = self.params['virtual_serial_number']
             user_data = self.params['user_data']
             tenant_id = self.conn.session.get_project_id()
-            flavor_id = self.conn.compute.find_flavor(flavor, ignore_missing=False).id
-            imageRef = self.conn.compute.find_image(image, ignore_missing=False).id
-            nics = self._parse_nics()
-            if user_data:
-                base64_encoded = base64.b64encode(user_data.encode('utf-8'))
-                userdata = base64_encoded.decode('utf-8')
-            else:
-                userdata = None
-            if not volume_id:
-                vol_id = []
-                for name in volume_name:
-                    vol_id.append(self.conn.block_storage.find_volume(name, ignore_missing=False).id)
-                vol_list = []
-                index = 1
-                for uuid in vol_id:
-                    entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
-                    vol_list.append(entry)
-                    index += 1
-                # vol_dict = {"block_device_mapping_v2": vol_list}
-            elif volume_id:
-                vol_list = []
-                index = 1
-                for uuid in volume_id:
-                    entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
-                    vol_list.append(entry)
-                    index += 1
-                # vol_dict = {"block_device_mapping_v2": vol_list}
             if state == "present":
+                flavor_id = self.conn.compute.find_flavor(flavor, ignore_missing=False).id
+                imageRef = self.conn.compute.find_image(image, ignore_missing=False).id
+                nics = self._parse_nics()
+                if user_data:
+                    base64_encoded = base64.b64encode(user_data.encode('utf-8'))
+                    userdata = base64_encoded.decode('utf-8')
+                else:
+                    userdata = None
+                if not volume_id:
+                    vol_id = []
+                    for name in volume_name:
+                        vol_id.append(self.conn.block_storage.find_volume(name, ignore_missing=False).id)
+                    vol_list = []
+                    index = 1
+                    for uuid in vol_id:
+                        entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
+                        vol_list.append(entry)
+                        index += 1
+                    # vol_dict = {"block_device_mapping_v2": vol_list}
+                elif volume_id:
+                    vol_list = []
+                    index = 1
+                    for uuid in volume_id:
+                        entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
+                        vol_list.append(entry)
+                        index += 1
+                    # vol_dict = {"block_device_mapping_v2": vol_list}
+
                 volid = None  # Initialize with None
                 template_id = None  # Initialize with None
                 if image_vol_template:
