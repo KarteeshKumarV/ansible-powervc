@@ -82,6 +82,11 @@ options:
      type: list
      elements: raw
      default: []
+  pmem_volume:
+    description:
+      - List of Persistent Memory (PMEM) volumes to attach to the VM.
+    type: list
+    elements: dict
   state:
     description:
       - VM Operation to be performed
@@ -251,6 +256,35 @@ EXAMPLES = '''
         debug:
           var: result
 
+  - name: PowerVC Create VM Playbook with Persistent memory
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with auto VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          nics:
+            - network_name: "NETWORK_NAME"
+          pmem_volume:
+           - name: pmem1
+             size: 256
+             affinity: true
+             device: DRAM
+           - name: pmem2
+             size: 256
+             affinity: false
+             device: DRAM
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
+
   - name: PowerVC Delete VM Playbook
     hosts: localhost
     gather_facts: no
@@ -299,6 +333,7 @@ class ServerOpsModule(OpenStackModule):
         collocation_rule_name=dict(),
         scg_id=dict(),
         virtual_serial_number=dict(required=False),
+        pmem_volume=dict(default=[], type='list', elements='dict'),
         security_groups=dict(default=[], type='list', elements='str'),
         state=dict(default='present', choices=['absent', 'present']),
     )
@@ -412,6 +447,7 @@ class ServerOpsModule(OpenStackModule):
             volume_id = self.params['volume_id']
             scg_id = self.params['scg_id']
             virtual_serial_number = self.params['virtual_serial_number']
+            pmem_volume = self.params['pmem_volume']
             user_data = self.params['user_data']
             tenant_id = self.conn.session.get_project_id()
             if state == "present":
@@ -448,7 +484,7 @@ class ServerOpsModule(OpenStackModule):
                 if image_vol_template:
                     volid = image_vol_template[0].get('volume_id', None)
                     template_id = image_vol_template[0].get('template_id', None)
-                flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id, scg_id, virtual_serial_number)
+                flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id, scg_id, virtual_serial_number, pmem_volume)
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
                 if availability_zone:
                     availability_zone = ":" + availability_zone
