@@ -489,7 +489,6 @@ class ServerOpsModule(OpenStackModule):
                     imageRef, volid, template_id, scg_id,
                     virtual_serial_number, pmem_volume
                 )
-                flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id, scg_id, virtual_serial_number, pmem_volume)
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
                 if availability_zone:
                     availability_zone = ":" + availability_zone
