@@ -108,3 +108,74 @@
         register: result
       - name: Disply server info
         debug: var=result
+
+  - name: PowerVC Create VM Playbook with custom VSN
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with custom VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          virtual_serial_number: "ABCD001"
+          nics:
+            - network_name: "NETWORK_NAME"
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
+
+  - name: PowerVC Create VM Playbook with auto VSN
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with auto VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          virtual_serial_number: "auto"
+          nics:
+            - network_name: "NETWORK_NAME"
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
+
+  - name: PowerVC Create VM Playbook with Persistent memory
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with auto VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          nics:
+            - network_name: "NETWORK_NAME"
+          pmem_volume:
+           - name: pmem1
+             size: 256
+             affinity: true
+             device: DRAM
+           - name: pmem2
+             size: 256
+             affinity: false
+             device: DRAM
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
