@@ -28,7 +28,7 @@ options:
     type: str
   host:
     description:
-      - ID of the host
+      - MTMS of the host
     type: str
   collocation_rule_name:
     description:
@@ -41,6 +41,11 @@ options:
   scg_id:
     description:
       - ID of the Storage Connectivity Group.
+    type: str
+  virtual_serial_number:
+    description:
+      - Virtual Serial Number (VSN) to be assigned to the VM.
+      - Valid values are C(auto), C(none), or a valid 7-character alpha-numeric VSN.
     type: str
   key_name:
     description:
@@ -77,9 +82,14 @@ options:
      type: list
      elements: raw
      default: []
+  pmem_volume:
+    description:
+      - List of Persistent Memory (PMEM) volumes to attach to the VM.
+    type: list
+    elements: dict
   state:
     description:
-      - VM Operation to be perfomed
+      - VM Operation to be performed
     choices: [absent, present]
     required: yes
     type: str
@@ -117,7 +127,7 @@ EXAMPLES = '''
           state: present
           validate_certs: no
         register: result
-      - name: Disply server info
+      - name: Display server info
         debug: var=result
 
   - name: PowerVC Create VM Playbook
@@ -132,7 +142,7 @@ EXAMPLES = '''
           timeout: 200
           max_count: "COUNT"
           collocation_rule_name: "COLLOCATION_RULE_NAME"
-          userdata: |
+          user_data: |
             #!/bin/sh
             apt update
             apt -y full-upgrade
@@ -174,7 +184,7 @@ EXAMPLES = '''
           state: present
           validate_certs: false
         register: result
-      - name: Disply server info
+      - name: Display server info
         debug: var=result
 
   - name: PowerVC Create VM Playbook with Storage Connectivity Group
@@ -201,8 +211,79 @@ EXAMPLES = '''
           state: present
           validate_certs: false
         register: result
-      - name: Disply server info
+      - name: Display server info
         debug: var=result
+
+  - name: PowerVC Create VM Playbook with custom VSN
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with custom VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          virtual_serial_number: "ABCD001"
+          nics:
+            - network_name: "NETWORK_NAME"
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
+
+  - name: PowerVC Create VM Playbook with auto VSN
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with auto VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          virtual_serial_number: "auto"
+          nics:
+            - network_name: "NETWORK_NAME"
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
+
+  - name: PowerVC Create VM Playbook with Persistent memory
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Create VM with auto VSN
+        ibm.powervc.server:
+          cloud: "CLOUD_NAME"
+          name: "VM_NAME"
+          image: "VM_IMAGE"
+          flavor: "FLAVOR_NAME"
+          host: "HOST_ID"
+          nics:
+            - network_name: "NETWORK_NAME"
+          pmem_volume:
+           - name: pmem1
+             size: 256
+             affinity: true
+             device: DRAM
+           - name: pmem2
+             size: 256
+             affinity: false
+             device: DRAM
+          state: present
+          validate_certs: false
+        register: result
+      - name: Display server info
+        debug:
+          var: result
 
   - name: PowerVC Delete VM Playbook
     hosts: localhost
@@ -221,7 +302,7 @@ EXAMPLES = '''
           name: "VM_NAME"
           state: absent
         register: result
-      - name: Disply server info
+      - name: Display server info
         debug: var=result
 
 '''
@@ -230,14 +311,13 @@ EXAMPLES = '''
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
 from ansible_collections.ibm.powervc.plugins.module_utils.crud_server import server_ops, server_flavor, get_collocation_rules_id
 import copy
-# import json
 import base64
 
 
 class ServerOpsModule(OpenStackModule):
     argument_spec = dict(
-        name=dict(required=False),
-        id=dict(required=False),
+        name=dict(),
+        id=dict(),
         volume_id=dict(default=[], type='list', elements='str'),
         volume_name=dict(default=[], type='list', elements='str'),
         flavor=dict(),
@@ -252,11 +332,16 @@ class ServerOpsModule(OpenStackModule):
         max_count=dict(type='int'),
         collocation_rule_name=dict(),
         scg_id=dict(),
+        virtual_serial_number=dict(required=False),
+        pmem_volume=dict(default=[], type='list', elements='dict'),
         security_groups=dict(default=[], type='list', elements='str'),
-        state=dict(choices=['absent', 'present']),
+        state=dict(default='present', choices=['absent', 'present']),
     )
     module_kwargs = dict(
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ['name', 'id']
+        ]
     )
 
     def _parse_nics(self):
@@ -361,42 +446,49 @@ class ServerOpsModule(OpenStackModule):
             volume_name = self.params['volume_name']
             volume_id = self.params['volume_id']
             scg_id = self.params['scg_id']
+            virtual_serial_number = self.params['virtual_serial_number']
+            pmem_volume = self.params['pmem_volume']
             user_data = self.params['user_data']
             tenant_id = self.conn.session.get_project_id()
-            flavor_id = self.conn.compute.find_flavor(flavor, ignore_missing=False).id
-            imageRef = self.conn.compute.find_image(image, ignore_missing=False).id
-            nics = self._parse_nics()
-            if user_data:
-                base64_encoded = base64.b64encode(user_data.encode('utf-8'))
-                userdata = base64_encoded.decode('utf-8')
-            else:
-                userdata = None
-            if not volume_id:
-                vol_id = []
-                for name in volume_name:
-                    vol_id.append(self.conn.block_storage.find_volume(name, ignore_missing=False).id)
-                vol_list = []
-                index = 1
-                for uuid in vol_id:
-                    entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
-                    vol_list.append(entry)
-                    index += 1
-                # vol_dict = {"block_device_mapping_v2": vol_list}
-            elif volume_id:
-                vol_list = []
-                index = 1
-                for uuid in volume_id:
-                    entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
-                    vol_list.append(entry)
-                    index += 1
-                # vol_dict = {"block_device_mapping_v2": vol_list}
             if state == "present":
+                flavor_id = self.conn.compute.find_flavor(flavor, ignore_missing=False).id
+                imageRef = self.conn.compute.find_image(image, ignore_missing=False).id
+                nics = self._parse_nics()
+                if user_data:
+                    base64_encoded = base64.b64encode(user_data.encode('utf-8'))
+                    userdata = base64_encoded.decode('utf-8')
+                else:
+                    userdata = None
+                if not volume_id:
+                    vol_id = []
+                    for name in volume_name:
+                        vol_id.append(self.conn.block_storage.find_volume(name, ignore_missing=False).id)
+                    vol_list = []
+                    index = 1
+                    for uuid in vol_id:
+                        entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
+                        vol_list.append(entry)
+                        index += 1
+                    # vol_dict = {"block_device_mapping_v2": vol_list}
+                elif volume_id:
+                    vol_list = []
+                    index = 1
+                    for uuid in volume_id:
+                        entry = {"boot_index": index, "delete_on_termination": False, "destination_type": "volume", "source_type": "volume", "uuid": uuid}
+                        vol_list.append(entry)
+                        index += 1
+                    # vol_dict = {"block_device_mapping_v2": vol_list}
+
                 volid = None  # Initialize with None
                 template_id = None  # Initialize with None
                 if image_vol_template:
                     volid = image_vol_template[0].get('volume_id', None)
                     template_id = image_vol_template[0].get('template_id', None)
-                flavor = server_flavor(self, self.conn, authtoken, tenant_id, flavor_id, imageRef, volid, template_id, scg_id)
+                flavor = server_flavor(
+                    self, self.conn, authtoken, tenant_id, flavor_id,
+                    imageRef, volid, template_id, scg_id,
+                    virtual_serial_number, pmem_volume
+                )
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
                 if availability_zone:
                     availability_zone = ":" + availability_zone
@@ -431,7 +523,7 @@ class ServerOpsModule(OpenStackModule):
             elif state == "absent":
                 vm_data = None
                 res = server_ops(self, self.conn, authtoken, tenant_id, vm_name, state, vm_data, vm_id=vmid)
-            self.exit_json(changed=False, result=res)
+            self.exit_json(changed=True, result=res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
 
