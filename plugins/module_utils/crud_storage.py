@@ -82,7 +82,7 @@ def storage_ops(module, endpoint, authtoken, tenant_id, verify, state, storage_i
             )
         return dict(changed=False, result=response.json())
     if state == "present":
-        url = f"{endpoint}/os-hosts/detail"
+        url = f"{endpoint}/os-hosts"
         response = requests.get(url, headers=headers, verify=verify)
         if response.status_code != 200:
             module.fail_json(
