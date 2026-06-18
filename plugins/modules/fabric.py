@@ -85,6 +85,30 @@ EXAMPLES = r'''
     type: brocade
     zoning_policy: initiator
 
+# Register fabric with ssh_key
+- name: Register fabric with ssh_key
+  ibm.powervc.fabric:
+    cloud: powervc
+    state: present
+    host: 9.2.4.6
+    user: admin
+    ssh_key: |
+        -----BEGIN OPENSSH PRIVATE KEY-----
+        -----------------------------------
+        -----------------------------------
+        -----END OPENSSH PRIVATE KEY-----
+    name: Fabric1
+    type: brocade
+    zoning_policy: initiator
+
+# Update fabric
+- name: Update name for the fabric
+  ibm.powervc.fabric:
+    cloud: "powervc"
+    state: present
+    fabric_name: "fab123"
+    name: "Fabric1-Updated"
+
 # Register Cisco fabric
 - name: Register fabric
   ibm.powervc.fabric:
@@ -119,7 +143,7 @@ from ansible_collections.openstack.cloud.plugins.module_utils.openstack import (
 class FabricModule(OpenStackModule):
     argument_spec = dict(
         state=dict(type="str", choices=["present", "absent"], default="present"),
-        id=dict(type="str"),
+        fabric_name=dict(type="str"),
         host=dict(type="str"),
         user=dict(type="str"),
         password=dict(type="str", no_log=True),
@@ -143,7 +167,7 @@ class FabricModule(OpenStackModule):
             self.conn.session.verify = False
         verify = self.conn.session.verify
         state = self.params.get("state")
-        fabric_id = self.params.get("id")
+        fabric_id = self.params.get("fabric_name")
         host = self.params.get("host")
         user = self.params.get("user")
         password = self.params.get("password")

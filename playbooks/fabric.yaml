@@ -68,6 +68,27 @@
       debug:
         var: result
 
+  - name: Register fabric with ssh_key
+    hosts: localhost
+    tasks:
+       - name: Register fabric
+         ibm.powervc.fabric:
+            cloud: "powervc"
+            state: present
+            host: 9.2.4.5
+            user: admin
+            ssh_key: |
+               -----BEGIN OPENSSH PRIVATE KEY-----
+               -----------------------------------
+               -----------------------------------
+               -----END OPENSSH PRIVATE KEY-----
+            name: Bro-9.2.4.5
+            type: brocade
+            zoning_policy: initiator
+         register: output
+       - debug:
+            var: output.result
+
 
   - name: Update Fabric Playbook
     hosts: localhost
@@ -85,6 +106,40 @@
         debug:
           var: result
 
+  - name: Update Fabric Playbook
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name: Update name for the fabric
+        ibm.powervc.fabric:
+          cloud: "powervc"
+          state: present
+          id: "fab123"
+          name: "Fabric1-Updated"
+          validate_certs: no
+      register: result
+      - name: Display result
+        debug:
+          var: result
+
+  - name: Uppdate fabric with ssh_key
+    hosts: localhost
+    tasks:
+       - name: Register fabric
+         ibm.powervc.fabric:
+            cloud: "powervc"
+            state: present
+            id: "fab123"
+            host: 9.2.4.5
+            user: admin
+            ssh_key: |
+               -----BEGIN OPENSSH PRIVATE KEY-----
+               -----------------------------------
+               -----------------------------------
+               -----END OPENSSH PRIVATE KEY-----
+         register: output
+       - debug:
+            var: output.result
 
   - name: Delete Fabric Playbook
     hosts: localhost
