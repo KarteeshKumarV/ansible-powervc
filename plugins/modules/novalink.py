@@ -185,7 +185,7 @@ EXAMPLES = '''
         - name: Update ssh_key
           ibm.powervc.novalink:
             host_id: "HYPERVISOR_ID/MTMS"
-            access_ip: "9.47.69.93"
+            access_ip: "9.2.4.5"
             user: "neo"
             ssh_key: |
               -----BEGIN RSA PRIVATE KEY-----

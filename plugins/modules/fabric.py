@@ -71,7 +71,7 @@ EXAMPLES = r'''
 - name: Get fabric
   ibm.powervc.fabric:
     cloud: powervc
-    id: fab123
+    fabric_name: fab123
 
 # Register Brocade fabric
 - name: Register fabric
