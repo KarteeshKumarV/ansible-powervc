@@ -167,6 +167,27 @@
       debug:
         var: result
 
+- name: Update SVC Storage (SSH Key) Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Update SVC storage using SSH key
+      ibm.powervc.storage:
+        cloud: "powervc"
+        state: present
+        host_name: 9.5.6.7
+        host: "1.2.4.5"
+        user: "superuser"
+        name: "SVC-1.2.4.5"
+        ssh_key: |
+          -----BEGIN OPENSSH PRIVATE KEY-----
+          -----------------------------------
+          -----END OPENSSH PRIVATE KEY-----
+      register: result
+
+    - name: Display result
+      debug:
+        var: result
 
 - name: Delete Storage Playbook
   hosts: localhost
