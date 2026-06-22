@@ -175,7 +175,7 @@
       ibm.powervc.storage:
         cloud: "powervc"
         state: present
-        host_name: 9.5.6.7
+        host_name: storage123
         host: "1.2.4.5"
         user: "superuser"
         name: "SVC-1.2.4.5"

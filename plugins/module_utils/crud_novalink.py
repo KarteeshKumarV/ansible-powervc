@@ -80,15 +80,16 @@ def put_host(module, authtoken, host_url, body):
         if "private_key_data" in resp.get("registration", {}):
             resp["registration"]["private_key_data"] = "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER"
         return dict(
-           changed=True,
-           msg="Updated the Host",
-           result=resp
+            changed=True,
+            msg="Updated the Host",
+            result=resp
         )
     else:
         module.fail_json(
             msg=f"Failed in updating host: {response.json()}",
             changed=False,
         )
+
 
 def host_ops(mod, connectn, authtoken, tenant_id, state, host_id, data):
     """
