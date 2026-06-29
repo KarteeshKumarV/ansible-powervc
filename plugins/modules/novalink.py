@@ -113,7 +113,6 @@ EXAMPLES = '''
          ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            host_type: "HOST_TYPE"
             host: "IP_ADDRESS"
             user: "USER_ID"
             ssh_key: |
