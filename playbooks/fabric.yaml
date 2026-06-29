@@ -19,7 +19,7 @@
       - name: Fetch specific fabric
         ibm.powervc.fabric:
           cloud: "powervc"
-          fabric_name: "fab123"
+          id: "fab123"
         register: result
       - name: Display result
         debug:
@@ -98,7 +98,7 @@
         ibm.powervc.fabric:
           cloud: "powervc"
           state: present
-          fabric_name: "fab123"
+          id: "fab123"
           name: "Fabric1-Updated"
           validate_certs: no
       register: result
@@ -114,7 +114,7 @@
         ibm.powervc.fabric:
           cloud: "powervc"
           state: present
-          fabric_name: "fab123"
+          id: "fab123"
           name: "Fabric1-Updated"
           validate_certs: no
       register: result
@@ -129,7 +129,7 @@
          ibm.powervc.fabric:
             cloud: "powervc"
             state: present
-            fabric_name: "fab123"
+            id: "fab123"
             host: 9.2.4.5
             user: admin
             ssh_key: |

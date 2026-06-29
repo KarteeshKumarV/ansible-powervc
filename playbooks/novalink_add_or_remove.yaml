@@ -6,7 +6,7 @@
          ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             password: "PASSWORD"
             force: True
@@ -23,7 +23,7 @@
          ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             password: "PASSWORD"
             stand_by: True
@@ -42,9 +42,9 @@
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
             host_type: "HOST_TYPE"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
-            private_key: |
+            ssh_key: |
               -----BEGIN RSA PRIVATE KEY-----
               -------------------------------
               -----END RSA PRIVATE KEY-----
@@ -60,7 +60,7 @@
        - name: Update the host name
          ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             name: "HOST_DISPLAY_NAME"
             state: present
          register: output
@@ -74,7 +74,7 @@
        - name: Update the host name
          ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             user: "USER_ID"
             password: "PASSWORD"
             state: present
@@ -89,9 +89,9 @@
        - name: Update the private key
          ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             user: "USER_ID"
-            private_key: |
+            ssh_key: |
               -----BEGIN RSA PRIVATE KEY-----
               -------------------------------
               -----END RSA PRIVATE KEY-----
@@ -107,7 +107,7 @@
        - name: Unregister the NovaLink host
          ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             state: absent
          register: output
        - debug:
@@ -120,7 +120,7 @@
        - name: Removes the PowerVC software from host
          ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             uninstall: True
             state: absent
          register: output

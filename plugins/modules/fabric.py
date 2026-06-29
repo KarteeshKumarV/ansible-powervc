@@ -71,7 +71,7 @@ EXAMPLES = r'''
 - name: Get fabric
   ibm.powervc.fabric:
     cloud: powervc
-    fabric_name: fab123
+    id: fab123
 
 # Register Brocade fabric
 - name: Register fabric
@@ -106,7 +106,7 @@ EXAMPLES = r'''
   ibm.powervc.fabric:
     cloud: "powervc"
     state: present
-    fabric_name: "fab123"
+    id: "fab123"
     name: "Fabric1-Updated"
 
 # Register Cisco fabric
@@ -143,7 +143,7 @@ from ansible_collections.openstack.cloud.plugins.module_utils.openstack import (
 class FabricModule(OpenStackModule):
     argument_spec = dict(
         state=dict(type="str", choices=["present", "absent"], default="present"),
-        fabric_name=dict(type="str"),
+        id=dict(type="str"),
         host=dict(type="str"),
         user=dict(type="str"),
         password=dict(type="str", no_log=True),
@@ -167,7 +167,7 @@ class FabricModule(OpenStackModule):
             self.conn.session.verify = False
         verify = self.conn.session.verify
         state = self.params.get("state")
-        fabric_id = self.params.get("fabric_name")
+        fabric_id = self.params.get("id")
         host = self.params.get("host")
         user = self.params.get("user")
         password = self.params.get("password")
