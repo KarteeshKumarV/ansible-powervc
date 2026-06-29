@@ -38,14 +38,10 @@ options:
     no_log: true
   force:
     description:
-      - Forcefully adds the NovaLink.
+      - Forcefully adds the NovaLink if state is present
+      - Uninstalls the Novalink if state is absent
     type: bool
     default: False
-  uninstall:
-    description:
-      - Removes the PowerVC software from the host.
-    type: bool
-    default: no
   stand_by:
     description:
       - Enables standby mode.
@@ -145,7 +141,7 @@ EXAMPLES = '''
          ibm.powervc.novalink:
             cloud: "CLOUD"
             id: "HYPERVISOR_ID/MTMS"
-            uninstall: yes
+            force: yes
             state: absent
          register: output
        - debug:
@@ -211,7 +207,6 @@ class HostAddModule(OpenStackModule):
         host_group=dict(default="Default Group", choices=["Default Group", "Default Reservation Group"], required=False),
         password=dict(type='str', no_log=True),
         stand_by=dict(type='bool', default=False),
-        uninstall=dict(type='bool', default=False),
         ssh_key=dict(type="str", no_log=True),
         standby_tag=dict(default="unplanned_maintenance", choices=["unplanned_maintenance", "planned_maintenance", "provisioning"], required=False),
         state=dict(choices=['absent', 'present'], default='present'),
@@ -234,7 +229,6 @@ class HostAddModule(OpenStackModule):
             stand_by = self.params['stand_by']
             standby_tag = self.params['standby_tag']
             force = self.params['force']
-            uninstall = self.params['uninstall']
             state = self.params['state']
             host_group = self.params['host_group']
             if host_group == "Default Reservation Group":
@@ -247,7 +241,7 @@ class HostAddModule(OpenStackModule):
                 )
 
             data = None
-            if state == "absent" and uninstall:
+            if state == "absent" and force:
                 data = "uninstall_novalink"
 
             if state == "present" and not host_id:
