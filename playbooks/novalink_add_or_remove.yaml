@@ -121,7 +121,7 @@
          ibm.powervc.novalink:
             cloud: "CLOUD"
             id: "HYPERVISOR_ID/MTMS"
-            uninstall: True
+            force: yes
             state: absent
          register: output
        - debug:
