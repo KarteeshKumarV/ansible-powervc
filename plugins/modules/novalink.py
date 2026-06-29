@@ -19,7 +19,7 @@ options:
     description:
       - Display name of the NovaLink host.
     type: str
-  access_ip:
+  host:
     description:
       - Management IP address of the NovaLink host.
     type: str
@@ -57,7 +57,7 @@ options:
     choices: ["unplanned_maintenance","planned_maintenance","provisioning"]
     type: str
     default: "unplanned_maintenance"
-  host_id:
+  id:
     description:
       - HYPERVISOR_ID/MTMS of the NovaLink host.
     type: str
@@ -78,7 +78,7 @@ EXAMPLES = '''
          ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             password: "PASSWORD"
             force: True
@@ -95,7 +95,7 @@ EXAMPLES = '''
          ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             password: "PASSWORD"
             stand_by: True
@@ -114,7 +114,7 @@ EXAMPLES = '''
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
             host_type: "HOST_TYPE"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             ssh_key: |
               -----BEGIN RSA PRIVATE KEY-----
@@ -132,7 +132,7 @@ EXAMPLES = '''
        - name: Unregister the NovaLink host
          ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             state: absent
          register: output
        - debug:
@@ -145,7 +145,7 @@ EXAMPLES = '''
        - name: Removes the PowerVC software from host
          ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             uninstall: True
             state: absent
          register: output
@@ -158,7 +158,7 @@ EXAMPLES = '''
     tasks:
         - name: Update NovaLink display name
           ibm.powervc.novalink:
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             name: "UpdatedHost"
             state: present
          register: output
@@ -171,7 +171,7 @@ EXAMPLES = '''
     tasks:
         - name: Update NovaLink password
           ibm.powervc.novalink:
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             password: "newpassword"
             state: present
          register: output
@@ -184,8 +184,8 @@ EXAMPLES = '''
     tasks:
         - name: Update ssh_key
           ibm.powervc.novalink:
-            host_id: "HYPERVISOR_ID/MTMS"
-            access_ip: "9.2.4.5"
+            id: "HYPERVISOR_ID/MTMS"
+            host: "9.2.4.5"
             user: "neo"
             ssh_key: |
               -----BEGIN RSA PRIVATE KEY-----
@@ -205,9 +205,9 @@ from ansible_collections.ibm.powervc.plugins.module_utils.crud_novalink import h
 
 class HostAddModule(OpenStackModule):
     argument_spec = dict(
-        host_id=dict(type='str', required=False),
+        id=dict(type='str', required=False),
         user=dict(type='str', required=False),
-        access_ip=dict(type='str', required=False),
+        host=dict(type='str', required=False),
         name=dict(type='str'),
         host_group=dict(default="Default Group", choices=["Default Group", "Default Reservation Group"], required=False),
         password=dict(type='str', no_log=True),
@@ -226,10 +226,10 @@ class HostAddModule(OpenStackModule):
         try:
             authtoken = self.conn.auth_token
             tenant_id = self.conn.session.get_project_id()
-            host_id = self.params['host_id']
+            host_id = self.params['id']
             user = self.params['user']
             name = self.params['name']
-            access_ip = self.params['access_ip']
+            access_ip = self.params['host']
             password = self.params['password']
             private_key_data = self.params['ssh_key']
             stand_by = self.params['stand_by']
