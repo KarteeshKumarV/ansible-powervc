@@ -45,7 +45,7 @@ options:
     description:
       - Removes the PowerVC software from the host.
     type: bool
-    default: False
+    default: no
   stand_by:
     description:
       - Enables standby mode.
@@ -145,7 +145,7 @@ EXAMPLES = '''
          ibm.powervc.novalink:
             cloud: "CLOUD"
             id: "HYPERVISOR_ID/MTMS"
-            uninstall: True
+            uninstall: yes
             state: absent
          register: output
        - debug:
