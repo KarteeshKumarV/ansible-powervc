@@ -98,6 +98,6 @@ unit-test: prep-collection
 	python -m pytest
 
 .PHONY: ansible-lint
-ansible-lint: 
-	cd playbooks && ansible-lint --exclude=*.yaml
-    python -m ansiblelint --profile production --exclude tests/integration/ --exclude tests/unit/
+ansible-lint:
+	cd playbooks && ansible-lint --exclude=users_input.yaml,powervc.yml,source.powervc.yml .
+	python -m ansiblelint --profile production --exclude tests/integration/ --exclude tests/unit/
