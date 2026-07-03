@@ -100,3 +100,4 @@ unit-test: prep-collection
 .PHONY: ansible-lint
 ansible-lint: 
 	cd playbooks && ansible-lint --exclude=*.yaml
+    python -m ansiblelint --profile production --exclude tests/integration/ --exclude tests/unit/
