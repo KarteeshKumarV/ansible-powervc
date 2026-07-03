@@ -129,10 +129,6 @@
           hitachi_ldev_start: 2000
           hitachi_ldev_end: 3000
           auto_add_certificate: true
-          rest_api_ip: 1.2.3.4
-          port: 23451
-          hitachi_ldev_start: 2000
-          hitachi_ldev_end: 3000
           default_fc_ports:
             - CL1-A
           target_fc_ports:
