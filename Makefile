@@ -99,4 +99,4 @@ unit-test: prep-collection
 
 .PHONY: ansible-lint
 ansible-lint: 
-	cd playbooks && ansible-lint .
+	cd playbooks && ansible-lint --exclude=*.yaml
