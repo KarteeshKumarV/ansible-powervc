@@ -197,3 +197,88 @@ Auth information is driven by openstacksdk, which means that values can come fro
 2. Directly passing the credentials in the playbook.
 
 Please refer the examples related to the aboves in each module playbook examples section.
+
+
+CLI Module Setup
+================
+
+Requirements (Ansible Server)
+------------------------------
+
+The following requirements must be met on the Ansible server before using CLI modules:
+
+* Ansible version 2.14.0 or later
+* Python version 3 or later
+* ``pexpect`` Python package — install if not already available:
+
+  .. code-block:: sh
+
+     $ pip install pexpect
+
+
+Setup
+-----
+
+Install the collection from Ansible Galaxy onto the Ansible controller:
+
+.. code-block:: sh
+
+   $ ansible-galaxy collection install ibm.powervc
+
+The collection will be installed to ``~/.ansible/collections/ansible_collections/ibm/powervc/`` by default.
+To install to a specific path:
+
+.. code-block:: sh
+
+   $ ansible-galaxy collection install ibm.powervc -p /root/.ansible/collections
+
+For more information, see `Ansible Galaxy <https://galaxy.ansible.com/ibm/powervc>`_.
+
+
+Pre-tasks on the Ansible Controller
+------------------------------------
+
+Perform the following steps from the collection directory:
+
+.. code-block:: sh
+
+   /root/.ansible/collections/ansible_collections/ibm/powervc/
+
+1. **Update the PowerVC Controller IP address** — edit ``vars/powervc.yml`` and set the ``ipaddress`` field to the primary IP of the PowerVC Controller.
+
+2. **Update other parameters** in ``vars/powervc.yml`` as required depending on the operation being performed.
+
+3. **Set up Ansible Vault** to securely store the PowerVC Controller credentials:
+
+   a. Create the vault file:
+
+      .. code-block:: sh
+
+         $ ansible-vault create vars/secret.yml
+
+   b. Enter a vault password when prompted and save it securely.
+
+   c. Add the following entry inside the vault file:
+
+      .. code-block:: yaml
+
+         pvcroot_password: <password>
+
+   d. If the file is not yet encrypted, encrypt it:
+
+      .. code-block:: sh
+
+         $ ansible-vault encrypt vars/secret.yml
+
+4. **Disable SSH host key checking** — the CLI modules connect over SSH and require this environment variable to be set to ``False``:
+
+   .. code-block:: sh
+
+      $ export ANSIBLE_HOST_KEY_CHECKING=False
+
+   For persistence across reboots, add the line to ``~/.bashrc`` and source it:
+
+   .. code-block:: sh
+
+      $ echo "export ANSIBLE_HOST_KEY_CHECKING=False" >> ~/.bashrc
+      $ source ~/.bashrc

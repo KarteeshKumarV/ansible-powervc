@@ -20,6 +20,12 @@ Orchestration to integrate with latest versions of PowerVC quicker.
 The **IBM PowerVC collection** is included as an upstream collection under the
 **Ansible Content for IBM PowerVC** umbrella of community content.
 
+### CLI Modules
+
+In addition to the OpenStack-based modules, the collection includes a set of **CLI modules** located in the repository under `ansible/plugins/modules/cli/`. These modules connect to the PowerVC Controller over SSH (using the `pvcroot` user) and drive PowerVC's command-line tools to perform operations such as backup, restore, configuration, service management, and more.
+
+All CLI modules authenticate via SSH using `login_host`, `login_user`, and `login_password` parameters.
+
 <!-- A more detailed Usage or detailed explanation of the repository here -->
 ## Usage
 
@@ -51,8 +57,11 @@ This repository contains some example best practices for open source repositorie
 
 ### Python
 
+The following packages are required on the **Ansible server**:
+
 - Requires Python 3.8 or higher
 - openstacksdk
+- pexpect (required for CLI modules — install manually if not bundled with your Python version: `pip install pexpect`)
 ## Resources
 
 Documentation of modules is generated on [GitHub Pages][pages].

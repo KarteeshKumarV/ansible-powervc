@@ -49,6 +49,43 @@ to refer to the collection repeatedly. For example, you can use the
 
 .. code-block:: yaml
 
+
+ibm.powervc.cli
+---------------
+
+CLI modules connect to the PowerVC Controller over SSH and are referenced
+using the ``ibm.powervc.cli`` namespace. For example, to monitor PowerVC
+node resources using the ``pvcmon`` CLI module:
+
+.. code-block:: yaml
+
+   ---
+   - name: "Monitor PowerVC Node Resources (with interval)"
+     hosts: localhost
+     vars_files:
+       - vars/powervc.yml
+       - vars/secret.yml
+
+     tasks:
+       - name: "Monitor resource usage with specified interval"
+         ibm.powervc.cli.pvcmon:
+           login_host: "{{ ipaddress }}"
+           login_user: "{{ pvc_user }}"
+           login_password: "{{ pvcroot_password }}"
+           resource: "{{ resource }}"
+           interval: "{{ interval }}"
+         register: result
+
+       - name: "Display monitoring output"
+         debug:
+           var: result.stdout_lines
+
+The variables ``ipaddress``, ``pvc_user``, ``resource``, ``interval`` 
+are defined in ``vars/powervc.yml``.
+The variable ``pvcroot_password`` is stored securely in the Ansible Vault file
+``vars/secret.yml``. See the `installation`_ guide for vault setup details.
+
+
 ansible-doc
 -----------
 
@@ -59,6 +96,9 @@ documentation can be accessed from the command line by using the
 
 Here's how to use the ``ansible-doc`` command after you install the
 **IBM PowerVC collection**: ``ansible-doc ibm.powervc.capture_vm``
+
+For CLI modules, use the fully qualified module name including the ``cli``
+sub-namespace. For example: ``ansible-doc ibm.powervc.cli.pvcmon``
 
 For more information on using the ``ansible-doc`` command, refer
 to the `Ansible guide`_.
@@ -72,3 +112,9 @@ Connection Method
 Ansible communicates with remote machines over the SSH protocol. By default, Ansible uses native OpenSSH and connects to remote machines and communicates from the control node via SSH tunnel.
 
 In case of PowerVC collection, it uses an API-based execution model in this case, the Ansible collection should use the local connection type, meaning all API calls are made from the control node rather than running code on the PowerVC host.
+
+CLI modules use a direct SSH connection to the PowerVC Controller (as the
+``pvcroot`` user) to execute native PowerVC CLI commands. The ``hosts`` value
+in CLI playbooks should be set to ``localhost`` so that all SSH connections
+are initiated from the Ansible controller. The environment variable
+``ANSIBLE_HOST_KEY_CHECKING`` must be set to ``False`` on the Ansible controller.
