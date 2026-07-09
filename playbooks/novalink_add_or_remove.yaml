@@ -3,10 +3,10 @@
     gather_facts: no
     tasks:
        - name: Register the NovaLink host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             password: "PASSWORD"
             force: True
@@ -20,10 +20,10 @@
     gather_facts: no
     tasks:
        - name: Register the NovaLink host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             password: "PASSWORD"
             stand_by: True
@@ -38,13 +38,60 @@
     gather_facts: no
     tasks:
        - name: Register the NovaLink host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
             host_type: "HOST_TYPE"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
-            private_key: |
+            ssh_key: |
+              -----BEGIN RSA PRIVATE KEY-----
+              -------------------------------
+              -----END RSA PRIVATE KEY-----
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Update the host name of the NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Update the host name
+         ibm.powervc.novalink:
+            cloud: "CLOUD"
+            id: "HYPERVISOR_ID/MTMS"
+            name: "HOST_DISPLAY_NAME"
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Update the password of the NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Update the host name
+         ibm.powervc.novalink:
+            cloud: "CLOUD"
+            id: "HYPERVISOR_ID/MTMS"
+            user: "USER_ID"
+            password: "PASSWORD"
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Update the private key of the NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+       - name: Update the private key
+         ibm.powervc.novalink:
+            cloud: "CLOUD"
+            id: "HYPERVISOR_ID/MTMS"
+            user: "USER_ID"
+            ssh_key: |
               -----BEGIN RSA PRIVATE KEY-----
               -------------------------------
               -----END RSA PRIVATE KEY-----
@@ -58,9 +105,9 @@
     gather_facts: no
     tasks:
        - name: Unregister the NovaLink host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             state: absent
          register: output
        - debug:
@@ -71,10 +118,10 @@
     gather_facts: no
     tasks:
        - name: Removes the PowerVC software from host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
-            uninstall: True
+            id: "HYPERVISOR_ID/MTMS"
+            force: yes
             state: absent
          register: output
        - debug:

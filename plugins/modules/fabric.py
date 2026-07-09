@@ -85,6 +85,30 @@ EXAMPLES = r'''
     type: brocade
     zoning_policy: initiator
 
+# Register fabric with ssh_key
+- name: Register fabric with ssh_key
+  ibm.powervc.fabric:
+    cloud: powervc
+    state: present
+    host: 9.2.4.6
+    user: admin
+    ssh_key: |
+        -----BEGIN OPENSSH PRIVATE KEY-----
+        -----------------------------------
+        -----------------------------------
+        -----END OPENSSH PRIVATE KEY-----
+    name: Fabric1
+    type: brocade
+    zoning_policy: initiator
+
+# Update fabric
+- name: Update name for the fabric
+  ibm.powervc.fabric:
+    cloud: "powervc"
+    state: present
+    id: "fab123"
+    name: "Fabric1-Updated"
+
 # Register Cisco fabric
 - name: Register fabric
   ibm.powervc.fabric:

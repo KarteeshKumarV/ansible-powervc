@@ -7,18 +7,19 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: novalink_registration
+module: novalink
 author:
     - Karteesh Kumar Vipparapelli (@vkarteesh)
 short_description: Register or unregister a NovaLink host in IBM PowerVC.
 description:
   - Register or unregister a NovaLink managed host in IBM PowerVC.
+  - Update the Username password/ssh_key of the NovaLink Host
 options:
   name:
     description:
       - Display name of the NovaLink host.
     type: str
-  access_ip:
+  host:
     description:
       - Management IP address of the NovaLink host.
     type: str
@@ -30,14 +31,15 @@ options:
     description:
       - Password for the NovaLink host user.
     type: str
+  ssh_key:
+    description:
+      - Private key for authentication.
+    type: str
+    no_log: true
   force:
     description:
-      - Forcefully adds the NovaLink.
-    type: bool
-    default: False
-  uninstall:
-    description:
-      - Removes the PowerVC software from the host.
+      - Forcefully adds the NovaLink if state is present
+      - Uninstalls the Novalink if state is absent
     type: bool
     default: False
   stand_by:
@@ -51,7 +53,7 @@ options:
     choices: ["unplanned_maintenance","planned_maintenance","provisioning"]
     type: str
     default: "unplanned_maintenance"
-  host_id:
+  id:
     description:
       - HYPERVISOR_ID/MTMS of the NovaLink host.
     type: str
@@ -69,10 +71,10 @@ EXAMPLES = '''
     gather_facts: no
     tasks:
        - name: Register the NovaLink host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             password: "PASSWORD"
             force: True
@@ -86,10 +88,10 @@ EXAMPLES = '''
     gather_facts: no
     tasks:
        - name: Register the NovaLink host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
             password: "PASSWORD"
             stand_by: True
@@ -104,13 +106,12 @@ EXAMPLES = '''
     gather_facts: no
     tasks:
        - name: Register the NovaLink host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
             name: "HOST_DISPLAY_NAME"
-            host_type: "HOST_TYPE"
-            access_ip: "IP_ADDRESS"
+            host: "IP_ADDRESS"
             user: "USER_ID"
-            private_key: |
+            ssh_key: |
               -----BEGIN RSA PRIVATE KEY-----
               -------------------------------
               -----END RSA PRIVATE KEY-----
@@ -124,9 +125,9 @@ EXAMPLES = '''
     gather_facts: no
     tasks:
        - name: Unregister the NovaLink host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
+            id: "HYPERVISOR_ID/MTMS"
             state: absent
          register: output
        - debug:
@@ -137,11 +138,55 @@ EXAMPLES = '''
     gather_facts: no
     tasks:
        - name: Removes the PowerVC software from host
-         ibm.powervc.novalink_registration:
+         ibm.powervc.novalink:
             cloud: "CLOUD"
-            host_id: "HYPERVISOR_ID/MTMS"
-            uninstall: True
+            id: "HYPERVISOR_ID/MTMS"
+            force: yes
             state: absent
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Update the display name of the NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+        - name: Update NovaLink display name
+          ibm.powervc.novalink:
+            id: "HYPERVISOR_ID/MTMS"
+            name: "UpdatedHost"
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Update the password of the NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+        - name: Update NovaLink password
+          ibm.powervc.novalink:
+            id: "HYPERVISOR_ID/MTMS"
+            password: "newpassword"
+            state: present
+         register: output
+       - debug:
+            var: output.result
+
+  - name: Update the sshkey of the NovaLink host
+    hosts: localhost
+    gather_facts: no
+    tasks:
+        - name: Update ssh_key
+          ibm.powervc.novalink:
+            id: "HYPERVISOR_ID/MTMS"
+            host: "9.2.4.5"
+            user: "neo"
+            ssh_key: |
+              -----BEGIN RSA PRIVATE KEY-----
+              -------------------------------
+              -----END RSA PRIVATE KEY-----
+            state: present
          register: output
        - debug:
             var: output.result
@@ -150,22 +195,21 @@ EXAMPLES = '''
 
 
 from ansible_collections.openstack.cloud.plugins.module_utils.openstack import OpenStackModule
-from ansible_collections.ibm.powervc.plugins.module_utils.crud_novalink_registration import host_ops
+from ansible_collections.ibm.powervc.plugins.module_utils.crud_novalink import host_ops
 
 
 class HostAddModule(OpenStackModule):
     argument_spec = dict(
-        host_id=dict(type='str', required=False),
+        id=dict(type='str', required=False),
         user=dict(type='str', required=False),
-        access_ip=dict(type='str', required=False),
+        host=dict(type='str', required=False),
         name=dict(type='str'),
         host_group=dict(default="Default Group", choices=["Default Group", "Default Reservation Group"], required=False),
         password=dict(type='str', no_log=True),
         stand_by=dict(type='bool', default=False),
-        uninstall=dict(type='bool', default=False),
-        private_key=dict(no_log=True),
+        ssh_key=dict(type="str", no_log=True),
         standby_tag=dict(default="unplanned_maintenance", choices=["unplanned_maintenance", "planned_maintenance", "provisioning"], required=False),
-        state=dict(choices=['absent', 'present'], required=True),
+        state=dict(choices=['absent', 'present'], default='present'),
         force=dict(type='bool', default=False),
     )
     module_kwargs = dict(
@@ -176,16 +220,15 @@ class HostAddModule(OpenStackModule):
         try:
             authtoken = self.conn.auth_token
             tenant_id = self.conn.session.get_project_id()
-            host_id = self.params['host_id']
+            host_id = self.params['id']
             user = self.params['user']
             name = self.params['name']
-            access_ip = self.params['access_ip']
+            access_ip = self.params['host']
             password = self.params['password']
-            private_key_data = self.params['private_key']
+            private_key_data = self.params['ssh_key']
             stand_by = self.params['stand_by']
             standby_tag = self.params['standby_tag']
             force = self.params['force']
-            uninstall = self.params['uninstall']
             state = self.params['state']
             host_group = self.params['host_group']
             if host_group == "Default Reservation Group":
@@ -198,10 +241,10 @@ class HostAddModule(OpenStackModule):
                 )
 
             data = None
-            if state == "absent" and uninstall:
+            if state == "absent" and force:
                 data = "uninstall_novalink"
 
-            if state == "present":
+            if state == "present" and not host_id:
                 registration = {
                     "access_ip": access_ip,
                     "user_id": user,
@@ -223,8 +266,25 @@ class HostAddModule(OpenStackModule):
                         "registration": registration
                     }
                 }
+            elif state == "present" and host_id:
+                registration = {}
+                if access_ip:
+                    registration["access_ip"] = access_ip
+                if user:
+                    registration["user_id"] = user
+                if name:
+                    registration["host_display_name"] = name
+                if password:
+                    registration["password"] = password
+                if private_key_data:
+                    registration["private_key_data"] = private_key_data
+                registration["auto_add_host_key"] = True
+                registration["force_switch"] = force
+                data = {
+                    "registration": registration
+                }
             res = host_ops(self, self.conn, authtoken, tenant_id, state, host_id, data)
-            self.exit_json(changed=False, result=res)
+            self.exit_json(**res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
 

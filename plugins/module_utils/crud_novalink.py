@@ -40,7 +40,10 @@ def delete_host(mod, authtoken, host_url, host_id):
     headers_scg = get_headers(authtoken)
     responce = requests.delete(host_url, headers=headers_scg, verify=False)
     if responce.ok:
-        return f"Removed the Novalink Host: {host_id}"
+        return dict(
+            changed=True,
+            msg=f"Removed the Novalink Host: {host_id}"
+        )
     else:
         mod.fail_json(
             msg=f"An unexpected error occurred: {responce.json()}", changed=False
@@ -49,15 +52,41 @@ def delete_host(mod, authtoken, host_url, host_id):
 
 def post_host(module, authtoken, host_url, post_data):
     headers_scg = get_headers(authtoken)
-    responce = requests.post(host_url, headers=headers_scg, json=post_data, verify=False)
-    if responce.ok:
-        return (
-            "Added the Host",
-            responce.json(),
+    response = requests.post(host_url, headers=headers_scg, json=post_data, verify=False)
+    if response.ok:
+        return dict(
+            changed=True,
+            msg="Added the Host",
+            result=response.json()
         )
     else:
         module.fail_json(
-            msg=f"Failed in Adding the host: {responce.json()}",
+            msg=f"Failed in Adding the host: {response.json()}",
+            changed=False,
+        )
+
+
+def put_host(module, authtoken, host_url, body):
+    headers_scg = get_headers(authtoken)
+    response = requests.put(
+        host_url,
+        headers=headers_scg,
+        json=body,
+        verify=False
+    )
+
+    if response.ok:
+        resp = response.json()
+        if "private_key_data" in resp.get("registration", {}):
+            resp["registration"]["private_key_data"] = "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER"
+        return dict(
+            changed=True,
+            msg="Updated the Host",
+            result=resp
+        )
+    else:
+        module.fail_json(
+            msg=f"Failed in updating host: {response.json()}",
             changed=False,
         )
 
@@ -74,6 +103,17 @@ def host_ops(mod, connectn, authtoken, tenant_id, state, host_id, data):
         else:
             host_url = f"{endpoint}/os-hosts/{host_id}"
         result = delete_host(mod, authtoken, host_url, host_id)
+    elif state == 'present' and host_id:
+        host_url = (
+            f"{endpoint}/os-hosts/"
+            f"{host_id}/update-registration"
+        )
+        result = put_host(
+            mod,
+            authtoken,
+            host_url,
+            data
+        )
     elif state == 'present':
         host_url = endpoint + "/os-hosts"
         result = post_host(mod, authtoken, host_url, data)
