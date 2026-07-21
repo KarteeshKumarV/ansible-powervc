@@ -179,3 +179,16 @@
       - name: Display server info
         debug:
           var: result
+
+  - name: Create VM with affinity score
+    ibm.powervc.server:
+      cloud: CLOUD_NAME
+      name: VM_NAME
+      image: IMAGE_NAME
+      flavor: FLAVOR_NAME
+      host: HOST_ID
+      affinity_score: 80
+      affinity_score_action: fail
+      nics:
+        - network_name: NETWORK_NAME
+      state: present
