@@ -87,20 +87,24 @@ options:
       - List of Persistent Memory (PMEM) volumes to attach to the VM.
     type: list
     elements: dict
-  affinity_score:
+  affinity:
     description:
-      - Minimum affinity score required for VM placement.
-      - Valid values are integers from 0 to 100.
-    type: int
-  affinity_score_action:
-    description:
-      - Action to take when the minimum affinity score cannot be satisfied.
-      - Valid values are C(warn), C(fail), and C(none).
-    type: str
-    choices:
-      - warn
-      - fail
-      - none
+      - Affinity settings for VM placement.
+    type: dict
+    suboptions:
+      score:
+        description:
+          - Minimum affinity score required for VM placement.
+          - Valid values are integers from 0 to 100.
+        type: int
+      action:
+        description:
+          - Action to take when the minimum affinity score cannot be satisfied.
+        type: str
+        choices:
+          - warn
+          - fail
+          - none
   state:
     description:
       - VM Operation to be performed
@@ -306,8 +310,9 @@ EXAMPLES = '''
       image: IMAGE_NAME
       flavor: FLAVOR_NAME
       host: HOST_ID
-      affinity_score: 80
-      affinity_score_action: fail
+      affinity:
+        score: 80
+        action: fail
       nics:
         - network_name: NETWORK_NAME
       state: present
@@ -361,8 +366,17 @@ class ServerOpsModule(OpenStackModule):
         scg_id=dict(),
         virtual_serial_number=dict(required=False),
         pmem_volume=dict(default=[], type='list', elements='dict'),
-        affinity_score=dict(type='int'),
-        affinity_score_action=dict(choices=['warn', 'fail', 'none']),
+        affinity=dict(
+            type='dict',
+            default={},
+            options=dict(
+                score=dict(type='int'),
+                action=dict(
+                    type='str',
+                    choices=['warn', 'fail', 'none']
+                )
+            )
+        ),
         security_groups=dict(default=[], type='list', elements='str'),
         state=dict(default='present', choices=['absent', 'present']),
     )
@@ -477,8 +491,9 @@ class ServerOpsModule(OpenStackModule):
             scg_id = self.params['scg_id']
             virtual_serial_number = self.params['virtual_serial_number']
             pmem_volume = self.params['pmem_volume']
-            affinity_score = self.params['affinity_score']
-            affinity_score_action = self.params['affinity_score_action']
+            affinity = self.params.get('affinity')
+            affinity_score = affinity.get('score')
+            affinity_score_action = affinity.get('action')
             user_data = self.params['user_data']
             tenant_id = self.conn.session.get_project_id()
             if state == "present":
@@ -544,8 +559,6 @@ class ServerOpsModule(OpenStackModule):
                         msg="Unable to determine primary network from the provided NICs.",
                         changed=False
                     )
-
-
                 vm_data = {"server": {
                            "name": vm_name,
                            "imageRef": imageRef,
