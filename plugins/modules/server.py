@@ -87,6 +87,20 @@ options:
       - List of Persistent Memory (PMEM) volumes to attach to the VM.
     type: list
     elements: dict
+  affinity_score:
+    description:
+      - Minimum affinity score required for VM placement.
+      - Valid values are integers from 0 to 100.
+    type: int
+  affinity_score_action:
+    description:
+      - Action to take when the minimum affinity score cannot be satisfied.
+      - Valid values are C(warn), C(fail), and C(none).
+    type: str
+    choices:
+      - warn
+      - fail
+      - none
   state:
     description:
       - VM Operation to be performed
@@ -285,6 +299,19 @@ EXAMPLES = '''
         debug:
           var: result
 
+  - name: Create VM with affinity score
+    ibm.powervc.server:
+      cloud: CLOUD_NAME
+      name: VM_NAME
+      image: IMAGE_NAME
+      flavor: FLAVOR_NAME
+      host: HOST_ID
+      affinity_score: 80
+      affinity_score_action: fail
+      nics:
+        - network_name: NETWORK_NAME
+      state: present
+
   - name: PowerVC Delete VM Playbook
     hosts: localhost
     gather_facts: no
@@ -334,6 +361,8 @@ class ServerOpsModule(OpenStackModule):
         scg_id=dict(),
         virtual_serial_number=dict(required=False),
         pmem_volume=dict(default=[], type='list', elements='dict'),
+        affinity_score=dict(type='int'),
+        affinity_score_action=dict(choices=['warn', 'fail', 'none']),
         security_groups=dict(default=[], type='list', elements='str'),
         state=dict(default='present', choices=['absent', 'present']),
     )
@@ -448,6 +477,8 @@ class ServerOpsModule(OpenStackModule):
             scg_id = self.params['scg_id']
             virtual_serial_number = self.params['virtual_serial_number']
             pmem_volume = self.params['pmem_volume']
+            affinity_score = self.params['affinity_score']
+            affinity_score_action = self.params['affinity_score_action']
             user_data = self.params['user_data']
             tenant_id = self.conn.session.get_project_id()
             if state == "present":
@@ -487,24 +518,33 @@ class ServerOpsModule(OpenStackModule):
                 flavor = server_flavor(
                     self, self.conn, authtoken, tenant_id, flavor_id,
                     imageRef, volid, template_id, scg_id,
-                    virtual_serial_number, pmem_volume
+                    virtual_serial_number, pmem_volume,
+                    affinity_score, affinity_score_action
                 )
                 collocation_rule_id = get_collocation_rules_id(self, self.conn, authtoken, tenant_id, collocation_rule)
                 if availability_zone:
                     availability_zone = ":" + availability_zone
 
                 uuid_value = None
-                net_port = any("port" in net for net in nics)
-                net_uuid = any("uuid" in net for net in nics)
-
-                if net_port and net_uuid:
-                    nics = [net for net in nics if not (uuid_value := net.get('uuid'))]
-
-                elif net_uuid and not net_port:
-                    for net in nics:
-                        if "uuid" in net:
-                            uuid_value = net["uuid"]
+                for nic in nics:
+                    # If network_id/network_name was provided,
+                    # _parse_nics() converts it to "uuid"
+                    if nic.get("uuid"):
+                        uuid_value = nic["uuid"]
+                        break
+                    # If port_id/port_name was provided,
+                    # _parse_nics() converts it to "port"
+                    if nic.get("port"):
+                        port = self.conn.network.get_port(nic["port"])
+                        if port:
+                            uuid_value = port.network_id
                             break
+                if not uuid_value:
+                    self.fail_json(
+                        msg="Unable to determine primary network from the provided NICs.",
+                        changed=False
+                    )
+
 
                 vm_data = {"server": {
                            "name": vm_name,
