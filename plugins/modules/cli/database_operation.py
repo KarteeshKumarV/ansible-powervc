@@ -33,7 +33,7 @@ options:
       - Type of database to execut the query (mongodb, mariadb)
     required: true
     type: str
-  db:
+  database:
     description:
       - Database to query
     required: true
@@ -42,9 +42,9 @@ options:
     description:
       - Name of the mongodb collection
     type: str
-  mode:
+  query:
     description:
-      - ';' separated queries
+      - semicolon separated queries
     type: str
 """
 
