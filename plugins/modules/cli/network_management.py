@@ -671,9 +671,9 @@ def _parse_network_show(lines):
     result = {}
     field_map = {
         'ip address': 'ip',
-        'ip'        : 'ip',
-        'netmask'   : 'netmask',
-        'gateway'   : 'gateway',
+        'ip' : 'ip',
+        'netmask' : 'netmask',
+        'gateway' : 'gateway',
     }
     for line in lines:
         if ':' not in line:
