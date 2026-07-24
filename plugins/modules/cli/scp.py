@@ -138,7 +138,6 @@ bytes_transferred:
 '''
 
 import os
-import stat
 import paramiko
 from ansible.module_utils.basic import AnsibleModule
 

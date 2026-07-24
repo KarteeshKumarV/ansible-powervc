@@ -130,7 +130,7 @@ def run_pvcmon(module):
 
     if int(rc) != 0:
         stderr_msg = "\n".join(output) if isinstance(output, list) else str(output)
-        module.fail_json(msg=f"pvcmon command failed", stderr=stderr_msg)
+        module.fail_json(msg="pvcmon command failed", stderr=stderr_msg)
 
     lines = output if isinstance(output, list) else [str(output)]
 
