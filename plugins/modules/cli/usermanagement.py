@@ -118,7 +118,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Create user with group assignment
-      ibm.powervc.usermanagement:
+      ibm.powervc.cli.usermanagement:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -141,7 +141,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Create user with expiry days
-      ibm.powervc.usermanagement:
+      ibm.powervc.cli.usermanagement:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -165,7 +165,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Remove user with confirmation
-      ibm.powervc.usermanagement:
+      ibm.powervc.cli.usermanagement:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -188,7 +188,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: List all users with filter
-      ibm.powervc.usermanagement:
+      ibm.powervc.cli.usermanagement:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -210,7 +210,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Change own password
-      ibm.powervc.usermanagement:
+      ibm.powervc.cli.usermanagement:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -233,7 +233,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Change user group assignment
-      ibm.powervc.usermanagement:
+      ibm.powervc.cli.usermanagement:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

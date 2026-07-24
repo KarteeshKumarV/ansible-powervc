@@ -45,7 +45,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Display without json formatting"
-      ibm.powervc.ldap:
+      ibm.powervc.cli.ldap:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -62,7 +62,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Display in json format"
-      ibm.powervc.ldap:
+      ibm.powervc.cli.ldap:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

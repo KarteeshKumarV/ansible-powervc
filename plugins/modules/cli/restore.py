@@ -45,7 +45,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Restore the named cluster
-      ibm.powervc.restore:
+      ibm.powervc.cli.restore:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

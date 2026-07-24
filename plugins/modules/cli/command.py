@@ -76,7 +76,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Run a command on the PowerVC Controller"
-      ibm.powervc.command:
+      ibm.powervc.cli.command:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -93,7 +93,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Run a command with interactive prompt responses"
-      ibm.powervc.command:
+      ibm.powervc.cli.command:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -112,7 +112,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Run only if /powervchome/myfile does not already exist"
-      ibm.powervc.command:
+      ibm.powervc.cli.command:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -130,7 +130,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Run only while /tmp/lockfile still exists"
-      ibm.powervc.command:
+      ibm.powervc.cli.command:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

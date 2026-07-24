@@ -79,7 +79,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: List current scale settings
-      ibm.powervc.scale_config:
+      ibm.powervc.cli.scale_config:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -98,7 +98,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Apply all scale settings
-      ibm.powervc.scale_config:
+      ibm.powervc.cli.scale_config:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -117,7 +117,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Set MemoryMax for nova-compute-svc
-      ibm.powervc.scale_config:
+      ibm.powervc.cli.scale_config:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -138,7 +138,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Set MemoryMax for nova-compute-svc on a novalink host
-      ibm.powervc.scale_config:
+      ibm.powervc.cli.scale_config:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -160,7 +160,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Set MemoryMax and restart nova-compute-svc
-      ibm.powervc.scale_config:
+      ibm.powervc.cli.scale_config:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -182,7 +182,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Revert all scale configuration
-      ibm.powervc.scale_config:
+      ibm.powervc.cli.scale_config:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

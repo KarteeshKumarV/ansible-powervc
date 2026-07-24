@@ -41,7 +41,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Retrieve system boot time from PowerVC Controller
-      ibm.powervc.uptime:
+      ibm.powervc.cli.uptime:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

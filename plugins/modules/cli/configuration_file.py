@@ -89,7 +89,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Add parameter to config file
-      ibm.powervc.configuration_file:
+      ibm.powervc.cli.configuration_file:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -114,7 +114,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Modify parameter in config file
-      ibm.powervc.configuration_file:
+      ibm.powervc.cli.configuration_file:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -139,7 +139,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Remove parameter from config file
-      ibm.powervc.configuration_file:
+      ibm.powervc.cli.configuration_file:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -162,7 +162,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Modify parameter and restart affected service
-      ibm.powervc.configuration_file:
+      ibm.powervc.cli.configuration_file:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

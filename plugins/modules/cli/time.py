@@ -62,7 +62,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Show settings"
-      ibm.powervc.time:
+      ibm.powervc.cli.time:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -80,7 +80,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Show properties"
-      ibm.powervc.time:
+      ibm.powervc.cli.time:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -98,7 +98,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Set time"
-      ibm.powervc.time:
+      ibm.powervc.cli.time:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -116,7 +116,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Show current time"
-      ibm.powervc.time:
+      ibm.powervc.cli.time:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

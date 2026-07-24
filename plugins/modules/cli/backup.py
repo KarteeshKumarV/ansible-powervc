@@ -55,7 +55,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Take a backup of the cluster (silent)"
-      ibm.powervc.backup:
+      ibm.powervc.cli.backup:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -73,7 +73,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Take a backup of the cluster (verbose)"
-      ibm.powervc.backup:
+      ibm.powervc.cli.backup:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -91,7 +91,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Take a backup and keep last 3"
-      ibm.powervc.backup:
+      ibm.powervc.cli.backup:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

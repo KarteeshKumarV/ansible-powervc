@@ -69,7 +69,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Query MongoDB collection"
-      ibm.powervc.database_operation:
+      ibm.powervc.cli.database_operation:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -89,7 +89,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Query MariaDB"
-      ibm.powervc.database_operation:
+      ibm.powervc.cli.database_operation:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

@@ -49,7 +49,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Show the hostname"
-      ibm.powervc.hostname:
+      ibm.powervc.cli.hostname:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -66,7 +66,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Modify hostname"
-      ibm.powervc.hostname:
+      ibm.powervc.cli.hostname:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

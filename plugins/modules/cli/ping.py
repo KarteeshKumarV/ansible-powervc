@@ -40,7 +40,7 @@ EXAMPLES = '''
     - ../vars/powervc.yml
   tasks:
     - name: Ping PowerVC with default packet count
-      ibm.powervc.ping:
+      ibm.powervc.cli.ping:
         login_host: "{{ ipaddress }}"
       register: result
 
@@ -55,7 +55,7 @@ EXAMPLES = '''
     - ../vars/powervc.yml
   tasks:
     - name: Ping PowerVC with 10 packets
-      ibm.powervc.ping:
+      ibm.powervc.cli.ping:
         login_host: "{{ ipaddress }}"
         count: 10
       register: result
@@ -71,7 +71,7 @@ EXAMPLES = '''
     - ../vars/powervc.yml
   tasks:
     - name: Ping PowerVC with 5 packets and 2-second timeout
-      ibm.powervc.ping:
+      ibm.powervc.cli.ping:
         login_host: "{{ ipaddress }}"
         count: 5
         timeout: 2

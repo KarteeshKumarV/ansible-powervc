@@ -60,7 +60,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Run configure on the cluster
-      ibm.powervc.configure:
+      ibm.powervc.cli.configure:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -79,7 +79,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Run configure and validate
-      ibm.powervc.configure:
+      ibm.powervc.cli.configure:
         validate: true
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
@@ -99,7 +99,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Run configure with verbose logging
-      ibm.powervc.configure:
+      ibm.powervc.cli.configure:
         verbose: true
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
@@ -119,7 +119,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Run force configure
-      ibm.powervc.configure:
+      ibm.powervc.cli.configure:
         force: true
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"

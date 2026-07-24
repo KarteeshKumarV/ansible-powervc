@@ -56,7 +56,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Get disk usage snapshot
-      ibm.powervc.pvcmon:
+      ibm.powervc.cli.pvcmon:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -76,7 +76,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Monitor memory at 5-second intervals
-      ibm.powervc.pvcmon:
+      ibm.powervc.cli.pvcmon:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

@@ -47,7 +47,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Get current locale setting
-      ibm.powervc.locale:
+      ibm.powervc.cli.locale:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -65,7 +65,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Set locale to zh_SG.gbk
-      ibm.powervc.locale:
+      ibm.powervc.cli.locale:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

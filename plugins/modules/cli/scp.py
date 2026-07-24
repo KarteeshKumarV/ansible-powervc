@@ -64,7 +64,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Copy a single file to PowerVC Controller
-      ibm.powervc.scp:
+      ibm.powervc.cli.scp:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -84,7 +84,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Copy a directory recursively to PowerVC Controller
-      ibm.powervc.scp:
+      ibm.powervc.cli.scp:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -105,7 +105,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Copy backup tarball to PowerVC backups directory
-      ibm.powervc.scp:
+      ibm.powervc.cli.scp:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

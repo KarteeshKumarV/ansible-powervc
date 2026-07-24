@@ -85,7 +85,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "List all filesystems"
-      ibm.powervc.filesystem:
+      ibm.powervc.cli.filesystem:
         state: "list"
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
@@ -102,7 +102,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "List filesystem in JSON format"
-      ibm.powervc.filesystem:
+      ibm.powervc.cli.filesystem:
         state: "list"
         json_format: "yes"
         login_host: "{{ ipaddress }}"
@@ -121,7 +121,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: "Free filesystem space older than 7 days"
-      ibm.powervc.filesystem:
+      ibm.powervc.cli.filesystem:
         state: "free"
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"

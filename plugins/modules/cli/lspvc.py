@@ -46,7 +46,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: List hypervisor information
-      ibm.powervc.lspvc:
+      ibm.powervc.cli.lspvc:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -65,7 +65,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: List uvmid information
-      ibm.powervc.lspvc:
+      ibm.powervc.cli.lspvc:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -84,7 +84,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: List PowerVC version information
-      ibm.powervc.lspvc:
+      ibm.powervc.cli.lspvc:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"

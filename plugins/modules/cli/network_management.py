@@ -174,7 +174,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Add host route
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -198,7 +198,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Remove host route
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -222,7 +222,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Add network interface
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -244,7 +244,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Show interface
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -263,7 +263,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Add DNS server
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -283,7 +283,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Remove DNS server
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -301,7 +301,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Show NTP service status
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -319,7 +319,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Enable and start chronyd
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -337,7 +337,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Set NTP servers
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -358,7 +358,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Unset specific NTP servers
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -378,7 +378,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Disable and stop chronyd
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -396,7 +396,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Display current /etc/hosts entries
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -414,7 +414,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Add entry to /etc/hosts
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -433,7 +433,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Remove entry from /etc/hosts
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
@@ -452,7 +452,7 @@ EXAMPLES = '''
     - ../vars/secret.yml
   tasks:
     - name: Replace an existing /etc/hosts entry
-      ibm.powervc.network_management:
+      ibm.powervc.cli.network_management:
         login_host: "{{ ipaddress }}"
         login_user: "{{ pvc_user }}"
         login_password: "{{ pvcroot_password }}"
