@@ -8,7 +8,6 @@ Uses Paramiko so that:
   - Interactive prompts (e.g. Y/N confirmations) are handled via an SSH
     channel with a pseudo-TTY, replacing the previous pexpect-based path.
 """
-import io
 import re
 import time
 import logging
