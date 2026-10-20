@@ -63,6 +63,11 @@ options:
     required: true
     choices: [present, absent]
     type: str
+  ai_diagnostics:
+    description:
+      - Enables optional AI-assisted diagnostics when an operation fails.
+    type: bool
+    default: false    
 '''
 
 EXAMPLES = '''
@@ -211,6 +216,7 @@ class HostAddModule(OpenStackModule):
         standby_tag=dict(default="unplanned_maintenance", choices=["unplanned_maintenance", "planned_maintenance", "provisioning"], required=False),
         state=dict(choices=['absent', 'present'], default='present'),
         force=dict(type='bool', default=False),
+        ai_diagnostics=dict(type='bool', default=False)
     )
     module_kwargs = dict(
         supports_check_mode=False
@@ -229,6 +235,7 @@ class HostAddModule(OpenStackModule):
             stand_by = self.params['stand_by']
             standby_tag = self.params['standby_tag']
             force = self.params['force']
+            ai_diagnostics = self.params['ai_diagnostics']
             state = self.params['state']
             host_group = self.params['host_group']
             if host_group == "Default Reservation Group":
@@ -283,7 +290,7 @@ class HostAddModule(OpenStackModule):
                 data = {
                     "registration": registration
                 }
-            res = host_ops(self, self.conn, authtoken, tenant_id, state, host_id, data)
+            res = host_ops(self, self.conn, authtoken, tenant_id, state, host_id, data, ai_diagnostics=ai_diagnostics)
             self.exit_json(**res)
         except Exception as e:
             self.fail_json(msg=f"An unexpected error occurred: {str(e)}", changed=False)
